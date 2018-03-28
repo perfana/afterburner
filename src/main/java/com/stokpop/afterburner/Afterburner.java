@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AfterburnerApplication {
+public class Afterburner {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AfterburnerApplication.class, args);
+		SpringApplication.run(Afterburner.class, args);
 	}
 }
