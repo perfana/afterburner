@@ -1,6 +1,6 @@
-package com.stokpop.afterburner;
+package nl.stokpop.afterburner;
 
-import com.stokpop.afterburner.domain.BigFatBastard;
+import nl.stokpop.afterburner.domain.BigFatBastard;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

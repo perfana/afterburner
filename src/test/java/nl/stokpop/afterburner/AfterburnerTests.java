@@ -1,4 +1,4 @@
-package com.stokpop.afterburner;
+package nl.stokpop.afterburner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

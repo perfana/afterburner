@@ -1,4 +1,4 @@
-package com.stokpop.afterburner.domain;
+package nl.stokpop.afterburner.domain;
 
 import java.util.ArrayList;
 import java.util.List;

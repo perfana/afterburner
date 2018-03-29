@@ -1,4 +1,4 @@
-package com.stokpop.afterburner.error;
+package nl.stokpop.afterburner.error;
 
 public class ErrorMessage {
     private final String developerMessage;

@@ -1,4 +1,4 @@
-package com.stokpop.afterburner.error;
+package nl.stokpop.afterburner.error;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;

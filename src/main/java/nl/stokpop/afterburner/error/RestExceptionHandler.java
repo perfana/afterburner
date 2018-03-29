@@ -1,4 +1,4 @@
-package com.stokpop.afterburner.error;
+package nl.stokpop.afterburner.error;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.stokpop.afterburner;
+package nl.stokpop.afterburner;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

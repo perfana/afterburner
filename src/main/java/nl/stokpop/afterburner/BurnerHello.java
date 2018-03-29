@@ -1,4 +1,4 @@
-package com.stokpop.afterburner;
+package nl.stokpop.afterburner;
 
 public class BurnerHello {
 
