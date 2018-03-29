@@ -2,7 +2,6 @@ package com.stokpop.afterburner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,11 +14,10 @@ public class DelayedResponse {
 
     private static final Logger log = LoggerFactory.getLogger(DelayedResponse.class);
 
-    private final String name;
+    private final AfterburnerProperties props;
 
-    public DelayedResponse(
-            @Value(value = "#{systemProperties['afterburner.name'] ?: 'Simply-Anonymous'}") final String name) {
-        this.name = name;
+    public DelayedResponse(final AfterburnerProperties props) {
+        this.props = props;
     }
 
     @RequestMapping("/delay")
@@ -41,7 +39,7 @@ public class DelayedResponse {
         } catch (InterruptedException e) {
             log.warn("Sleep received interrupt: {}", e.getMessage());
         }
-        return new BurnerHello(String.format("This was a delay of %s", duration), name, sleepInMillis);
+        return new BurnerHello(String.format("This was a delay of %s", duration), props.getAfterburnerName(), sleepInMillis);
     }
 
     private long determineISO8601DurationInMillis(String duration) {
@@ -52,8 +50,8 @@ public class DelayedResponse {
             throw new AfterburnerException(String.format("Not a valid duration [%s]", duration), e);
         }
         long seconds = parsedDuration.getSeconds();
-        int nanos = parsedDuration.getNano();
-        return seconds * 1_000 + nanos / 1_000_000;
+        int nano = parsedDuration.getNano();
+        return seconds * 1_000 + nano / 1_000_000;
     }
 
 
