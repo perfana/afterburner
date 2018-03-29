@@ -3,13 +3,23 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.stokpop</groupId>
+	<groupId>nl.stokpop</groupId>
 	<artifactId>afterburner</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>afterburner</name>
-	<description>Demo project to be used in performance test and tuning excercises.</description>
+	<description>Demo project to be used in performance test and tuning exercises.</description>
+    <url>https://github.com/stokpop/afterburner-java</url>
+
+    <developers>
+        <developer>
+            <name>Peter Paul Bakker</name>
+            <email>peter.paul.bakker@stokpop.nl</email>
+            <organization>Stokpop Software Solutions</organization>
+            <organizationUrl>https://www.stokpop.nl</organizationUrl>
+        </developer>
+    </developers>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
