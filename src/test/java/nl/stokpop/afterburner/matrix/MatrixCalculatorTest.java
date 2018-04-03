@@ -117,7 +117,7 @@ public class MatrixCalculatorTest {
         long[][] square = MatrixCalculator.simpleMagicSquare(1);
 
         long[][] expectedSquare = new long[1][1];
-        expectedSquare[0][0] = 0;
+        expectedSquare[0][0] = 1;
 
         MatrixEqualResult equal = MatrixCalculator.areEqual(square, expectedSquare);
         assertTrue(equal.getMessage(), equal.areEqual());
