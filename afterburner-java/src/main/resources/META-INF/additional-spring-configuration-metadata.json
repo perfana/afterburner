@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "afterburner.name",
+      "type": "java.lang.String",
+      "description": "The name of the Afterburner instance. Used to identify the Afterburner instance, e.g. in response messages."
+    }
+  ]
+}
