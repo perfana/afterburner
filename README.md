@@ -1,6 +1,11 @@
 # afterburner-java
 Simple self-running test jar to use in load test environments to tune and explore monitor and analysis tools.
 
+# Start
+Start in the afterburner-java directory:
+    
+    mvn spring-boot:run
+    
 # functions
 
 ## delay
@@ -14,7 +19,7 @@ Examples:
 * `/delay?duration=150` delay for 150 millis
 
 ## memory
-Call this endpoint to increase memory usage. 
+Call this endpoint to increase memory usage to simulate a memory leak. 
 
 If you increase the memory usage continuously or with a high
 number of objects you will likely see a OutOfMemory related issues.

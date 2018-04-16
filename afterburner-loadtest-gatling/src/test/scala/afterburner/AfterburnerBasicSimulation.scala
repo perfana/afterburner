@@ -7,9 +7,7 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 class AfterburnerBasicSimulation extends Simulation {
     private val baseUrl = "http://localhost:8080"
-    private val delayEndpoint = "/delay"
     private val contentType = "application/json"
-    private val requestCount = 10000
 
     val httpProtocol: HttpProtocolBuilder = http
         .baseURL(baseUrl)
@@ -17,12 +15,21 @@ class AfterburnerBasicSimulation extends Simulation {
         .acceptHeader("*/*")
         .contentTypeHeader(contentType)
         .userAgentHeader("curl/7.54.0")
-        .warmUp(baseUrl + "/health")
+        .warmUp(baseUrl + "/memory/clear")
 
     val scn: ScenarioBuilder = scenario("AfterburnerBasicSimulation")
         .exec(http("simple_delay")
-        .get(delayEndpoint)
-        .check(status.is(200)))
+            .get("/delay?duration=555")
+            .check(status.is(200)))
+        .pause(3)
+        .exec(http("simple_mini_leak")
+            .get("/memory/grow?objects=8&items=54")
+            .check(status.is(200)))
+        .pause(2)
+        .exec(http("simple_cpu_burn")
+            .get("/cpu/magic-identity-check?matrixSize=133")
+            .check(status.is(200)))
+        .pause(3)
 
-    setUp(scn.inject(atOnceUsers(requestCount))).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
 }
