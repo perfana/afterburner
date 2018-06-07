@@ -1,5 +1,7 @@
-package nl.stokpop.afterburner;
+package nl.stokpop.afterburner.controller;
 
+import nl.stokpop.afterburner.AfterburnerException;
+import nl.stokpop.afterburner.AfterburnerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;

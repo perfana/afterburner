@@ -1,5 +1,6 @@
-package nl.stokpop.afterburner;
+package nl.stokpop.afterburner.controller;
 
+import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.matrix.InvalidMatrixException;
 import nl.stokpop.afterburner.matrix.MatrixCalculator;
 import nl.stokpop.afterburner.matrix.MatrixEqualResult;

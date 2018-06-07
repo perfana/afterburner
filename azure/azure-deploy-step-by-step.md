@@ -6,30 +6,30 @@ Commands used on OSX:
 
 First install Azure CLI:
 
-    $ brew update && brew install azure-cli
+    brew update && brew install azure-cli
 
 Then login to your Azure account:
 
-    $ az login
+    az login
 
 Create a group in your region (use some other name for `afterburner01`):
 
-    $ az group create --name afterburner01 --location westeurope
+    az group create --name afterburner01 --location westeurope
 
 Configure the group and location, so it is default for the commands that follow:
 
-    $ az configure -d group=afterburner01 location=westeurope
+    az configure -d group=afterburner01 location=westeurope
     
 Create a docker registry to push the docker image to (use some other name for `acrafterburner01`):
 
-    $ az acr create --admin-enabled --name acrafterburner01 --sku Basic
+    az acr create --admin-enabled --name acrafterburner01 --sku Basic
 
 Export all docker access information in environment variables, use your own `your@email`:
 
-    $ export DOCKER_REGISTRY=$(az acr show --name acrafterburner01 --query loginServer --output tsv)
-    $ export DOCKER_USER=acrafterburner01
-    $ export DOCKER_PASSWORD=$(az acr credential show --name acrafterburner01 --query passwords[0].value --output tsv)
-    $ export DOCKER_EMAIL=your@email
+    export DOCKER_REGISTRY=$(az acr show --name acrafterburner01 --query loginServer --output tsv)
+    export DOCKER_USER=acrafterburner01
+    export DOCKER_PASSWORD=$(az acr credential show --name acrafterburner01 --query passwords[0].value --output tsv)
+    export DOCKER_EMAIL=your@email
 
 In mvn settings.xml add registry server information:
 
@@ -105,7 +105,7 @@ And add `spring-boot-maven-plugin`:
 
 Create a docker directory:
 
-    $ mkdir src/main/docker
+    mkdir src/main/docker
 
 Create Dockerfile in src/main/docker/:
 
@@ -119,23 +119,23 @@ ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/afterburne
 
 Build and push image to Azure registry: 
 
-    $ mvn package docker:build -DpushImage
+    mvn package docker:build -DpushImage
 
 Check the image:
 
-    $ az acr repository list --name acrafterburner01
+    az acr repository list --name acrafterburner01
 
 Create service plan for to run docker on linux:
 
-    $ az appservice plan create --name linuxappservice --is-linux --sku S1
+    az appservice plan create --name linuxappservice --is-linux --sku S1
 
 Create webapp with this service plan and the afterburner container:
 
-    $ az webapp create --name afterburner01 --plan linuxappservice --deployment-container-image-name https://acrafterburner01.azurecr.io/afterburner-java
+    az webapp create --name afterburner01 --plan linuxappservice --deployment-container-image-name https://acrafterburner01.azurecr.io/afterburner-java
 
 Set config for pulling the container from the registry:
 
-    $ az webapp config container set --name afterburner01 \
+    az webapp config container set --name afterburner01 \
         --docker-custom-image-name ${DOCKER_REGISTRY}/afterburner-java:latest \
         --docker-registry-server-url https://${DOCKER_REGISTRY} \
         --docker-registry-server-password ${DOCKER_PASSWORD} \
@@ -143,20 +143,30 @@ Set config for pulling the container from the registry:
 
 Set internal port inside container:
 
-    $ az webapp config appsettings set --settings PORT=8080 --name afterburner01
+    az webapp config appsettings set --settings PORT=8080 --name afterburner01
 
 Start/restart afterburner:
 
-    $ az webapp restart --name afterburner01
+    az webapp restart --name afterburner01
 
 Query the url for the afterburner application:
 
-    $ export AFTERBURNER_URL=$(az webapp show --name afterburner01 --query hostNames[0] --out tsv)
+    export AFTERBURNER_URL=$(az webapp show --name afterburner01 --query hostNames[0] --out tsv)
     
 Check if it works:
 
-    $ curl ${AFTERBURNER_URL}/delay
+    curl ${AFTERBURNER_URL}/delay
 
+# Cleanup
+
+To avoid running into unexpected costs, clean up after usage:
+
+    az webapp delete --name afterburner01
+    az appservice delete --name linuxappserver 
+    az appservice plan delete --yes --name linuxappservice
+    az acr delete --name acrafterburner01
+    
+    
 # Troubleshoot
 
 If you get this error:
@@ -171,7 +181,7 @@ If container does not start correctly (`503 Service Temporarily Unavailable`),
 try to run the container locally to see if it works:
 
 ```
-$ curl -v afterburner01.azurewebsites.net
+curl -v afterburner01.azurewebsites.net
 * Rebuilt URL to: afterburner01.azurewebsites.net/
 *   Trying XXX.XXX.XXX.XXX...
 * TCP_NODELAY set
@@ -196,21 +206,21 @@ And check if all environment variables set.
 
 Login to the remote docker registry:
     
-    $ docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
+    docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
 
 Pull the latest image:
 
-    $ docker pull ${DOCKER_REGISTRY}/afterburner-java:latest
+    docker pull ${DOCKER_REGISTRY}/afterburner-java:latest
 
 Check if it runs:
 
-    $ docker run -i -t ${DOCKER_REGISTRY}/afterburner-java
+    docker run -i -t ${DOCKER_REGISTRY}/afterburner-java
     Error: Invalid or corrupt jarfile /app.jar
 
 Get to the shell of your docker to check out the image status:
 
 ```
-$ docker run -it --entrypoint sh ${DOCKER_REGISTRY}/afterburner-java:latest
+docker run -it --entrypoint sh ${DOCKER_REGISTRY}/afterburner-java:latest
 / # ls
 app.jar  bin      dev      etc      home     lib      media    mnt      proc     root     run      sbin     srv      sys      tmp      usr      var
 / # ls -al
@@ -239,8 +249,9 @@ This was solved by adding the repackage goal:
 ```
 Show the history of the image:
  
-    $ docker image history --no-trunc ${DOCKER_REGISTRY}/afterburner-java:latest > image_history
+    docker image history --no-trunc ${DOCKER_REGISTRY}/afterburner-java:latest > image_history
 
 Get into a docker shell and expose port 8080 so you can try running the app.jar manually:
 
-    $ docker run -it -p 8080:8080 --entrypoint sh ${DOCKER_REGISTRY}/afterburner-java:latest
+    docker run -it -p 8080:8080 --entrypoint sh ${DOCKER_REGISTRY}/afterburner-java:latest
+

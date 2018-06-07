@@ -1,10 +1,10 @@
-package nl.stokpop.afterburner;
+package nl.stokpop.afterburner.controller;
 
 public class BurnerHello {
 
-    private String message;
-    private String name;
-    private long durationInMillis;
+    private final String message;
+    private final String name;
+    private final long durationInMillis;
 
     public BurnerHello(final String message, final String name, final long durationInMillis) {
         this.message = message;

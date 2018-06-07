@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AfterburnerProperties {
 
-    private String afterburnerName;
+    private final String afterburnerName;
 
     public AfterburnerProperties(
             @Value(value = "${afterburner.name:Simply-Anonymous}") final String afterburnerName) {
