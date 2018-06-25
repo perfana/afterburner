@@ -1,0 +1,8 @@
+job_specifications:
+- id: myjmeterjob
+  tasks:
+  - environment_variables:
+      JMETER_FILES_PATH: jmeter1
+      JMETER_SCRIPT_NAME: afterburner-simple.jmx
+    docker_image: acrafterburner01.azurecr.io/jmeter
+    command: -n -t /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/afterburner-simple.jmx -l /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/result_1.jtl -j /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/jmeter_1.log
