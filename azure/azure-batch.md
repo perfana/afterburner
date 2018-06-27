@@ -6,6 +6,12 @@ Based on: [running-docker-container-on-azure-batch](https://azure.microsoft.com/
 
 First follow: [batch-shipyard-from-scratch-step-by-step](http://batch-shipyard.readthedocs.io/en/latest/05-batch-shipyard-from-scratch-step-by-step/)
 
+Make sure you have an Azure Batch account and an Azure Storage account in
+Azure Portal before continuing with shipyard below. 
+Fill the [KEY], [...] placeholders in
+`azure/config/credentials.yaml` with the account keys and names as found 
+Azure portal.
+
 # Create a jmeter docker and push to registry
 
 First create a docker registry, if not there:
@@ -29,7 +35,8 @@ Possibly, also push Afterburner if not in the docker registry already:
     
     docker push ${DOCKER_REGISTRY}/afterburner-java
 
-See [instructions](TODO) on how to run the Afterburner image on Azure.
+See [instructions](azure-deploy-step-by-step.md) on how to run the
+Afterburner image on Azure.
 
 Then, use the jMeter image to deploy to Azure Batch via shipyard:
 * point to the jmeter docker image
@@ -37,14 +44,17 @@ Then, use the jMeter image to deploy to Azure Batch via shipyard:
 * create job that runs the jmeter container
 * supply env parameters to the job
 * add storage for the jmx file and log files
+These steps are detailed below.
 
 # `shipyard` via docker
 
 Follow the steps below to use shipyard via a docker image.
-You might want to do this to avoid having to install the CLI tools locally
-and run into dependency issues with, for instance, python version.
+You might want to run via docker to avoid having to install 
+the CLI tools locally and run into dependency issues with,
+for instance, Python version.
 
-The shipyard docker image can be found here: https://hub.docker.com/r/alfpark/batch-shipyard/
+The shipyard docker image can be found here: 
+https://hub.docker.com/r/alfpark/batch-shipyard/
 
 To get the latest (notice to get `latest-cli`, the `latest` tag does not exist).
 
@@ -60,26 +70,19 @@ Usage: shipyard.py [OPTIONS] COMMAND [ARGS]...
 
 Include a mapping to a local directory to contain files:
 
-    alias shipyard="docker run --rm -it -v /Users/pp/azure:/azure alfpark/batch-shipyard:latest-cli"
-
-```
-# if using Docker
-docker run --rm -it \
-    -v /home/user/batch-shipyard-configs:/configs \
-    -w /configs \
-    alfpark/batch-shipyard:latest-cli \
-    <command> <subcommand> <options...>
-```
+    alias shipyard="docker run --rm -it -v /full/path/to/azure/config:/config -w /config alfpark/batch-shipyard:latest-cli"
 
 See [shipyard usage](https://github.com/Azure/batch-shipyard/blob/master/docs/20-batch-shipyard-usage.md).
 
 Now put the needed yaml files in the local azure directory, e.g. in a `config` directory.
 Then run the `pool add` command to add the pool:
 
-    shipyard pool add --configdir /azure/config
+    shipyard pool add 
+
+If you need another config dir than /config, you can use this option `--configdir /full/path/to/config`
 
 ```
-$ shipyard pool add --configdir /azure/config
+$ shipyard pool add 
 2018-06-04 10:24:18.943 INFO - creating container: shipyardgr-stokpopbatch1-mypool
 ... lot more logging ...
 2018-06-04 10:29:18.611 INFO - node tvm-3634815727_1-20180604t102632z: ip XX.XX.XX.XX port 50000
@@ -87,7 +90,7 @@ $ shipyard pool add --configdir /azure/config
 
 Start the job:
 
-    shipyard jobs add --configdir /azure/config --tail stdout.txt
+    shipyard jobs add --tail stdout.txt
 
 ```
 2018-06-04 10:32:41.119 INFO - Adding job myjob to pool mypool
@@ -99,7 +102,7 @@ Start the job:
 
 Delete the job:
 
-   shipyard jobs del --configdir /azure/config -y --wait
+   shipyard jobs del -y --wait
 
 ```
 2018-06-04 10:35:17.557 INFO - deleting job: myjob
@@ -109,7 +112,7 @@ Delete the job:
 
 Delete the pool:
 
-   shipyard pool del --configdir /azure/config -y
+   shipyard pool del -y
 
 ```
 2018-06-04 10:37:59.369 INFO - Deleting pool: mypool
@@ -119,7 +122,7 @@ Delete the pool:
 
 Done! Check if all is gone:
 
-    shipyard pool list --configdir /azure/config
+    shipyard pool list 
 
 ```
 2018-06-04 10:40:46.823 INFO - list of pools
@@ -130,7 +133,7 @@ Done! Check if all is gone:
 
 Not yet deleted... but some time later:
 
-    shipyard pool list --configdir /azure/config
+    shipyard pool list 
 
 ```
 2018-06-04 10:42:42.802 ERROR - no pools found
@@ -142,7 +145,7 @@ To run a jMeter script and store the logging a mount to Azure Storage
 is added to the job. The job is a docker jMeter instance. Basically
 run the following `jobs add` shipyard command with proper config files.
 
-     shipyard jobs add --configdir /azure/config --tail stdout.txt
+     shipyard jobs add --tail stdout.txt
 
 The important parts in the config files are:
 
@@ -208,7 +211,7 @@ docker job. E.g.:
 
 Get more (debug) logging when starting a job by supplying -v, like so:
 
-    shipyard jobs add -v --configdir /azure/config --tail stderr.txt
+    shipyard jobs add -v --tail stderr.txt
 
 This show valuable info such as the complete command used to start docker:
 
