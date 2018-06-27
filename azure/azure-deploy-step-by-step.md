@@ -162,7 +162,6 @@ Check if it works:
 To avoid running into unexpected costs, clean up after usage:
 
     az webapp delete --name afterburner01
-    az appservice delete --name linuxappserver 
     az appservice plan delete --yes --name linuxappservice
     az acr delete --name acrafterburner01
     
