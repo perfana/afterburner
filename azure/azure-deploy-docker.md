@@ -11,25 +11,35 @@ First install Azure CLI:
 Then login to your Azure account:
 
     az login
+    
+Think of a group name and registry name. 
+Use other names to prevent name clash in Azure! 
+Also replace <your.email> your own email address:
 
-Create a group in your region (use some other name for `afterburner01`):
+    export AFB_ID=$RANDOM
+	export GROUP=grpafterburner$RANDOM
+	export REGISTRY_NAME=acrafterburner$RANDOM
+	export APP_NAME=appafterburner$RANDOM
+	export MY_EMAIL=<your.email>
 
-    az group create --name afterburner01 --location westeurope
+Create a group in your region :
+
+    az group create --name $GROUP --location westeurope
 
 Configure the group and location, so it is default for the commands that follow:
 
-    az configure -d group=afterburner01 location=westeurope
+    az configure -d group=$GROUP location=westeurope
     
-Create a docker registry to push the docker image to (use some other name for `acrafterburner01`):
+Create a docker registry to push the docker image to:
 
-    az acr create --admin-enabled --name acrafterburner01 --sku Basic
+    az acr create --admin-enabled --name $REGISTRY_NAME --sku Basic
 
 Export all docker access information in environment variables, use your own `your@email`:
 
-    export DOCKER_REGISTRY=$(az acr show --name acrafterburner01 --query loginServer --output tsv)
-    export DOCKER_USER=acrafterburner01
-    export DOCKER_PASSWORD=$(az acr credential show --name acrafterburner01 --query passwords[0].value --output tsv)
-    export DOCKER_EMAIL=your@email
+    export DOCKER_REGISTRY=$(az acr show --name $REGISTRY_NAME --query loginServer --output tsv)
+    export DOCKER_USER=$REGISTRY_NAME
+    export DOCKER_PASSWORD=$(az acr credential show --name $REGISTRY_NAME --query passwords[0].value --output tsv)
+    export DOCKER_EMAIL=$MY_EMAIL
 
 In mvn settings.xml add registry server information:
 
@@ -68,12 +78,12 @@ in pom.xml:
         <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.14</version>
+            <version>1.0.0</version>
             <configuration>
                 <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                <dockerDirectory>src/main/docker</dockerDirectory>
+                <dockerDirectory>.</dockerDirectory>
                 <buildArgs>
-                    <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                    <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                 </buildArgs>
                 <serverId>${docker.registry}</serverId>
                 <registryUrl>https://${docker.registry}</registryUrl>
@@ -103,18 +113,14 @@ And add `spring-boot-maven-plugin`:
     </plugin>
 ```
 
-Create a docker directory:
-
-    mkdir src/main/docker
-
-Create Dockerfile in src/main/docker/:
+Create Dockerfile in the root of afterburner-java:
 
 ```
 FROM openjdk:8-jdk-alpine
 VOLUME /tmp
 ARG JAR_FILE
 COPY ${JAR_FILE} afterburner-springboot.jar
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/afterburner-springboot.jar"]
+ENTRYPOINT ["java","-jar","/afterburner-springboot.jar"]
 ```
 
 Build and push image to Azure registry: 
@@ -123,7 +129,7 @@ Build and push image to Azure registry:
 
 Check the image:
 
-    az acr repository list --name acrafterburner01
+    az acr repository list --name $REGISTRY_NAME
 
 Create service plan for to run docker on linux:
 
@@ -131,11 +137,11 @@ Create service plan for to run docker on linux:
 
 Create webapp with this service plan and the afterburner container:
 
-    az webapp create --name afterburner01 --plan linuxappservice --deployment-container-image-name https://acrafterburner01.azurecr.io/afterburner-java
+    az webapp create --name $APP_NAME --plan linuxappservice --deployment-container-image-name https://$REGISTRY_NAME.azurecr.io/afterburner-java
 
 Set config for pulling the container from the registry:
 
-    az webapp config container set --name afterburner01 \
+    az webapp config container set --name $APP_NAME \
         --docker-custom-image-name ${DOCKER_REGISTRY}/afterburner-java:latest \
         --docker-registry-server-url https://${DOCKER_REGISTRY} \
         --docker-registry-server-password ${DOCKER_PASSWORD} \
@@ -143,15 +149,15 @@ Set config for pulling the container from the registry:
 
 Set internal port inside container:
 
-    az webapp config appsettings set --settings PORT=8080 --name afterburner01
+    az webapp config appsettings set --settings PORT=8080 --name $APP_NAME
 
 Start/restart afterburner:
 
-    az webapp restart --name afterburner01
+    az webapp restart --name $APP_NAME
 
 Query the url for the afterburner application:
 
-    export AFTERBURNER_URL=$(az webapp show --name afterburner01 --query hostNames[0] --out tsv)
+    export AFTERBURNER_URL=$(az webapp show --name $APP_NAME --query hostNames[0] --out tsv)
     
 Check if it works:
 
@@ -161,9 +167,9 @@ Check if it works:
 
 To avoid running into unexpected costs, clean up after usage:
 
-    az webapp delete --name afterburner01
+    az webapp delete --name $APP_NAME
     az appservice plan delete --yes --name linuxappservice
-    az acr delete --name acrafterburner01
+    az acr delete --name $REGISTRY_NAME
     
     
 # Troubleshoot
@@ -234,7 +240,9 @@ drwxr-xr-x    2 root     root          4096 Apr 30 18:15 app.jar
 In this example the `app.jar` was a directory instead of a proper file. 
 The Spotify `docker-maven-plugin` was not configured correctly. 
 
-Another issue: the app.jar was too small. Only the slim `app.jar` was deployed, not the full blown self running jar, because the Springboot maven repackage plugin was not executed in a maven build.
+### app.jar too small
+
+Issue: the app.jar was too small. Only the slim `app.jar` was deployed, not the full blown self running jar, because the Springboot maven repackage plugin was not executed in a maven build.
 This was solved by adding the repackage goal:
 
 ```xml
@@ -254,3 +262,19 @@ Get into a docker shell and expose port 8080 so you can try running the app.jar 
 
     docker run -it -p 8080:8080 --entrypoint sh ${DOCKER_REGISTRY}/afterburner-java:latest
 
+### docker COPY failed
+
+Issue copying the jar file from target, first noticed with docker `Version 18.03.1-ce-mac65 (24312)`.
+The error:
+    
+       [ERROR] Failed to execute goal com.spotify:docker-maven-plugin:1.0.0:build (default-cli) on project afterburner-java: 
+       Exception caught: COPY failed: stat /var/lib/docker/tmp/docker-builder159179441/Users/tada/afterburner/afterburner-java/target/afterburner-java-1.0-SNAPSHOT.jar: 
+       no such file or directory -> [Help 1]
+ 
+ See: https://github.com/docker/for-mac/issues/1922
+        
+ "Solved" this by moving the Dockerfile from aterburner-java/src/main/docker to afterburner-java, so the
+ Dockerfile can copy the relative file target/afterburner...jar. But now
+ all files below afterburner-java are copied to the target/docker dir, which does not seem correct.
+ To be continued...
+ 

@@ -86,12 +86,13 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.14</version>
+                <version>1.0.0</version>
                 <configuration>
                     <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <dockerDirectory>.</dockerDirectory>
                     <buildArgs>
-                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                        <!-- needs to be relative to the Dockerfile to copy ok -->
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
                     <serverId>${docker.registry}</serverId>
                     <registryUrl>https://${docker.registry}</registryUrl>
