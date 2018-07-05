@@ -12,15 +12,17 @@ Then login to your Azure account:
 
     az login
     
-Think of a group name and registry name. 
-Use other names to prevent name clash in Azure! 
-Also replace <your.email> your own email address:
+Think of a group name and registry name. You can also use an existing Azure resource group. 
+Use different names to prevent name clash in Azure!
 
-    export AFB_ID=$RANDOM
-	export GROUP=grpafterburner$RANDOM
-	export REGISTRY_NAME=acrafterburner$RANDOM
-	export APP_NAME=appafterburner$RANDOM
-	export MY_EMAIL=<your.email>
+    export AFBID=$RANDOM
+	export GROUP=grpafterburner$AFBID
+	export REGISTRY_NAME=acrafterburner$AFBID
+	export APP_NAME=appafterburner$AFBID
+	export MY_EMAIL=[your.email]
+	
+The `$RANDOM` turns into a random number on the fly. 
+Also replace `[your.email]` with your own email address
 
 Create a group in your region :
 
