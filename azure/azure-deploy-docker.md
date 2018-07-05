@@ -73,24 +73,28 @@ in top level pom.xml:
 in pom.xml:
 
 ```xml
-<build>
-    <plugins>
-        <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>1.0.0</version>
-            <configuration>
-                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                <dockerDirectory>.</dockerDirectory>
-                <buildArgs>
-                    <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-                </buildArgs>
-                <serverId>${docker.registry}</serverId>
-                <registryUrl>https://${docker.registry}</registryUrl>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
+<plugin>
+    <groupId>com.spotify</groupId>
+    <artifactId>docker-maven-plugin</artifactId>
+    <version>1.0.0</version>
+    <configuration>
+        <dockerDirectory>src/main/docker</dockerDirectory>
+        <resources>
+            <resource>
+                <targetPath>/</targetPath>
+                <directory>${project.build.directory}</directory>
+                <include>${project.build.finalName}.jar</include>
+            </resource>
+        </resources>
+        <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+        <buildArgs>
+            <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+        </buildArgs>
+        <serverId>${docker.registry}</serverId>
+        <registryUrl>https://${docker.registry}</registryUrl>
+    </configuration>
+</plugin>
+
 ``` 
 
 And add `spring-boot-maven-plugin`:
@@ -246,13 +250,13 @@ Issue: the app.jar was too small. Only the slim `app.jar` was deployed, not the 
 This was solved by adding the repackage goal:
 
 ```xml
-    <executions>
-        <execution>
-            <goals>
-                <goal>repackage</goal>
-            </goals>
-        </execution>
-    </executions>
+<executions>
+    <execution>
+        <goals>
+            <goal>repackage</goal>
+        </goals>
+    </execution>
+</executions>
 ```
 Show the history of the image:
  
@@ -271,10 +275,16 @@ The error:
        Exception caught: COPY failed: stat /var/lib/docker/tmp/docker-builder159179441/Users/tada/afterburner/afterburner-java/target/afterburner-java-1.0-SNAPSHOT.jar: 
        no such file or directory -> [Help 1]
  
- See: https://github.com/docker/for-mac/issues/1922
+See: https://github.com/docker/for-mac/issues/1922
         
- "Solved" this by moving the Dockerfile from aterburner-java/src/main/docker to afterburner-java, so the
- Dockerfile can copy the relative file target/afterburner...jar. But now
- all files below afterburner-java are copied to the target/docker dir, which does not seem correct.
- To be continued...
- 
+Solved this by adding a proper resources tag to the Spotify docker maven plugin:
+
+```xml
+<resources>
+    <resource>
+        <targetPath>/</targetPath>
+        <directory>${project.build.directory}</directory>
+        <include>${project.build.finalName}.jar</include>
+    </resource>
+</resources>
+```

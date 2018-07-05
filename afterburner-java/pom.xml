@@ -88,11 +88,17 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
                     <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                    <dockerDirectory>.</dockerDirectory>
                     <buildArgs>
-                        <!-- needs to be relative to the Dockerfile to copy ok -->
-                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                        <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
                     <serverId>${docker.registry}</serverId>
                     <registryUrl>https://${docker.registry}</registryUrl>
