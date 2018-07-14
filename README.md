@@ -45,6 +45,20 @@ Examples:
 * `/cpu/magic-identity-check?matrixSize=600` check for size 600, currently takes 2.5 sec on a simple laptop
 * `/cpu/magic-identity-check?matrixSize=0` get a 500 error (might also be handy for testing)
 
+## remote call
+Call another remote http(s) endpoint. Use `path` to specify the path to be called on the remote
+instance. 
+
+The base url is specified via the `afterburner.remote.call.base_url` property. For instance: 
+`-Dafterburner.remote.call.base_url=https//my.remote.site:1234`. The default value is
+`http://localhost:8080` so it will call itself.
+
+The remote client in use is Apache HttpClient. In the source code you can switch to OkHttp.
+
+Examples:
+* `/remote/call?path=delay` call delay on remote afterburner
+* `/remote/call?path=remote/call?path=delay` call remote afterburner to call remote afterburner to call delay
+
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
 * `--server.port=8090` use different port (default 8080)

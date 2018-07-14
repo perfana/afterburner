@@ -1,5 +1,8 @@
 package nl.stokpop.afterburner.error;
 
+import nl.stokpop.afterburner.AfterburnerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private final static Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
+
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<Object> handleGeneralException(final Exception ex, final WebRequest request) {
         
@@ -20,6 +25,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus returnCode = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorMessage errorMessage = new ErrorMessage(devMessage, userMessage, returnCode.value());
 
+        if (ex instanceof AfterburnerException) {
+            log.error(devMessage);
+        }
+        else {
+            log.error(devMessage, ex);
+        }
+        
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), returnCode, request);
     }
 
