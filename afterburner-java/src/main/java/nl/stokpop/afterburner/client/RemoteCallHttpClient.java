@@ -50,7 +50,7 @@ public class RemoteCallHttpClient implements RemoteCall {
     @Override
     public String call(final String path) throws RemoteCallException {
         final String completeUrl = RemoteCallUtil.createCompleteUrl(this.baseUrl, path);
-        log.info("Remote call [{}]", completeUrl);
+        log.info("Remote call via HttpClient [{}]", completeUrl);
         HttpGet httpGet = new HttpGet(completeUrl);
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet)) {

@@ -53,11 +53,15 @@ The base url is specified via the `afterburner.remote.call.base_url` property. F
 `-Dafterburner.remote.call.base_url=https//my.remote.site:1234`. The default value is
 `http://localhost:8080` so it will call itself.
 
-The remote client in use is Apache HttpClient. In the source code you can switch to OkHttp.
+The default remote client is Apache HttpClient. With the `type` request parameter you can switch to OkHttp.
 
 Examples:
-* `/remote/call?path=delay` call delay on remote afterburner
+* `/remote/call?path=delay` call delay on remote afterburner via HttpClient
+* `/remote/call?path=delay&type=okhttp` call delay on remote afterburner via OkHttp
 * `/remote/call?path=remote/call?path=delay` call remote afterburner to call remote afterburner to call delay
+* `/remote/call?type=okhttp&path=remote/call?path=delay` same, but first call via OkHttp and second via HttpClient
+
+note: do not forget to escape & with a backslash using bash and curl
 
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance

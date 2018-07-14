@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +19,6 @@ import java.util.Map;
 public class RemoteCallOkHttp implements RemoteCall {
 
     private final static Logger log = LoggerFactory.getLogger(RemoteCallOkHttp.class);
-
-    private final static Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
 
     private final String baseUrl;
     private final Map<String, String> headers;
@@ -38,7 +35,7 @@ public class RemoteCallOkHttp implements RemoteCall {
 
     @Autowired
     public RemoteCallOkHttp(
-        @Value("${remote.call.base_url:http://localhost:8080}") final String baseUrl) {
+            @Value("${afterburner.remote.call.base_url:http://localhost:8080}") final String baseUrl) {
             this(baseUrl, Collections.emptyMap());
         }
 
@@ -49,7 +46,7 @@ public class RemoteCallOkHttp implements RemoteCall {
     @Override
     public String call(final String path) throws RemoteCallException {
         final String completeUrl = RemoteCallUtil.createCompleteUrl(baseUrl, path);
-        log.debug("Call for [{}]", completeUrl);
+        log.info("Remote call via OkHttp [{}]", completeUrl);
         try {
             String result = get(completeUrl);
             log.debug("Result: [{}]", result);
