@@ -49,8 +49,7 @@ Examples:
 Call another remote http(s) endpoint. Use `path` to specify the path to be called on the remote
 instance. 
 
-The base url is specified via the `afterburner.remote.call.base_url` property. For instance: 
-`-Dafterburner.remote.call.base_url=https//my.remote.site:1234`. The default value is
+The base url is specified via the `afterburner.remote.call.base_url` property. The default value is
 `http://localhost:8080` so it will call itself.
 
 The default remote client is Apache HttpClient. With the `type` request parameter you can switch to OkHttp.
@@ -65,8 +64,10 @@ note: do not forget to escape & with a backslash using bash and curl
 
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
+* `-Dafterburner.remote.call.base_url=https//my.remote.site:1234` connect remote calls to this base url
+* `export AFTERBURNER_REMOTE_CALL_BASE_URL=https//my.remote.site:1234` provide base url via environment variable
 * `--server.port=8090` use different port (default 8080)
-* `export SERVER_PORT=8090` use different port via env variable 
+* `export SERVER_PORT=8090` use different port via env variable
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)
