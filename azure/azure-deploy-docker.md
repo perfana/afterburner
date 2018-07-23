@@ -15,11 +15,11 @@ Then login to your Azure account:
 Think of a group name and registry name. You can also use an existing Azure resource group. 
 Use different names to prevent name clash in Azure!
 
-    export AFBID=$RANDOM
-	export GROUP=grpafterburner$AFBID
-	export REGISTRY_NAME=acrafterburner$AFBID
-	export APP_NAME=appafterburner$AFBID
-	export MY_EMAIL=[your.email]
+    AFBID=$RANDOM
+	GROUP=grpafterburner$AFBID
+	REGISTRY_NAME=acrafterburner$AFBID
+	APP_NAME=appafterburner$AFBID
+	MY_EMAIL=[your.email]
 	
 The `$RANDOM` turns into a random number on the fly. 
 Also replace `[your.email]` with your own email address
@@ -139,11 +139,12 @@ Check the image:
 
 Create service plan for to run docker on linux:
 
-    az appservice plan create --name linuxappservice --is-linux --sku S1
+    APP_SERVICE_NAME=linuxappservice
+    az appservice plan create --name $APP_SERVICE_NAME --is-linux --sku S1
 
 Create webapp with this service plan and the afterburner container:
 
-    az webapp create --name $APP_NAME --plan linuxappservice --deployment-container-image-name https://$REGISTRY_NAME.azurecr.io/afterburner-java
+    az webapp create --name $APP_NAME --plan $APP_SERVICE_NAME --deployment-container-image-name https://$REGISTRY_NAME.azurecr.io/afterburner-java
 
 Set config for pulling the container from the registry:
 
@@ -174,7 +175,7 @@ Check if it works:
 To avoid running into unexpected costs, clean up after usage:
 
     az webapp delete --name $APP_NAME
-    az appservice plan delete --yes --name linuxappservice
+    az appservice plan delete --yes --name $APP_SERVICE_NAME
     az acr delete --name $REGISTRY_NAME
     
     

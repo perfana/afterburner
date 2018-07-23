@@ -14,19 +14,20 @@ Azure portal.
 
 # Create a jmeter docker and push to registry
 
-First create a docker registry, if not there:
+First create a docker registry, if not there (added $AFBID number to avoid name clashes, as used for creating the afterburner app):
 
-    az group create --name afterburner01 --location westeurope
-    az configure -d group=afterburner01 location=westeurope
-    az acr create --admin-enabled --name acrafterburner01 --sku Basic
+    ACR_NAME=acrafterburner$AFBID
+    az group create --name $ACR_NAME --location westeurope
+    az configure -d group=$ACR_NAME location=westeurope
+    az acr create --admin-enabled --name $ACR_NAME --sku Basic
 
 Next, push the jmeter image to that registry. Note you need the hash code
 of the jmeter docker image, look it up with `docker images list`.
     
-    export DOCKER_REGISTRY=$(az acr show --name acrafterburner01 --query loginServer --output tsv)
-    export DOCKER_USER=acrafterburner01
-    export DOCKER_PASSWORD=$(az acr credential show --name acrafterburner01 --query passwords[0].value --output tsv)
-    export DOCKER_EMAIL=<your email>
+    DOCKER_REGISTRY=$(az acr show --name $ACR_NAME --query loginServer --output tsv)
+    DOCKER_USER=$ACR_NAME
+    DOCKER_PASSWORD=$(az acr credential show --name $ACR_NAME --query passwords[0].value --output tsv)
+    DOCKER_EMAIL=<your email>
     docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
     docker tag <your hash for jmeter image> ${DOCKER_REGISTRY}/jmeter
     docker push ${DOCKER_REGISTRY}/jmeter
@@ -35,7 +36,7 @@ Possibly, also push Afterburner if not in the docker registry already:
     
     docker push ${DOCKER_REGISTRY}/afterburner-java
 
-See [instructions](azure-deploy-step-by-step.md) on how to run the
+See [instructions](azure-deploy-docker.md) on how to run the
 Afterburner image on Azure.
 
 Then, use the jMeter image to deploy to Azure Batch via shipyard:
