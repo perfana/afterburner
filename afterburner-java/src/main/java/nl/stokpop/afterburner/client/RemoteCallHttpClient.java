@@ -1,5 +1,6 @@
 package nl.stokpop.afterburner.client;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -16,6 +17,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component("remote-call-http-client")
 public class RemoteCallHttpClient implements RemoteCall {
@@ -44,7 +46,27 @@ public class RemoteCallHttpClient implements RemoteCall {
     }
 
     public RemoteCallHttpClient(final String baseUrl, final Map<String, String> headers) {
-        this(baseUrl, headers, HttpClients.createDefault());
+        this(baseUrl, headers, createHttpClient());
+    }
+
+    private static CloseableHttpClient createHttpClient() {
+        int connectTimeoutMillis = (int) TimeUnit.SECONDS.toMillis(5);
+        int socketTimeoutMillis = (int) TimeUnit.SECONDS.toMillis(5);
+        int connectionRequestTimeoutMillis = 400;
+
+        RequestConfig defaultRequestConfig = RequestConfig.custom()
+                .setConnectTimeout(connectTimeoutMillis)
+                .setSocketTimeout(socketTimeoutMillis)
+                .setConnectionRequestTimeout(connectionRequestTimeoutMillis)
+                .build();
+
+        int maxConnections = 20;
+
+        return HttpClients.custom()
+                .setDefaultRequestConfig(defaultRequestConfig)
+                .setMaxConnPerRoute(maxConnections)
+                .setMaxConnTotal(maxConnections)
+                .build();
     }
 
     @Override
