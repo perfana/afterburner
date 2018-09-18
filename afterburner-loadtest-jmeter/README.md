@@ -23,4 +23,3 @@ Run the jmeter docker:
 
     $ run-docker.sh
     
-

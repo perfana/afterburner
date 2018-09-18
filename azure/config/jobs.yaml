@@ -2,7 +2,10 @@ job_specifications:
 - id: myjmeterjob
   tasks:
   - environment_variables:
-      JMETER_FILES_PATH: jmeter1
+      JMETER_FILES_PATH: jmeter
       JMETER_SCRIPT_NAME: afterburner-simple.jmx
+      JMETER_JMX_DOMAIN: appafterburner01.azurewebsites.net
+      JMETER_FILE_DIR: /mnt/batch/tasks/mounts/azfile-stokpop-jmeter/run00001
     docker_image: acrafterburner01.azurecr.io/jmeter
-    command: -n -t /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/afterburner-simple.jmx -l /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/result_1.jtl -j /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/jmeter_1.log
+    command: -Jjmx.domain=$JMETER_JMX_DOMAIN -n -t $JMETER_FILE_DIR/$JMETER_SCRIPT_NAME -l $JMETER_FILE_DIR/result.jtl -j $JMETER_FILE_DIR/jmeter.log
+    

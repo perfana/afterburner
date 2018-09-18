@@ -16,7 +16,7 @@ Think of a group name and registry name. You can also use an existing Azure reso
 Use different names to prevent name clash in Azure!
 
     AFBID=$RANDOM
-	GROUP=grpafterburner$AFBID
+	RESOURCE_GROUP_NAME=grpafterburner$AFBID
 	REGISTRY_NAME=acrafterburner$AFBID
 	APP_NAME=appafterburner$AFBID
 	MY_EMAIL=[your.email]
@@ -26,11 +26,11 @@ Also replace `[your.email]` with your own email address
 
 Create a group in your region :
 
-    az group create --name $GROUP --location westeurope
+    az group create --name $RESOURCE_GROUP_NAME --location westeurope
 
 Configure the group and location, so it is default for the commands that follow:
 
-    az configure -d group=$GROUP location=westeurope
+    az configure -d group=$RESOURCE_GROUP_NAME location=westeurope
     
 Create a docker registry to push the docker image to:
 

@@ -64,8 +64,8 @@ note: do not forget to escape & with a backslash using bash and curl
 
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
-* `-Dafterburner.remote.call.base_url=https//my.remote.site:1234` connect remote calls to this base url
-* `export AFTERBURNER_REMOTE_CALL_BASE_URL=https//my.remote.site:1234` provide base url via environment variable
+* `-Dafterburner.remote.call.base_url=https://my.remote.site:1234` connect remote calls to this base url
+* `export AFTERBURNER_REMOTE_CALL_BASE_URL=https://my.remote.site:1234` provide base url via environment variable
 * `--server.port=8090` use different port (default 8080)
 * `export SERVER_PORT=8090` use different port via env variable
 

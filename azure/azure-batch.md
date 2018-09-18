@@ -21,7 +21,7 @@ First create a docker registry, if not there (added $AFBID number to avoid name 
     az configure -d group=$ACR_NAME location=westeurope
     az acr create --admin-enabled --name $ACR_NAME --sku Basic
 
-Next, push the jmeter image to that registry. Note you need the hash code
+Next, push the jmeter image to that registry. Note you need the <image hash>
 of the jmeter docker image, look it up with `docker images list`.
     
     DOCKER_REGISTRY=$(az acr show --name $ACR_NAME --query loginServer --output tsv)
@@ -29,22 +29,23 @@ of the jmeter docker image, look it up with `docker images list`.
     DOCKER_PASSWORD=$(az acr credential show --name $ACR_NAME --query passwords[0].value --output tsv)
     DOCKER_EMAIL=<your email>
     docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
-    docker tag <your hash for jmeter image> ${DOCKER_REGISTRY}/jmeter
+    docker tag <image-hash> ${DOCKER_REGISTRY}/jmeter
     docker push ${DOCKER_REGISTRY}/jmeter
     
-Possibly, also push Afterburner if not in the docker registry already:
+Possibly, also push Afterburner if not in the remote Azure docker registry already:
     
+    docker tag ${DOCKER_REGISTRY}/afterburner-java
     docker push ${DOCKER_REGISTRY}/afterburner-java
 
 See [instructions](azure-deploy-docker.md) on how to run the
 Afterburner image on Azure.
 
 Then, use the jMeter image to deploy to Azure Batch via shipyard:
-* point to the jmeter docker image
-* add docker registry plus credentials
-* create job that runs the jmeter container
-* supply env parameters to the job
-* add storage for the jmx file and log files
+* point to the jmeter docker image in the config.yaml
+* add docker registry plus credentials in credentials.yaml
+* create job that runs the jmeter container in jobs.yaml
+* supply env parameters to the job in jobs.yaml
+* add Azure storage for the jmx file and log files
 These steps are detailed below.
 
 # `shipyard` via docker
@@ -140,10 +141,93 @@ Not yet deleted... but some time later:
 2018-06-04 10:42:42.802 ERROR - no pools found
 ```
 
-# Add mount to Azure Storage
+# Add Azure storage and upload file
+
+First, create a storage account and a jmeter share to store the jmeter jmx files and
+other load script related files, such as properties and csv files. Also the log and jtl 
+files will be stored there after the test.
+
+See: [storage-how-to-use-files-cli](https://docs.microsoft.com/en-us/azure/storage/files/storage-how-to-use-files-cli).
+
+```
+RESOURCE_GROUP_NAME=grpafterburner$AFBID
+STORAGENAME=afterburnerstorage
+
+STORAGEACCT=$(az storage account create \
+--resource-group $RESOURCE_GROUP_NAME \
+--name "$STORAGENAME" \
+--location westeurope \
+--sku Standard_LRS \
+--query "name" | tr -d '"')
+
+STORAGEKEY=$(az storage account keys list \
+--resource-group $RESOURCE_GROUP_NAME \
+--account-name $STORAGEACCT \
+--query "[0].value" | tr -d '"')
+
+az storage share create \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--name "jmeter"
+```
+
+Upload the jmeter files into a unique name for a job run (e.g. run00001).
+
+```
+az storage directory create \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--share-name "jmeter" \
+--name "run00001"
+
+az storage file upload \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--share-name "jmeter" \
+--source "~/git/afterburner/afterburner-loadtest-jmeter/afterburner-simple.jmx" \
+--path "run00001/afterburner-simple.jmx"
+```
+
+After the test list the files and download what is needed to process further:
+
+```
+az storage file list \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--share-name "jmeter" \
+--path "run00001" \
+--output table
+
+az storage file download \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--share-name "jmeter" \
+--path "run00001/jmeter.log" \
+--dest "~/jmeter.log"
+
+az storage file download \
+--account-name $STORAGEACCT \
+--account-key $STORAGEKEY \
+--share-name "jmeter" \
+--path "run00001/result.jtl" \
+--dest "~/result.jtl"
+```
+
+Delete account after usage (be careful, will delete all files):
+
+```
+az storage account delete \
+    --resource-group $RESOURCE_GROUP_NAME \
+    --name $STORAGEACCT \
+    --yes
+```
+
+# Add mount to Azure storage
 
 To run a jMeter script and store the logging a mount to Azure Storage
-is added to the job. The job is a docker jMeter instance. Basically
+is added to the job. The job is a docker jMeter instance. 
+
+Basically
 run the following `jobs add` shipyard command with proper config files.
 
      shipyard jobs add --tail stdout.txt
@@ -154,7 +238,7 @@ The important parts in the config files are:
 
 ```
 batch_shipyard:
-  storage_account_settings: mystorageaccount
+  storage_account_settings: afterburnerstorage
 global_resources:
   docker_images:
   - acrafterburner01.azurecr.io/jmeter
@@ -162,8 +246,8 @@ global_resources:
     shared_data_volumes:
       azurefile_vol:
         volume_driver: azurefile
-        storage_account_settings: mystorageaccount
-        azure_file_share_name: jmeter1
+        storage_account_settings: afterburnerstorage
+        azure_file_share_name: jmeter
         container_path: $AZ_BATCH_NODE_SHARED_DIR/azfile
         mount_options:
         - file_mode=0777
@@ -176,18 +260,18 @@ global_resources:
 ```
   input_data:
     azure_storage:
-    - storage_account_settings: mystorageaccount
-      remote_path: jmeter1
-      local_path: $AZ_BATCH_NODE_SHARED_DIR/jmeter1
+    - storage_account_settings: afterburnerstorage
+      remote_path: jmeter
+      local_path: $AZ_BATCH_NODE_SHARED_DIR/jmeter
 ```
 
 ### jobs.yaml
 
-(Note these settings are now hard coded, need to use env variables.)
+To run the jmeter script with the correct files:
 
 ```
     docker_image: acrafterburner01.azurecr.io/jmeter
-    command: -n -t /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/afterburner-simple.jmx -l /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/result_1.jtl -j /mnt/batch/tasks/mounts/azfile-stokpop-jmeter1/jmeter1/tmp/jmeter_1.log 
+    -Jjmx.domain=$JMETER_JMX_DOMAIN -n -t $JMETER_FILE_DIR/$JMETER_SCRIPT_NAME -l $JMETER_FILE_DIR/result.jtl -j $JMETER_FILE_DIR/jmeter.log
 ```
 
 ### credentials.yaml
@@ -206,11 +290,18 @@ Use a simple busybox docker image to do simple testing, such as figuring out
 which mounts are available or which values env vars have inside the started
 docker job. E.g.:
 
-    ls -alR /mnt
+Use busybox from jobs.yaml:
 
-    echo $AZ_BATCH_TASK_WORKING_DIR
+    docker_image: <docker registry>/busybox 
+    command: ls -alR /mnt
 
-Get more (debug) logging when starting a job by supplying -v, like so:
+or
+
+    docker_image: <docker registry>/busybox 
+    command: env
+
+Get more (debug) logging when starting a job by supplying -v 
+and possibly tail stderr.txt instead of stdout.txt, like so:
 
     shipyard jobs add -v --tail stderr.txt
 
@@ -220,3 +311,13 @@ This show valuable info such as the complete command used to start docker:
 2018-06-06 10:31:36.304 DEBUG convoy.batch:_construct_task:4345 task: task-00007 command: /bin/bash -c 'set -e; set -o pipefail; [ -f .shipyard.envlist ] && export $(cat .shipyard.envlist | xargs); env | grep AZ_BATCH_ >> .shipyard.envlist; docker run --rm --name myjob1-task-00007 -v $AZ_BATCH_NODE_ROOT_DIR:$AZ_BATCH_NODE_ROOT_DIR -w $AZ_BATCH_TASK_WORKING_DIR --env-file .shipyard.envlist busybox ls -al /jmeter; wait'
 ```
     
+# Cleanup
+
+Delete batch account:
+
+```
+az batch batch account delete \
+    --resource-group $RESOURCE_GROUP_NAME \
+    --name $ \
+    --yes
+```
