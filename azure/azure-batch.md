@@ -31,10 +31,10 @@ Next, push the jmeter image to that registry. Note this uses the docker tag jmet
     docker tag jmeter ${DOCKER_REGISTRY}/jmeter
     docker push ${DOCKER_REGISTRY}/jmeter
     
-Possibly, also push Afterburner if not in the remote Azure docker registry already:
+Possibly, also push Afterburner from the afterburner-java directory, if not in the remote Azure docker registry already:
     
-    docker tag ${DOCKER_REGISTRY}/afterburner-java
-    docker push ${DOCKER_REGISTRY}/afterburner-java
+    mvn clean install -DskipTests
+    mvn package docker:build -DpushImage
 
 See [instructions](azure-deploy-docker.md) on how to run the
 Afterburner image on Azure.
