@@ -8,9 +8,9 @@ This is based on this article: [make-use-of-docker-with-jmeter-learn-how](https:
 
 # instructions
 
-Build the docker from `docker` directory:
+Build the docker from this directory:
     
-    $ docker build -t jmeter .
+    $ docker build --file docker/Dockerfile --tag jmeter docker
     
 Export path (folder) to where your `afterburner-simple.jmx` file lives. The APP_NAME environment variable is from the run 
 Afterburner in docker step-by-step guide.
