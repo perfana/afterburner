@@ -21,15 +21,14 @@ First create a docker registry, if not there (added $AFBID number to avoid name 
     az configure -d group=$ACR_NAME location=westeurope
     az acr create --admin-enabled --name $ACR_NAME --sku Basic
 
-Next, push the jmeter image to that registry. Note you need the <image hash>
-of the jmeter docker image, look it up with `docker images list`.
+Next, push the jmeter image to that registry. Note this uses the docker tag jmeter used in the jmeter docker build process.
     
     DOCKER_REGISTRY=$(az acr show --name $ACR_NAME --query loginServer --output tsv)
     DOCKER_USER=$ACR_NAME
     DOCKER_PASSWORD=$(az acr credential show --name $ACR_NAME --query passwords[0].value --output tsv)
     DOCKER_EMAIL=<your email>
     docker login --username ${DOCKER_USER} --password ${DOCKER_PASSWORD} ${DOCKER_REGISTRY}
-    docker tag <image-hash> ${DOCKER_REGISTRY}/jmeter
+    docker tag jmeter ${DOCKER_REGISTRY}/jmeter
     docker push ${DOCKER_REGISTRY}/jmeter
     
 Possibly, also push Afterburner if not in the remote Azure docker registry already:
