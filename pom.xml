@@ -31,9 +31,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <springboot.version>2.0.3.RELEASE</springboot.version>
-        <!-- the 'weird' {$env..} syntax is too fool intellij to not report an error -->
-        <docker.image.prefix>{$env.DOCKER_REGISTRY}</docker.image.prefix>
-        <docker.registry>{$env.DOCKER_REGISTRY}</docker.registry>
+        <docker.image.prefix>${env.DOCKER_REGISTRY}</docker.image.prefix>
+        <docker.registry>${env.DOCKER_REGISTRY}</docker.registry>
     </properties>
 
     <modules>

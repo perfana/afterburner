@@ -1,14 +1,14 @@
 batch_shipyard:
-  storage_account_settings: afterburnerstorage
+  storage_account_settings: jmeterstorageaccount
 global_resources:
   docker_images:
-  - acrafterburner01.azurecr.io/jmeter
+  - [DOCKER_REGISTRY]/jmeter
   volumes:
     shared_data_volumes:
       azurefile_vol:
         volume_driver: azurefile
-        storage_account_settings: afterburnerstorage
-        azure_file_share_name: jmeter
+        storage_account_settings: jmeterstorageaccount
+        azure_file_share_name: jmeter1
         container_path: $AZ_BATCH_NODE_SHARED_DIR/azfile
         mount_options:
         - file_mode=0777

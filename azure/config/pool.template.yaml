@@ -1,11 +1,11 @@
 pool_specification:
-  id: mypool
+  id: jmeterpool
   vm_configuration:
     platform_image:
       offer: UbuntuServer
       publisher: Canonical
       sku: 16.04-LTS
   vm_count:
-    dedicated: 1
+    dedicated: 2
     low_priority: 0
   vm_size: STANDARD_D1_V2
