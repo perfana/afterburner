@@ -1,10 +1,10 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
-#azure/config/config.yaml
-#azure/config/credentials.yaml
-#azure/config/jobs.yaml
-#azure/config/pool.yaml
+azure/config/config.yaml
+azure/config/credentials.yaml
+azure/config/jobs.yaml
+azure/config/pool.yaml
 
 azure/config/jmeterpool/
 afterburner-loadtest-jmeter/tmp/
