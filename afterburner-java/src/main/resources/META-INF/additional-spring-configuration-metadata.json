@@ -4,6 +4,31 @@
       "name": "afterburner.name",
       "type": "java.lang.String",
       "description": "The name of the Afterburner instance. Used to identify the Afterburner instance, e.g. in response messages."
+    },
+    {
+      "name": "afterburner.remote.call.additional.headers",
+      "type": "java.util.Map",
+      "description": "A list of http headers to be added to remote call requests, e.g. {'key1':'value1', 'key2:'value2'}"
+    },
+    {
+      "name": "afterburner.remote.call.httpclient.connect.timeout.millis",
+      "type": "java.lang.Integer",
+      "description": "Timeout in milliseconds for a connection to connect to remote server."
+    },
+    {
+      "name": "afterburner.remote.call.httpclient.socket.timeout.millis",
+      "type": "java.lang.Integer",
+      "description": "Timeout in milliseconds for a reply to come back from remote server."
+    },
+    {
+      "name": "afterburner.remote.call.httpclient.connection.request.timeout.millis",
+      "type": "java.lang.Integer",
+      "description": "Timeout in milliseconds to get a free connection from the http connection pool."
+    },
+    {
+      "name": "afterburner.remote.call.httpclient.connections.max",
+      "type": "java.lang.Integer",
+      "description": "The maximum number of connections in the http connection pool."
     }
   ]
 }
