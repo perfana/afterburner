@@ -79,8 +79,9 @@ public class RemoteCallHttpClient implements RemoteCall {
             String result = EntityUtils.toString(response.getEntity(), CHARSET_UTF_8);
             log.debug("Result: [{}]", result);
             return result;
-        } catch (IOException e) {
-            throw new RemoteCallException(String.format("Failed to call url [%s]", completeUrl), e);
+        } catch (IOException ex) {
+            String message = String.format("Failed to call url [%s]", completeUrl);
+            throw new RemoteCallException(message, ex);
         }
     }
 
