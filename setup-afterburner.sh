@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 is_command_available () {
-    command -v "$1" >/dev/null
+    command -v "$1" &>/dev/null
 }
 
 if ! is_command_available "java"; then
@@ -23,8 +23,8 @@ cd azure
 source setup-afterburner-01-exports.sh
 source setup-afterburner-02-creates.sh
 source setup-afterburner-03-exports.sh
-cd - >/dev/null
+cd - &>/dev/null
 cd afterburner-java
 source setup-afterburner-04-build-and-push-image.sh
 source setup-afterburner-05-create-webapp.sh
-cd - >/dev/null
+cd - &>/dev/null

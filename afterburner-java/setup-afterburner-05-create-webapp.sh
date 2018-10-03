@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-az appservice plan create --name linuxappservice --is-linux --sku S1
-az webapp create --name $APP_NAME --plan linuxappservice --deployment-container-image-name https://$REGISTRY_NAME.azurecr.io/afterburner-java
+APP_SERVICE_NAME=linuxappservice$AFBID
+az appservice plan create --name $APP_SERVICE_NAME --is-linux --sku S1
+az webapp create --name $APP_NAME --plan $APP_SERVICE_NAME --deployment-container-image-name https://$REGISTRY_NAME.azurecr.io/afterburner-java
 az webapp config container set --name $APP_NAME \
     --docker-custom-image-name ${DOCKER_REGISTRY}/afterburner-java:latest \
     --docker-registry-server-url https://${DOCKER_REGISTRY} \

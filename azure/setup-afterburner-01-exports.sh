@@ -8,7 +8,7 @@
     && echo "and optionally run 'setup-resource-group.sh' if non-existing resource group" \
     && exit 1
 
-export AFBID=$RANDOM
+export AFBID=${AFBID:-$RANDOM}
 export REGISTRY_NAME=acrafterburner$AFBID
 export APP_NAME=appafterburner$AFBID
 printenv | grep $AFBID

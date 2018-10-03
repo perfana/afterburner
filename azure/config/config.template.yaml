@@ -8,7 +8,7 @@ global_resources:
       azurefile_vol:
         volume_driver: azurefile
         storage_account_settings: jmeterstorageaccount
-        azure_file_share_name: jmeter1
+        azure_file_share_name: [JMETER_SHARE]
         container_path: $AZ_BATCH_NODE_SHARED_DIR/azfile
         mount_options:
         - file_mode=0777
