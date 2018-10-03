@@ -24,7 +24,8 @@ public class AfterburnerConfig {
     @Value("${afterburner.remote.call.httpclient.connections.max:20}")
     private int connectionsMax;
 
-    @Value("#{${afterburner.remote.call.additional.headers:{}}}")
+    // {:} is empty map, which is default if additional header not present
+    @Value("#{${afterburner.remote.call.additional.headers:{:}}}")
     Map<String, String> additionalHeaders;
 
     @Bean
