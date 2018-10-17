@@ -1,0 +1,4 @@
+GET http://localhost:8080/delay?duration=99
+Accept: application/json
+
+###

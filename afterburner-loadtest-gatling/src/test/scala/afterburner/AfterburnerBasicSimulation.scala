@@ -10,7 +10,7 @@ class AfterburnerBasicSimulation extends Simulation {
     private val contentType = "application/json"
 
     val httpProtocol: HttpProtocolBuilder = http
-        .baseURL(baseUrl)
+        .baseUrl(baseUrl)
         .inferHtmlResources()
         .acceptHeader("*/*")
         .contentTypeHeader(contentType)
@@ -30,6 +30,16 @@ class AfterburnerBasicSimulation extends Simulation {
             .get("/cpu/magic-identity-check?matrixSize=133")
             .check(status.is(200)))
         .pause(3)
+        .exec(http("upload-file")
+            .post("/files/upload")
+            .asMultipartForm
+            .bodyPart(
+                StringBodyPart("upload", "test from gatling")
+                  .fileName("gatling-upload.txt")
+            )
+        )
 
-    setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
+
+    //setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(1) during 1)).protocols(httpProtocol)
 }

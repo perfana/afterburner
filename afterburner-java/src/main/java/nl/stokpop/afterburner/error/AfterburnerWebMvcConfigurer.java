@@ -26,8 +26,9 @@ public class AfterburnerWebMvcConfigurer implements WebMvcConfigurer {
                 int status = response.getStatus();
                 if (status != HttpStatus.OK.value()
                         && !ErrorPage.PATH.equals(requestURI)) {
-                    String queryString = request.getQueryString();
-                    log.warn("Not OK but [{}:{}] for URI [{}] and Query String [{}]", status, HttpStatus.resolve(status).getReasonPhrase(), requestURI, queryString == null ? "" : queryString);
+                    String queryString = request.getQueryString() == null ? "Unknown" : request.getQueryString();
+                    String reasonPhrase = HttpStatus.resolve(status) == null ? "Unknown" : HttpStatus.resolve(status).getReasonPhrase();
+                    log.warn("No status [200:OK] but [{}:{}] for URI [{}] and Query String [{}]", status, reasonPhrase, requestURI, queryString);
                 }
             }
         });

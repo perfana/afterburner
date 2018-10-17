@@ -1,0 +1,12 @@
+POST http://localhost:8080/files/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="upload"; filename="test.txt"
+Content-Type: application/octet-stream
+
+this is a test!
+
+--WebAppBoundary--
+
+###
