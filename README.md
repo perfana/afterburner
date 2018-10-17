@@ -100,6 +100,13 @@ Examples:
 
 note: do not forget to escape & with a backslash using bash and curl
 
+## upload file
+Upload a file to the java tmp directory (be careful not to fill that directory :-).
+
+Example:
+* `curl --trace-ascii - -F 'upload=@pom.xml' http://localhost:8080/files/upload` upload the pom.xml file
+* `/files/download/pom.xml` download the pom.xml file after a succeeded upload
+
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
 * `-Dafterburner.remote.call.base_url=https://my.remote.site:1234` connect remote calls to this base url
