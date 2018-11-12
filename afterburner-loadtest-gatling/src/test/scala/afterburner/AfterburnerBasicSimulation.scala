@@ -40,6 +40,6 @@ class AfterburnerBasicSimulation extends Simulation {
         )
 
 
-    //setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
-    setUp(scn.inject(constantUsersPerSec(1) during 1)).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
+    //setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
 }
