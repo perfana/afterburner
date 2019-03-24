@@ -22,7 +22,7 @@ public class CpuBurner {
     }
 
     @RequestMapping("/cpu/magic-identity-check")
-    public BurnerHello magicIdentityCheck(
+    public BurnerMessage magicIdentityCheck(
             @RequestParam(value = "matrixSize", defaultValue = "10") int matrixSize) throws InvalidMatrixException {
 
         long startTime = System.currentTimeMillis();
@@ -40,7 +40,7 @@ public class CpuBurner {
                 matrixSize, matrixEqualResult.areEqual() ? "is equal" : "is not equal");
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerHello(message, props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
     }
 
 }

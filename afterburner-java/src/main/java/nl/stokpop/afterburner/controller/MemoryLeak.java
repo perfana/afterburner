@@ -29,7 +29,7 @@ public class MemoryLeak {
     }
 
     @RequestMapping("/memory/grow")
-    public BurnerHello memoryGrow(
+    public BurnerMessage memoryGrow(
             @RequestParam(value = "objects", defaultValue = "10") int objects,
             @RequestParam(value = "items", defaultValue = "9") int items) {
 
@@ -42,17 +42,17 @@ public class MemoryLeak {
         }
         String message = createMemoryMessage();
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerHello(message, name, durationMillis);
+        return new BurnerMessage(message, name, durationMillis);
     }
     
     @RequestMapping("/memory/clear")
-    public BurnerHello memoryClear() {
+    public BurnerMessage memoryClear() {
         log.info("Clear Big list with size [{}].", bigList.size());
         long startTime = System.currentTimeMillis();
         this.bigList = new ArrayList<>();
         String message = createMemoryMessage();
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerHello(message, props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
     }
 
     private String createMemoryMessage() {

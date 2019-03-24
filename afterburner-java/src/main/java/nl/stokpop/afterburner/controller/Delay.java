@@ -12,18 +12,20 @@ import java.time.Duration;
 import java.time.format.DateTimeParseException;
 
 @RestController
-public class DelayedResponse {
+public class Delay {
 
-    private static final Logger log = LoggerFactory.getLogger(DelayedResponse.class);
+    private static final Logger log = LoggerFactory.getLogger(Delay.class);
 
     private final AfterburnerProperties props;
 
-    public DelayedResponse(final AfterburnerProperties props) {
+    public Delay(final AfterburnerProperties props) {
         this.props = props;
     }
 
     @RequestMapping("/delay")
-    public BurnerHello delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
+    public BurnerMessage delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
+        long startTime = System.currentTimeMillis();
+
         long sleepInMillis;
         if (duration.startsWith("P")) {
             sleepInMillis = determineISO8601DurationInMillis(duration);
@@ -41,7 +43,8 @@ public class DelayedResponse {
         } catch (InterruptedException e) {
             log.warn("Sleep received interrupt: {}", e.getMessage());
         }
-        return new BurnerHello(String.format("This was a delay of %s", duration), props.getAfterburnerName(), sleepInMillis);
+        long durationMillis = System.currentTimeMillis() - startTime;
+        return new BurnerMessage(String.format("This was a delay of %s", duration), props.getAfterburnerName(), durationMillis);
     }
 
     private long determineISO8601DurationInMillis(String duration) {

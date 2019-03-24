@@ -74,6 +74,34 @@ Example:
 * `curl --trace-ascii - -F 'upload=@pom.xml' http://localhost:8080/files/upload` upload the pom.xml file
 * `/files/download/pom.xml` download the pom.xml file after a succeeded upload
 
+## database connect
+
+Show latency of connecting to a database using a simple query on a Springboot template.
+
+The default query is 'SELECT 1' and can be changed via the `afterburner.database.connect.query` property.
+
+Example:
+* `curl http://localhost:8080/db/connect`
+
+Example output:
+   
+    {"message":"{ 'db-call':'success','query-duration-nanos':447302064 }","name":"Afterburner-One","durationInMillis":447}
+
+## tcp connect
+
+Show latency to remote TCP port using a Java TCP Socket creation.
+This closely matches the network latency to the remote site, but includes 
+some Java related overhead, such as possible gc times and Java security manager
+checks in the Socket code.
+
+Example: 
+* `curl http://localhost:8080/tcp/connect?host=www.google.com\&port=80\&timeout-ms=1000`
+
+Example output:
+
+    {"message":"{ 'tcp-connect':'success', 'connect-duration-nanos':5281882, 'close-duration-nanos':39150, 'host':'www.google.com', 'port':80 }","name":"Afterburner-One","durationInMillis":6}
+ 
+
 # properties
 * `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
 * `-Dafterburner.remote.call.base_url=https://my.remote.site:1234` connect remote calls to this base url
