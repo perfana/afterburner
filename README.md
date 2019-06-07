@@ -24,15 +24,21 @@ Examples:
 * `/delay?duration=150` delay for 150 millis
 
 ## memory
-Call this endpoint to increase memory usage to simulate a memory leak. 
+Call this endpoint to increase memory usage to simulate a memory leak or to generate lots of young objects for each request (churn). 
 
-If you increase the memory usage continuously or with a high
-number of objects you will likely see a OutOfMemory related issues.
+If you increase the memory usage continuously or with a high number of objects you will likely see a OutOfMemory related issues.
 
-Examples:
+Increasing the number of short lived objects (objects that are alive only during a request) you can simulate a high
+memory churn rate and see how the garbage collector behaves.
+
+Examples for memory leak:
 * `/memory/grow` grows an in memory structure with default values
-* `/memory/grow?objects=5&items=5` grows structure with the given values
+* `/memory/grow?objects=5&items=5` grows structure with the given values (5 objects with 5 items each)
 * `/memory/clear` clears the memory structure and memory will be freed
+
+Examples for memory churn:
+* `/memory/churn` creates lots of objects and sleeps for a while
+* `/memory/churn?objects=1818&duration=200` creates 1818 objects and sleeps for 200 milliseconds
 
 ## cpu
 Call this endpoint to burn some cpu cycles using matrix calculations.

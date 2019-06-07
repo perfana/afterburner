@@ -23,11 +23,15 @@ class AfterburnerBasicSimulation extends Simulation {
             .check(status.is(200)))
         .pause(3)
         .exec(http("simple_mini_leak")
-            .get("/memory/grow?objects=8&items=54")
+            .get("/memory/grow?objects=2&items=13")
             .check(status.is(200)))
         .pause(2)
         .exec(http("simple_cpu_burn")
             .get("/cpu/magic-identity-check?matrixSize=133")
+            .check(status.is(200)))
+        .pause(3)
+        .exec(http("memory_churn")
+            .get("/memory/churn?objects=1818")
             .check(status.is(200)))
         .pause(3)
         .exec(http("upload-file")
@@ -40,6 +44,6 @@ class AfterburnerBasicSimulation extends Simulation {
         )
 
 
-    setUp(scn.inject(constantUsersPerSec(12) during 30)).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(12) during 300)).protocols(httpProtocol)
     //setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
 }
