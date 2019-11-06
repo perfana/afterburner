@@ -2,7 +2,7 @@
 
 Simple self-running test jar to use in load test environments to tune and explore monitor and analysis tools.
 
-Build status: [![Build Status](https://travis-ci.org/stokpop/afterburner.svg?branch=master)](https://travis-ci.org/stokpop/afterburner)
+[![Build Status](https://travis-ci.com/stokpop/afterburner.svg?branch=master)](https://travis-ci.com/stokpop/afterburner)
 
 # afterburner-java
 
