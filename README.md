@@ -73,6 +73,20 @@ Examples:
 
 note: do not forget to escape & with a backslash using bash and curl
 
+## remote call async
+Call many remote http(s) endpoint in parallel using `@Async` method.
+
+Works the same as the remote call above with the addition of how many times
+the remote call should be made. All calls are `@Async` calls, using `CompletableFuture`.
+
+Example:
+* `/remote/call-many?count=10` call delay on remote afterburner via HttpClient.
+* `/remote/call-many?count=200&path=/delay?duration=PT2S` call delay of 2 seconds on remote afterburner via HttpClient.
+* `/remote/call-many?count=4&path=/cpu/magic-identity-check` call 4 times the magic-identity-check in parallel on remote afterburner
+
+A custom thread executor pool is created that also registers itself with micrometer.
+This way the executor can be monitored on tasks in the queue and number of threads in use.
+
 ## upload file
 Upload a file to the java tmp directory (be careful not to fill that directory :-).
 

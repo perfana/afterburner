@@ -1,39 +1,54 @@
 package nl.stokpop.afterburner.controller;
 
 import nl.stokpop.afterburner.AfterburnerException;
-import nl.stokpop.afterburner.client.RemoteCallException;
-import nl.stokpop.afterburner.client.RemoteCallHttpClient;
-import nl.stokpop.afterburner.client.RemoteCallOkHttp;
+import nl.stokpop.afterburner.service.AfterburnerRemote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
 @RestController
 public class RemoteCallController {
 
-    private final RemoteCallHttpClient httpClient;
-    private final RemoteCallOkHttp okHttp;
+    private final AfterburnerRemote afterburnerRemote;
 
     @Autowired
-    public RemoteCallController(final RemoteCallHttpClient httpClient, final RemoteCallOkHttp okHttp) {
-        this.httpClient = httpClient;
-        this.okHttp = okHttp;
+    public RemoteCallController(final AfterburnerRemote afterburnerRemote) {
+        this.afterburnerRemote = afterburnerRemote;
     }
 
     @RequestMapping("remote/call")
     public String remoteCallHttpClient(
-            @RequestParam(value = "path", defaultValue = "/") String path,
+            @RequestParam(value = "path", defaultValue = "/delay") String path,
             @RequestParam(value = "type", defaultValue = "httpclient") String type) {
-        try {
-            switch (type) {
-                case "httpclient": return httpClient.call(path);
-                case "okhttp": return okHttp.call(path);
-                default: throw new RemoteCallException(String.format("Unknown remote call type [%s]", type));
+        return afterburnerRemote.executeCall(path, type);
+    }
+
+    @RequestMapping("remote/call-many")
+    public String remoteCallHttpClientMany(
+            @RequestParam(value = "path", defaultValue = "/delay") String path,
+            @RequestParam(value = "type", defaultValue = "httpclient") String type,
+            @RequestParam(value = "count", defaultValue = "10") int count) {
+
+            List<CompletableFuture<String>> results = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                results.add(afterburnerRemote.executeCallAsync(path, type));
             }
-        } catch (RemoteCallException e) {
-            throw new AfterburnerException("Call to remote url via HttpClient failed.", e);
-        }
+            return results.stream().map(stringCompletableFuture -> {
+                try {
+                    return stringCompletableFuture.get(60, TimeUnit.SECONDS);
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    throw new AfterburnerException("Execute async failed.", e);
+                }
+            }).collect(Collectors.joining(","));
     }
 
 }

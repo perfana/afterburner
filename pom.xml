@@ -30,7 +30,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <springboot.version>2.0.6.RELEASE</springboot.version>
+        <springboot.version>2.2.2.RELEASE</springboot.version>
         <!--suppress UnresolvedMavenProperty -->
         <docker.image.prefix>${env.DOCKER_REGISTRY}</docker.image.prefix>
         <!--suppress UnresolvedMavenProperty -->
