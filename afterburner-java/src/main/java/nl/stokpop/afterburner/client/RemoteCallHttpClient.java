@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class RemoteCallHttpClient implements RemoteCall {
 
     private final static Logger log = LoggerFactory.getLogger(RemoteCallHttpClient.class);
 
-    private final static Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
+    private final static Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
 
     private final String baseUrl;
     private final Map<String, String> additionalHeaders;

@@ -13,44 +13,42 @@ public final class Sleeper {
     private static final Logger log = LoggerFactory.getLogger(Delay.class);
 
     public static void sleep(String duration) {
-        long sleepInMillis = parseDurationIntoMillis(duration);
+        Duration sleepInMillis = parseDurationIntoMillis(duration);
         log.info("About to sleep for [{}] millis (duration = [{}]).", sleepInMillis, duration);
         sleep(sleepInMillis);
     }
 
-    private static void sleep(long sleepInMillis) {
+    public static void sleep(Duration sleepDuration) {
         try {
-            Thread.sleep(sleepInMillis);
+            Thread.sleep(sleepDuration.toMillis());
         } catch (InterruptedException e) {
             log.warn("Sleep received interrupt: {}", e.getMessage());
         }
     }
 
-    public static long parseDurationIntoMillis(String duration) {
-        long sleepInMillis;
+    private static Duration parseDurationIntoMillis(String duration) {
+        Duration sleepDuration;
         if (duration.startsWith("P")) {
-            sleepInMillis = determineISO8601DurationInMillis(duration);
+            sleepDuration = determineISO8601DurationInMillis(duration);
         }
         else {
             try {
-                sleepInMillis = Long.parseLong(duration);
+                sleepDuration = Duration.ofMillis(Long.parseLong(duration));
             } catch (NumberFormatException e) {
                 throw new AfterburnerException(String.format("Not a valid duration [%s]", duration), e);
             }
         }
-        return sleepInMillis;
+        return sleepDuration;
     }
 
-    public static long determineISO8601DurationInMillis(String duration) {
+    private static Duration determineISO8601DurationInMillis(String duration) {
         Duration parsedDuration;
         try {
             parsedDuration = Duration.parse(duration);
         } catch (DateTimeParseException e) {
             throw new AfterburnerException(String.format("Not a valid duration [%s]", duration), e);
         }
-        long seconds = parsedDuration.getSeconds();
-        int nano = parsedDuration.getNano();
-        return seconds * 1_000 + nano / 1_000_000;
+        return parsedDuration;
     }
 
 }

@@ -1,10 +1,11 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.util.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,8 @@ public class MemoryChurn {
         this.props = props;
     }
 
-    @RequestMapping("/memory/churn")
+    @ApiOperation(value = "Simulate high object churn: lots of objects created per request.")
+    @GetMapping("/memory/churn")
     public BurnerMessage delay(@RequestParam(value = "objects", defaultValue = "181") int objects,
                                @RequestParam(value = "duration", defaultValue = "100") String duration) {
         long startTime = System.currentTimeMillis();
@@ -37,6 +39,7 @@ public class MemoryChurn {
                 .collect(Collectors.toList());
 
         Sleeper.sleep(duration);
+
         long durationMillis = System.currentTimeMillis() - startTime;
         return new BurnerMessage(String.format("This churner object creation took [%s] ms for [%d] BigDecimals and [%s] delay.", durationMillis, numbers.size(), duration), props.getAfterburnerName(), durationMillis);
     }

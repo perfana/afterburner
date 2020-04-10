@@ -1,9 +1,10 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerException;
 import nl.stokpop.afterburner.service.AfterburnerRemote;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,14 +26,16 @@ public class RemoteCallController {
         this.afterburnerRemote = afterburnerRemote;
     }
 
-    @RequestMapping("remote/call")
+    @ApiOperation(value = "Call one remote service.")
+    @GetMapping("remote/call")
     public String remoteCallHttpClient(
             @RequestParam(value = "path", defaultValue = "/delay") String path,
             @RequestParam(value = "type", defaultValue = "httpclient") String type) {
         return afterburnerRemote.executeCall(path, type);
     }
 
-    @RequestMapping("remote/call-many")
+    @ApiOperation(value = "Call many remote services in parallel using CompletableFutures.")
+    @GetMapping("remote/call-many")
     public String remoteCallHttpClientMany(
             @RequestParam(value = "path", defaultValue = "/delay") String path,
             @RequestParam(value = "type", defaultValue = "httpclient") String type,

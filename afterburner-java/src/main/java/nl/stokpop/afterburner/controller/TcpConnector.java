@@ -1,9 +1,9 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,11 +18,12 @@ public class TcpConnector {
     private final AfterburnerProperties props;
 
     @Autowired
-    public TcpConnector(JdbcTemplate template, AfterburnerProperties props) {
+    public TcpConnector(AfterburnerProperties props) {
         this.props = props;
     }
 
-    @RequestMapping("/tcp/connect")
+    @ApiOperation(value = "Check connection to remote port. This measures the TCP handshake (socket.connect()) to the remote system.")
+    @GetMapping("/tcp/connect")
     public BurnerMessage tcpConnect(
             @RequestParam(value = "host", defaultValue = "localhost") String host,
             @RequestParam(value = "port", defaultValue = "8080") int port,

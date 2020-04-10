@@ -1,9 +1,10 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,7 +20,8 @@ public class DatabaseConnector {
         this.props = props;
     }
 
-    @RequestMapping("/db/connect")
+    @ApiOperation(value = "Execute trivial query on remote database and measure the response time.")
+    @GetMapping("/db/connect")
     public BurnerMessage checkDatabaseConnection() {
         long startTime = System.currentTimeMillis();
 

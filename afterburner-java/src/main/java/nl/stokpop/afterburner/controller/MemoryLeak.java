@@ -1,10 +1,11 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BigFatBastard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,8 @@ public class MemoryLeak {
                 : props.getAfterburnerName();
     }
 
-    @RequestMapping("/memory/grow")
+    @ApiOperation(value = "Simulate a memory leak.")
+    @GetMapping("/memory/grow")
     public BurnerMessage memoryGrow(
             @RequestParam(value = "objects", defaultValue = "10") int objects,
             @RequestParam(value = "items", defaultValue = "9") int items) {
@@ -44,8 +46,9 @@ public class MemoryLeak {
         long durationMillis = System.currentTimeMillis() - startTime;
         return new BurnerMessage(message, name, durationMillis);
     }
-    
-    @RequestMapping("/memory/clear")
+
+    @ApiOperation(value = "Clear the memory leak.")
+    @GetMapping("/memory/clear")
     public BurnerMessage memoryClear() {
         log.info("Clear Big list with size [{}].", bigList.size());
         long startTime = System.currentTimeMillis();

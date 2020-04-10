@@ -1,5 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
+import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,13 +9,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -32,6 +27,8 @@ public class FileUpload {
 
     private Path filesPath;
 
+    private File storedFile;
+
     @PostConstruct
     public void init() {
         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -44,12 +41,14 @@ public class FileUpload {
         }
     }
 
-    @RequestMapping(value = "/files/upload", method = RequestMethod.POST, consumes = "multipart/form-data")
+    @ApiOperation(value = "Upload a file using multipart/form-data and store in temp directory.")
+    @PostMapping(value = "/files/upload", consumes = "multipart/form-data")
     public ResponseEntity<String> upload(@RequestParam("upload") MultipartFile file) {
         String filename = file.getOriginalFilename();
         long size = file.getSize();
         log.info("Upload file: [{}] of size [{}] bytes.", filename, size);
         saveFile(file);
+        log.info("Stored file: " + storedFile);
         return ResponseEntity.ok().body(String.format("File upload succeeded [%s] of size [%d] bytes.", filename, size));
     }
 
@@ -64,6 +63,7 @@ public class FileUpload {
 
         try {
             File destFile = filesPath.resolve(filename).toFile();
+            storedFile = destFile;
             log.info("Saving {}.", destFile.getAbsolutePath());
             file.transferTo(destFile);
         } catch (IOException | IllegalStateException e) {
@@ -77,8 +77,8 @@ public class FileUpload {
         }
     }
 
-    @GetMapping("/files/download/{filename:.+}")
-    @ResponseBody
+    @ApiOperation(value = "Download a file.", notes = "Download an already uploaded file by name.")
+    @GetMapping(value = "/files/download/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         Resource file = loadAsResource(filename);
         long sizeBytes;

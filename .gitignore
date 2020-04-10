@@ -10,6 +10,7 @@ cloud-init.txt
 
 *.ignore
 *.bak
+*.iml
 
 azure/config/jmeterpool/
 afterburner-loadtest-jmeter/tmp/

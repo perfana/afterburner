@@ -11,6 +11,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.stream.Collectors;
 
 @Configuration
 public class AfterburnerWebMvcConfigurer implements WebMvcConfigurer {
@@ -26,9 +29,16 @@ public class AfterburnerWebMvcConfigurer implements WebMvcConfigurer {
                 int status = response.getStatus();
                 if (status != HttpStatus.OK.value()
                         && !ErrorPage.PATH.equals(requestURI)) {
+
                     String queryString = request.getQueryString() == null ? "Unknown" : request.getQueryString();
                     String reasonPhrase = HttpStatus.resolve(status) == null ? "Unknown" : HttpStatus.resolve(status).getReasonPhrase();
-                    log.warn("No status [200:OK] but [{}:{}] for URI [{}] and Query String [{}]", status, reasonPhrase, requestURI, queryString);
+
+                    Enumeration<String> headerNames = request.getHeaderNames();
+                    String headers = Collections.list(headerNames).stream()
+                        .map(h -> h + ": " + String.join(",", Collections.list(request.getHeaders(h))))
+                        .collect(Collectors.joining(";"));
+
+                    log.warn("No status [200:OK] but [{}:{}] for URI [{}] and Query String [{}] and headers [{}]", status, reasonPhrase, requestURI, queryString, headers);
                 }
             }
         });

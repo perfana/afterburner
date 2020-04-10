@@ -42,6 +42,14 @@ class AfterburnerBasicSimulation extends Simulation {
             .get("/remote/call-many?count=2")
             .check(status.is(200)))
         .pause(3)
+        .exec(http("parallel")
+          .get("/parallel")
+          .check(status.is(200)))
+        .pause(3)
+        .exec(http("tcp connect")
+          .get("/tcp/connect")
+          .check(status.is(200)))
+        .pause(3)
         .exec(http("upload-file")
             .post("/files/upload")
             .asMultipartForm
@@ -51,7 +59,6 @@ class AfterburnerBasicSimulation extends Simulation {
             )
         )
 
-
-    setUp(scn.inject(constantUsersPerSec(12) during 300)).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(12) during 60)).protocols(httpProtocol)
     //setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
 }
