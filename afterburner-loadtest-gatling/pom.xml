@@ -19,7 +19,7 @@
         <events-gatling.version>3.0.3-events-7</events-gatling.version>
         <gatling-plugin.version>3.0.3</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <scala-maven-plugin.version>4.3.1</scala-maven-plugin.version>
+        <scala-maven-plugin.version>4.4.0</scala-maven-plugin.version>
     </properties>
 
     <dependencies>
