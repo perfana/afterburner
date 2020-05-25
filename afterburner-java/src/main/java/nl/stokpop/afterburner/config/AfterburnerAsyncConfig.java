@@ -30,7 +30,6 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setMaxPoolSize(10);
         executor.setCorePoolSize(5);
-        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix(executorName);
         executor.initialize();
 
