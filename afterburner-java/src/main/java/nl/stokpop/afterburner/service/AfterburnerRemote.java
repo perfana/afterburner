@@ -27,7 +27,7 @@ public class AfterburnerRemote {
     public AfterburnerRemote(RemoteCallHttpClient httpClient, RemoteCallOkHttp okHttp, MeterRegistry registry, AfterburnerProperties props) {
         this.httpClient = httpClient;
         this.okHttp = okHttp;
-        this.counterTotalCalls = registry.counter("remote.calls", "name", props.getAfterburnerName());
+        this.counterTotalCalls = registry.counter("remote.calls", "name", props.getName());
     }
 
     public String executeCall(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) {

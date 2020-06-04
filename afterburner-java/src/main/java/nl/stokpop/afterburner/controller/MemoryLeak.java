@@ -24,9 +24,9 @@ public class MemoryLeak {
 
     public MemoryLeak(final AfterburnerProperties props) {
         this.props = props;
-        this.name = props.getAfterburnerName() == null
+        this.name = props.getName() == null
                 ? String.format("Anonymous Burner [%s]", this.toString())
-                : props.getAfterburnerName();
+                : props.getName();
     }
 
     @ApiOperation(value = "Simulate a memory leak.")
@@ -55,7 +55,7 @@ public class MemoryLeak {
         this.bigList = new ArrayList<>();
         String message = createMemoryMessage();
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
     private String createMemoryMessage() {

@@ -1,26 +1,17 @@
 package nl.stokpop.afterburner;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Configuration
+@ConfigurationProperties(prefix = "afterburner")
+@Data
 public class AfterburnerProperties {
 
-    private final String afterburnerName;
-    private final String databaseConnectQuery;
+    String name = "afterburner-one";
+    String databaseConnectQuery = "SELECT 1";
 
-    public AfterburnerProperties(
-            @Value(value = "${afterburner.name:Afterburner-Anonymous}") final String afterburnerName,
-            @Value(value = "${afterburner.database.connect.query:SELECT 1}") final String databaseConnectQuery) {
-        this.afterburnerName = afterburnerName;
-        this.databaseConnectQuery = databaseConnectQuery;
-    }
+    int asyncMaxPoolSize = 10;
+    int asyncCorePoolSize = 5;
+    int asyncQueueSize = -1;
 
-    public String getAfterburnerName() {
-        return afterburnerName;
-    }
-
-    public String getDatabaseConnectQuery() {
-        return databaseConnectQuery;
-    }
 }

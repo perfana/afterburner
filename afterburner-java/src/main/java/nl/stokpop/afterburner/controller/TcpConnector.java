@@ -46,13 +46,13 @@ public class TcpConnector {
                     estimatedConnectTime, estimatedCloseTime, host, port);
 
             long durationMillis = System.currentTimeMillis() - startTime;
-            return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
+            return new BurnerMessage(message, props.getName(), durationMillis);
 
         } catch (IOException e) {
             String message = String.format("{ 'tcp-connect':'failure', 'error':'%s', 'host':'%s', 'port':%d }",
                     e.getMessage(), host, port);
             long durationMillis = System.currentTimeMillis() - startTime;
-            return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
+            return new BurnerMessage(message, props.getName(), durationMillis);
         } finally {
             if (socket != null) {
                 try {

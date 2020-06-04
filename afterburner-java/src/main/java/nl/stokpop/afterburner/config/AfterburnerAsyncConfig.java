@@ -3,6 +3,7 @@ package nl.stokpop.afterburner.config;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import nl.stokpop.afterburner.AfterburnerProperties;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -20,11 +21,12 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
 
     private final MeterRegistry registry;
     private final BeanFactory beanFactory;
+    private final AfterburnerProperties props;
 
-
-    AfterburnerAsyncConfig(MeterRegistry registry, BeanFactory beanFactory) {
+    AfterburnerAsyncConfig(MeterRegistry registry, BeanFactory beanFactory, AfterburnerProperties props) {
         this.registry = registry;
         this.beanFactory = beanFactory;
+        this.props = props;
     }
 
     @Override
@@ -33,8 +35,11 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
         final String executorName = "afterburner-executor";
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(10);
-        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(props.getAsyncMaxPoolSize());
+        executor.setCorePoolSize(props.getAsyncCorePoolSize());
+        if (props.getAsyncQueueSize() != -1) {
+            executor.setQueueCapacity(props.getAsyncQueueSize());
+        }
         executor.setThreadNamePrefix(executorName);
         executor.initialize();
 

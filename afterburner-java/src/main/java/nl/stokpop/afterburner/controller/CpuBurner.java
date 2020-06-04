@@ -42,7 +42,7 @@ public class CpuBurner {
                 matrixSize, matrixEqualResult.areEqual() ? "is equal" : "is not equal");
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
 }

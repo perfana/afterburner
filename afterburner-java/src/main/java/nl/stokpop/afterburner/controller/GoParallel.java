@@ -71,7 +71,7 @@ public class GoParallel {
             .reduce(0L, Long::sum);
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(String.format("The sum of prime numbers up to %d: %d", maxPrime, sum), props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(String.format("The sum of prime numbers up to %d: %d", maxPrime, sum), props.getName(), durationMillis);
     }
 
     @ApiOperation(value = "Calculate the sum of prime numbers, with some additional delay, using a regular (serial) stream.")
@@ -86,7 +86,7 @@ public class GoParallel {
             .reduce(0L, Long::sum);
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(String.format("The sum of prime numbers up to %d: %d", maxPrime, sum), props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(String.format("The sum of prime numbers up to %d: %d", maxPrime, sum), props.getName(), durationMillis);
     }
 
 }

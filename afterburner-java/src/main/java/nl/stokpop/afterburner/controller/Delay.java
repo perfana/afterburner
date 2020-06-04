@@ -26,6 +26,6 @@ public class Delay {
         long startTime = System.currentTimeMillis();
         Sleeper.sleep(duration);
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(String.format("This was a delay of %s", duration), props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(String.format("This was a delay of %s", duration), props.getName(), durationMillis);
     }
 }

@@ -35,7 +35,7 @@ public class DatabaseConnector {
 
         String message = String.format("{ 'db-call':'success','query-duration-nanos':%d }", estimatedQueryTime);
 
-        return new BurnerMessage(message, props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
 }

@@ -41,7 +41,7 @@ public class MemoryChurn {
         Sleeper.sleep(duration);
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        return new BurnerMessage(String.format("This churner object creation took [%s] ms for [%d] BigDecimals and [%s] delay.", durationMillis, numbers.size(), duration), props.getAfterburnerName(), durationMillis);
+        return new BurnerMessage(String.format("This churner object creation took [%s] ms for [%d] BigDecimals and [%s] delay.", durationMillis, numbers.size(), duration), props.getName(), durationMillis);
     }
 
 }
