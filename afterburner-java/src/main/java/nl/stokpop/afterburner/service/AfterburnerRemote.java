@@ -9,10 +9,11 @@ import nl.stokpop.afterburner.client.RemoteCallHttpClient;
 import nl.stokpop.afterburner.client.RemoteCallOkHttp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @Service
 public class AfterburnerRemote {
@@ -48,7 +49,7 @@ public class AfterburnerRemote {
     }
 
     @Async
-    public CompletableFuture<String> executeCallAsync(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) {
-        return CompletableFuture.completedFuture(executeCall(path, type));
+    public Future<String> executeCallAsync(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) {
+        return new AsyncResult<>(executeCall(path, type));
     }
 }

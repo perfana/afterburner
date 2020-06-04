@@ -3,8 +3,10 @@ package nl.stokpop.afterburner.config;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.cloud.sleuth.instrument.async.LazyTraceExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -17,9 +19,12 @@ import java.util.concurrent.Executor;
 public class AfterburnerAsyncConfig implements AsyncConfigurer {
 
     private final MeterRegistry registry;
+    private final BeanFactory beanFactory;
 
-    AfterburnerAsyncConfig(final MeterRegistry registry) {
+
+    AfterburnerAsyncConfig(MeterRegistry registry, BeanFactory beanFactory) {
         this.registry = registry;
+        this.beanFactory = beanFactory;
     }
 
     @Override
@@ -34,7 +39,10 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
         executor.initialize();
 
         // enable metrics for this executor
-        return ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);
+        Executor monitoredExecutor = ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);
+
+        // enable tracing for @Async: have one parent trace instead of all separate traces
+        return new LazyTraceExecutor(this.beanFactory, monitoredExecutor);
     }
 
     // needed to reactivate the jvm metrics after registering executor (???)

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -41,13 +41,13 @@ public class RemoteCallController {
             @RequestParam(value = "type", defaultValue = "httpclient") String type,
             @RequestParam(value = "count", defaultValue = "10") int count) {
 
-            List<CompletableFuture<String>> results = new ArrayList<>();
+            List<Future<String>> results = new ArrayList<>();
             for (int i = 0; i < count; i++) {
                 results.add(afterburnerRemote.executeCallAsync(path, type));
             }
-            return results.stream().map(stringCompletableFuture -> {
+            return results.stream().map(futureString -> {
                 try {
-                    return stringCompletableFuture.get(60, TimeUnit.SECONDS);
+                    return futureString.get(60, TimeUnit.SECONDS);
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     throw new AfterburnerException("Execute async failed.", e);
                 }
