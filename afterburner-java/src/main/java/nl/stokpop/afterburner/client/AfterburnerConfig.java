@@ -2,7 +2,8 @@ package nl.stokpop.afterburner.client;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +29,9 @@ public class AfterburnerConfig {
     @Value("#{${afterburner.remote.call.additional.headers:{:}}}")
     Map<String, String> additionalHeaders;
 
+    // Need to inject traceHttpClientBuilder to have spans in http headers
     @Bean
-    public CloseableHttpClient createHttpClient() {
+    public CloseableHttpClient createHttpClient(@Qualifier("traceHttpClientBuilder") HttpClientBuilder builder) {
 
         RequestConfig defaultRequestConfig = RequestConfig.custom()
                 .setConnectTimeout(connectTimeoutMillis)
@@ -37,7 +39,7 @@ public class AfterburnerConfig {
                 .setConnectionRequestTimeout(connectionRequestTimeoutMillis)
                 .build();
 
-        return HttpClients.custom()
+        return builder
                 .setDefaultRequestConfig(defaultRequestConfig)
                 .setMaxConnPerRoute(connectionsMax)
                 .setMaxConnTotal(connectionsMax)
