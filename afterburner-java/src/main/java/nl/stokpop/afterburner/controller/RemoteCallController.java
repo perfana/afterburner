@@ -37,9 +37,9 @@ public class RemoteCallController {
     @ApiOperation(value = "Call many remote services in parallel using CompletableFutures.")
     @GetMapping("remote/call-many")
     public String remoteCallHttpClientMany(
-            @RequestParam(value = "path", defaultValue = "/delay") String path,
+            @RequestParam(value = "path", defaultValue = "/delay?duration=33") String path,
             @RequestParam(value = "type", defaultValue = "httpclient") String type,
-            @RequestParam(value = "count", defaultValue = "10") int count) {
+            @RequestParam(value = "count", defaultValue = "3") int count) {
 
             List<Future<String>> results = new ArrayList<>();
             for (int i = 0; i < count; i++) {

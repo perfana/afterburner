@@ -57,7 +57,7 @@ public class GoParallel {
     @ApiOperation(value = "Calculate the sum of prime numbers, with some additional delay, using parallel stream (common fork join pool).")
     @GetMapping("/parallel")
     public BurnerMessage goParallel(
-        @RequestParam(value = "primeDelayMillis", defaultValue = "5") int primeDelayMillis,
+        @RequestParam(value = "primeDelayMillis", defaultValue = "2") int primeDelayMillis,
         @RequestParam(value = "maxPrime", defaultValue = "10000") long maxPrime) {
         long startTime = System.currentTimeMillis();
 

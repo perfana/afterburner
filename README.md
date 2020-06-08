@@ -158,6 +158,22 @@ Example:
 * `/parallel` runs prime number check in parallel using the common join fork pool
 * `/parallel-info` print metrics of the common join fork pool
 
+## basket validation
+
+Use this basket validation for concurrency issues with shared data in multiple threads.
+ 
+ * `/basket/purchase` - post a basket purchase, the request will be validated on total price and products/prices
+ 
+Good request:
+
+    curl -H "Content-Type: application/json" -d '{ "customer": "Johnny", "prices": [10, 20, 30], "products": ["apple", "banana","oranges"], "totalPrice": 60 }' localhost:8080/basket/purchase
+
+Bad request with validation errors:
+
+    curl -H "Content-Type: application/json" -d '{ "customer": "BadGuy", "prices": [20, 30], "products": ["sushi", "icescream"], "totalPrice": 40 }' localhost:8080/basket/purchase
+
+Put under load and check if all validates as expected.
+
 ## autonomous worker
 
 Use the autonomous worker to investigate the behaviour of @Schedule.
