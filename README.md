@@ -174,6 +174,16 @@ Bad request with validation errors:
 
 Put under load and check if all validates as expected.
 
+## Basket database store
+
+You can store baskets in a database by calling:
+
+    curl -H "Content-Type: application/json" -d '{ "customer": "Johnny", "prices": [10, 20, 30], "products": ["apple", "banana","oranges"], "totalPrice": 60 }' localhost:8080/basket/store
+    
+And retrieve all baskets via:
+
+    curl localhost:8080/basket/all
+
 ## autonomous worker
 
 Use the autonomous worker to investigate the behaviour of @Schedule.

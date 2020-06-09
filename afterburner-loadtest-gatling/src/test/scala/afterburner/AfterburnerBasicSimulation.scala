@@ -36,6 +36,16 @@ class AfterburnerBasicSimulation extends Simulation {
           .asJson
           .check(status.is(400)))
         .pause(1)
+        .exec(http("basket store")
+          .post("/basket/store")
+          .body(StringBody("{ \"customer\": \"BadGuy\", \"prices\": [20, 30], \"products\": [\"sushi\", \"icescream\"], \"totalPrice\": 40 }"))
+          .asJson
+          .check(status.is(200)))
+        .pause(1)
+        .exec(http("basket find all")
+          .get("/basket/all")
+          .check(status.is(200)))
+        .pause(1)
         .exec(http("simple_mini_leak")
             .get("/memory/grow?objects=2&items=13")
             .check(status.is(200)))

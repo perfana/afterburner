@@ -38,4 +38,6 @@ public class DatabaseConnector {
         return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
+
+
 }
