@@ -1,8 +1,7 @@
-package nl.stokpop.afterburner.controller;
+package nl.stokpop.afterburner.basket;
 
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
-import nl.stokpop.afterburner.basket.*;
 import nl.stokpop.afterburner.domain.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,7 @@ import java.util.List;
 @RestController
 public class BasketController {
 
-    private static final Logger log = LoggerFactory.getLogger(Delay.class);
+    private static final Logger log = LoggerFactory.getLogger(BasketController.class);
 
     private final AfterburnerProperties props;
 
@@ -82,4 +81,5 @@ public class BasketController {
         log.info("Basket find all. Duration ms: " + durationMillis);
         return new ResponseEntity<>(reply, HttpStatus.OK);
     }
+
 }

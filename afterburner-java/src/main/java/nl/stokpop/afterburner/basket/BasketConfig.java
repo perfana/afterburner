@@ -14,10 +14,11 @@ import java.util.List;
 public class BasketConfig {
 
     @Bean
-    List<Validator> validators() {
+    List<Validator> validators(TotalAmountCheckValidator totalAmountCheckValidator) {
         List<Validator> validators = new ArrayList<>();
         validators.add(new ProducstAndPricesValidator());
-        validators.add(new TotalAmountCheckValidator());
+        // total amount check validator is a @component due to needing a remote call
+        validators.add(totalAmountCheckValidator);
         return Collections.unmodifiableList(validators);
     }
 
