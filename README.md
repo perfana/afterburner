@@ -207,5 +207,24 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
 * `--server.port=8090` use different port (default 8080)
 * `export SERVER_PORT=8090` use different port via env variable
 
+# Tracing
+
+Run a jeager instance to see the tracing. For example via docker:
+
+    docker run -d --name jaeger \
+      -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+      -p 5775:5775/udp \
+      -p 6831:6831/udp \
+      -p 6832:6832/udp \
+      -p 5778:5778 \
+      -p 16686:16686 \
+      -p 14268:14268 \
+      -p 14250:14250 \
+      -p 9411:9411 \
+      jaegertracing/all-in-one:1.18
+      
+Then see traces here: http://localhost:16686/ 
+
+
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)

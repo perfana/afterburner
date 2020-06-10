@@ -1,5 +1,7 @@
 package nl.stokpop.afterburner.controller;
 
+import brave.Span;
+import brave.Tracer;
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.matrix.InvalidMatrixException;
@@ -18,8 +20,11 @@ public class CpuBurner {
     
     private final AfterburnerProperties props;
 
-    public CpuBurner(final AfterburnerProperties props) {
+    private final Tracer tracer;
+
+    public CpuBurner(final AfterburnerProperties props, Tracer tracer) {
         this.props = props;
+        this.tracer = tracer;
     }
 
     @ApiOperation(value = "Spend some time on CPU doing some magic matrix calculations.")
@@ -31,12 +36,35 @@ public class CpuBurner {
 
         log.info("Calculate magic matrix identity for matrix size [{}].", matrixSize);
 
-        long[][] simpleMagicSquare = MatrixCalculator.simpleMagicSquare(matrixSize);
-        long[][] identitySquare = MatrixCalculator.identitySquare(matrixSize);
+        long[][] simpleMagicSquare;
+        long[][] identitySquare;
+        
+        Span matrixInitSpan = tracer.nextSpan().name("matrix-init").start();
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixInitSpan.start())) {
+            simpleMagicSquare = MatrixCalculator.simpleMagicSquare(matrixSize);
+            identitySquare = MatrixCalculator.identitySquare(matrixSize);
+        }
+        finally {
+            matrixInitSpan.tag("matrix-size", String.valueOf(matrixSize)).finish();
+        }
 
-        long[][] multiplyMatrix = MatrixCalculator.multiply(simpleMagicSquare, identitySquare);
+        long[][] multiplyMatrix;
+        Span matrixMultiplySpan = tracer.nextSpan().name("matrix-multiply").start();
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixMultiplySpan.start())) {
+            multiplyMatrix = MatrixCalculator.multiply(simpleMagicSquare, identitySquare);
+        }
+        finally {
+            matrixMultiplySpan.tag("matrix-size", String.valueOf(matrixSize)).finish();
+        }
 
-        MatrixEqualResult matrixEqualResult = MatrixCalculator.areEqual(simpleMagicSquare, multiplyMatrix);
+        MatrixEqualResult matrixEqualResult;
+        Span matrixEqualCheckSpan = tracer.nextSpan().name("matrix-equal-check").start();
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixEqualCheckSpan.start())) {
+            matrixEqualResult = MatrixCalculator.areEqual(simpleMagicSquare, multiplyMatrix);
+        }
+        finally {
+            matrixEqualCheckSpan.tag("matrix-size", String.valueOf(matrixSize)).finish();
+        }
 
         String message = String.format("A simple magic square multiplied by an identity square of size [%d] [%s] to the magic square.",
                 matrixSize, matrixEqualResult.areEqual() ? "is equal" : "is not equal");
