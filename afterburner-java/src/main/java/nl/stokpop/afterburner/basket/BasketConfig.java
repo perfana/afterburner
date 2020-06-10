@@ -1,5 +1,8 @@
-package nl.stokpop.afterburner.validate;
+package nl.stokpop.afterburner.basket;
 
+import nl.stokpop.afterburner.basket.validate.ProducstAndPricesValidator;
+import nl.stokpop.afterburner.basket.validate.TotalAmountCheckValidator;
+import nl.stokpop.afterburner.basket.validate.Validator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

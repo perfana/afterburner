@@ -1,5 +1,6 @@
-package nl.stokpop.afterburner.validate;
+package nl.stokpop.afterburner.basket;
 
+import nl.stokpop.afterburner.basket.validate.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

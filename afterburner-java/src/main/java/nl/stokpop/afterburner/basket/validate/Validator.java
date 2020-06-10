@@ -1,4 +1,6 @@
-package nl.stokpop.afterburner.validate;
+package nl.stokpop.afterburner.basket.validate;
+
+import nl.stokpop.afterburner.basket.BasketRequest;
 
 import java.util.Collection;
 

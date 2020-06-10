@@ -2,12 +2,8 @@ package nl.stokpop.afterburner.controller;
 
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
+import nl.stokpop.afterburner.basket.*;
 import nl.stokpop.afterburner.domain.Basket;
-import nl.stokpop.afterburner.service.BasketService;
-import nl.stokpop.afterburner.validate.BasketListReply;
-import nl.stokpop.afterburner.validate.BasketReply;
-import nl.stokpop.afterburner.validate.BasketRequest;
-import nl.stokpop.afterburner.validate.BasketValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

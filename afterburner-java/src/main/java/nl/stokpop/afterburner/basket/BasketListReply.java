@@ -1,4 +1,4 @@
-package nl.stokpop.afterburner.validate;
+package nl.stokpop.afterburner.basket;
 
 import lombok.Singular;
 import lombok.Value;

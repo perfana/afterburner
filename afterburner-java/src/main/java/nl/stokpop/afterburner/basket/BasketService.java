@@ -1,4 +1,4 @@
-package nl.stokpop.afterburner.service;
+package nl.stokpop.afterburner.basket;
 
 import nl.stokpop.afterburner.database.BasketRepository;
 import nl.stokpop.afterburner.domain.Basket;
