@@ -31,7 +31,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <springboot.version>2.2.6.RELEASE</springboot.version>
-        <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
+        <spring-cloud.version>Hoxton.SR7</spring-cloud.version>
         <!--suppress UnresolvedMavenProperty -->
         <docker.image.prefix>${env.DOCKER_REGISTRY}</docker.image.prefix>
         <!--suppress UnresolvedMavenProperty -->
