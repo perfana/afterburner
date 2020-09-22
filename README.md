@@ -127,13 +127,22 @@ Show latency of connecting to a database using a simple query on a Springboot te
 
 The default query is 'SELECT 1' and can be changed via the `afterburner.database.connect.query` property.
 
+Afterburner connects to the mysql employees test database on default port 3306 on localhost.
+
 Example:
-* `/db/connect`
+* `/db/connect` perform simple SELECT 1 to measure base performance to database
+* `/db/connect/name\?firstName=Anneke` find employees by first name
 
 Example output:
    
     {"message":"{ 'db-call':'success','query-duration-nanos':447302064 }","name":"Afterburner-One","durationInMillis":447}
 
+or
+
+    [{"empNo":10006,"birthDate":"1953-04-20","firstName":"Anneke","lastName":"Preusig","gender":"F","hireDate":"1989-06-02"},{"empNo":10640,"birthDate":"1958-11-09","firstName":"Anneke","lastName":"Meszaros" ... 
+
+See dependencies how to set up the database component.
+    
 ## tcp connect
 
 Show latency to remote TCP port using a Java TCP Socket creation.
@@ -207,6 +216,8 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
 * `--server.port=8090` use different port (default 8080)
 * `export SERVER_PORT=8090` use different port via env variable
 
+## Dependencies
+
 # Tracing
 
 Run a jeager instance to see the tracing. For example via docker:
@@ -225,6 +236,28 @@ Run a jeager instance to see the tracing. For example via docker:
       
 Then see traces here: http://localhost:16686/ 
 
+# Database
+
+Run MariaDB with the MySql employees database:
+
+    docker run -d --name mariadbtest \
+      -e MYSQL_ROOT_PASSWORD=mypass \
+      -v /path/to/git/test_db:/db \
+      -p 3306:3306 \
+      mariadb:10.5.5
+
+Clone https://github.com/datacharmer/test_db into /path/to/git/
+
+    git clone https://github.com/datacharmer/test_db.git
+    
+Then ssh into this docker:
+    
+    docker exec -it mariadbtest /bin/bash
+
+And load the test database:
+    
+    cd /db
+    mysql -p mypass < employees.sql
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)
