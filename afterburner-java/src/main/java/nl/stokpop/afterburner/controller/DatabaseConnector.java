@@ -2,8 +2,8 @@ package nl.stokpop.afterburner.controller;
 
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
-import nl.stokpop.afterburner.database.Employee;
-import nl.stokpop.afterburner.database.EmployeeMapper;
+import nl.stokpop.afterburner.mybatis.Employee;
+import nl.stokpop.afterburner.mybatis.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;

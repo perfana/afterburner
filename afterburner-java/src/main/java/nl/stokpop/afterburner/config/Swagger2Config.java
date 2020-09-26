@@ -1,7 +1,6 @@
 package nl.stokpop.afterburner.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -23,9 +22,11 @@ import static springfox.documentation.schema.AlternateTypeRules.DIRECT_SUBSTITUT
 @EnableSwagger2
 public class Swagger2Config {
 
+    private final TypeResolver typeResolver;
 
-    @Autowired
-    private TypeResolver typeResolver;
+    public Swagger2Config(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     @Bean
     public Docket api() {
@@ -36,7 +37,7 @@ public class Swagger2Config {
                     typeResolver.resolve(MultipartFile.class), DIRECT_SUBSTITUTION_RULE_ORDER))
             .useDefaultResponseMessages(false)
             .select()
-            .apis(RequestHandlerSelectors.basePackage("nl.stokpop.afterburner.controller"))
+            .apis(RequestHandlerSelectors.basePackage("nl.stokpop.afterburner"))
             .paths(PathSelectors.any())
             .build()
             .apiInfo(apiEndPointsInfo());

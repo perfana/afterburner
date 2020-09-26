@@ -131,17 +131,24 @@ Afterburner connects to the mysql employees test database on default port 3306 o
 
 Example:
 * `/db/connect` perform simple SELECT 1 to measure base performance to database
-* `/db/connect/name\?firstName=Anneke` find employees by first name
 
 Example output:
    
     {"message":"{ 'db-call':'success','query-duration-nanos':447302064 }","name":"Afterburner-One","durationInMillis":447}
 
-or
+## remote database
+
+Call a remote MariaDB database with the MySql employee test database loaded.
+
+* `/db/employee/name\?firstName=Anneke` find employees by first name
+
+Other names to try: Steen, Aamer, Guoxiang (via `SELECT DISTINCT e.first_name FROM employees.employees e`)
+
+Example output:
 
     [{"empNo":10006,"birthDate":"1953-04-20","firstName":"Anneke","lastName":"Preusig","gender":"F","hireDate":"1989-06-02"},{"empNo":10640,"birthDate":"1958-11-09","firstName":"Anneke","lastName":"Meszaros" ... 
 
-See dependencies how to set up the database component.
+See dependencies section how to set up the database component.
     
 ## tcp connect
 
@@ -173,11 +180,11 @@ Use this basket validation for concurrency issues with shared data in multiple t
  
  * `/basket/purchase` - post a basket purchase, the request will be validated on total price and products/prices
  
-Good request:
+Good request (10 + 20 + 30 = 60):
 
     curl -H "Content-Type: application/json" -d '{ "customer": "Johnny", "prices": [10, 20, 30], "products": ["apple", "banana","oranges"], "totalPrice": 60 }' localhost:8080/basket/purchase
 
-Bad request with validation errors:
+Bad request with validation errors (20 + 30 != 40):
 
     curl -H "Content-Type: application/json" -d '{ "customer": "BadGuy", "prices": [20, 30], "products": ["sushi", "icescream"], "totalPrice": 40 }' localhost:8080/basket/purchase
 
