@@ -15,7 +15,7 @@ public class AutonomousWorker {
     @Value("${afterburner.autonomous.worker.stability:true}")
     private volatile boolean stability;
 
-    @Scheduled(fixedDelay = 10_000, initialDelay = 5_000)
+    @Scheduled(fixedDelay = 120_000, initialDelay = 5_000)
     public void doSomeFixedDelayWork() {
         String threadName = Thread.currentThread().getName();
         log.info("\\\\ {} start some fixed delay work", threadName);
@@ -26,7 +26,7 @@ public class AutonomousWorker {
         log.info("// {} end some fixed delay work", threadName);
     }
 
-    @Scheduled(fixedRate = 10_000, initialDelay = 5_000)
+    @Scheduled(fixedRate = 120_000, initialDelay = 15_000)
     public void doSomeFixedRateWork() {
         String threadName = Thread.currentThread().getName();
         log.info("++ {} initiated some fixed rate work", threadName);

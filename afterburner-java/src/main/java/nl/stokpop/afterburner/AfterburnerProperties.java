@@ -1,10 +1,14 @@
 package nl.stokpop.afterburner;
 
-import lombok.Data;
+import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.stereotype.Component;
 
+@Component
 @ConfigurationProperties(prefix = "afterburner")
-@Data
+@ConstructorBinding
+@Value
 public class AfterburnerProperties {
 
     String name = "afterburner-one";
