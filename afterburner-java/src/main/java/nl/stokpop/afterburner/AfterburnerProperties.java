@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner;
 
-import lombok.Value;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.stereotype.Component;
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "afterburner")
 @ConstructorBinding
-@Value
+@Data
 public class AfterburnerProperties {
 
-    String name = "afterburner-one";
+    String name = "afterburner";
     String databaseConnectQuery = "SELECT 1";
 
     int asyncMaxPoolSize = 10;
