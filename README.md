@@ -31,7 +31,7 @@ Most examples below can be run with curl. Or check out swagger for the calls wit
 # swagger
 The swagger-ui is here after starting afterburner:
 
-    http://localhost:8080/swagger-ui.html#/
+    http://localhost:8080/swagger-ui/
     
 # functions
 
