@@ -17,7 +17,7 @@ public class Swagger2Config {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
             .select()
-            .apis(RequestHandlerSelectors.any())
+            .apis(RequestHandlerSelectors.basePackage("nl.stokpop.afterburner"))
             .paths(PathSelectors.any())
             .build()
             .apiInfo(apiEndPointsInfo());
