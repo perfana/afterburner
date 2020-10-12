@@ -44,16 +44,12 @@ public class RemoteCallOkHttp implements RemoteCall {
         }
 
     @Override
-    public String call(final String path) throws RemoteCallException {
+    public String call(final String path) throws RemoteCallException, IOException {
         final String completeUrl = RemoteCallUtil.createCompleteUrl(baseUrl, path);
         log.info("Remote call via OkHttp [{}]", completeUrl);
-        try {
-            String result = get(completeUrl);
-            log.debug("Result: [{}]", result);
-            return result;
-        } catch (IOException e) {
-            throw new RuntimeException(String.format("Failed to call url [%s]", completeUrl), e);
-        }
+        String result = get(completeUrl);
+        log.debug("Result: [{}]", result);
+        return result;
     }
 
     private String get(String url) throws IOException {

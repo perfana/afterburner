@@ -1,4 +1,4 @@
-package nl.stokpop.afterburner.controller;
+package nl.stokpop.afterburner.domain;
 
 import lombok.Builder;
 import lombok.Value;

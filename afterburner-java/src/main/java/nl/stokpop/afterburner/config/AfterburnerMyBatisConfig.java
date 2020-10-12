@@ -8,7 +8,9 @@ import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.support.DatabaseStartupValidator;
 
 import javax.sql.DataSource;
 
@@ -44,5 +46,13 @@ public class AfterburnerMyBatisConfig {
     @Bean
     ConfigurationCustomizer mybatisConfigurationCustomizer() {
         return configuration -> configuration.setDefaultFetchSize(10);
+    }
+
+    @Bean
+    public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource) {
+        DatabaseStartupValidator dsv = new DatabaseStartupValidator();
+        dsv.setDataSource(dataSource);
+        dsv.setValidationQuery(DatabaseDriver.MARIADB.getValidationQuery());
+        return dsv;
     }
 }

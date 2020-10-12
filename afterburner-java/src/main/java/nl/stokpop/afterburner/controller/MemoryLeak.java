@@ -3,6 +3,7 @@ package nl.stokpop.afterburner.controller;
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BigFatBastard;
+import nl.stokpop.afterburner.domain.BurnerMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;

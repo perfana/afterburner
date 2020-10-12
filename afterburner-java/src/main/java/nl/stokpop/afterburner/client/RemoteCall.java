@@ -1,5 +1,7 @@
 package nl.stokpop.afterburner.client;
 
+import java.io.IOException;
+
 public interface RemoteCall {
 
     /**
@@ -11,6 +13,6 @@ public interface RemoteCall {
      * @param path the part of the url after [http://my.domain:8080/][path]
      * @return the result of the remote call (if any)
      */
-    String call(String path) throws RemoteCallException;
+    String call(String path) throws RemoteCallException, IOException;
 
 }

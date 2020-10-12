@@ -2,6 +2,7 @@ package nl.stokpop.afterburner.controller;
 
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
+import nl.stokpop.afterburner.domain.BurnerMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

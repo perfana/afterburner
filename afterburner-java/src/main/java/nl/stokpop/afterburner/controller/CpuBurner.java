@@ -4,6 +4,7 @@ import brave.Span;
 import brave.Tracer;
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
+import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.matrix.InvalidMatrixException;
 import nl.stokpop.afterburner.matrix.MatrixCalculator;
 import nl.stokpop.afterburner.matrix.MatrixEqualResult;

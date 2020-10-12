@@ -12,7 +12,7 @@ public class ErrorPage implements ErrorController {
 
 	  @GetMapping(value = PATH)
 	  public ResponseEntity<String> error() {
-		  return ResponseEntity.status(HttpStatus.NOT_FOUND).body("<h1>Not a valid Afterburner url</h2><p>Please try another url...</p>");
+		  return ResponseEntity.status(HttpStatus.NOT_FOUND).body("<h1>Not a valid Afterburner url</h2><p>Please try another url... or check the swagger docs: <a href = 'swagger-ui/'>swagger-ui/</a></p>");
 	  }
 
 	  @Override

@@ -1,6 +1,7 @@
 package nl.stokpop.afterburner.controller;
 
 import io.swagger.annotations.ApiOperation;
+import nl.stokpop.afterburner.domain.SystemInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -41,7 +41,7 @@ public class RemoteCallHttpClient implements RemoteCall {
     }
     
     @Override
-    public String call(final String path) throws RemoteCallException {
+    public String call(final String path) throws RemoteCallException, IOException {
         final String completeUrl = RemoteCallUtil.createCompleteUrl(this.baseUrl, path);
 
         log.info("Remote call via HttpClient [{}]", completeUrl);
@@ -52,9 +52,6 @@ public class RemoteCallHttpClient implements RemoteCall {
             String result = EntityUtils.toString(response.getEntity(), CHARSET_UTF_8);
             log.debug("Result: [{}]", result);
             return result;
-        } catch (IOException ex) {
-            String message = String.format("Failed to call url [%s]", completeUrl);
-            throw new RemoteCallException(message, ex);
         }
     }
 

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +52,14 @@ public class TotalAmountCheckValidator implements Validator {
     }
 
     private boolean customerHasSufficientFunds(String customer, long amount) {
-        String reply = afterburnerRemote.executeCall("/fund/check?customer=" + customer + "&amount=" + amount, "httpclient");
+        String reply;
+        try {
+            reply = afterburnerRemote.executeCall("/fund/check?customer=" + customer + "&amount=" + amount, "httpclient");
+        } catch (IOException e) {
+            // should we fail if the funds cannot be checked? or sell and take the risk?
+            log.error("Execute remote call failed to check funds for customer " + customer, e);
+            return false;
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectReader fundReader = objectMapper.readerFor(FundReply.class);

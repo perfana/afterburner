@@ -2,6 +2,7 @@ package nl.stokpop.afterburner.controller;
 
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.AfterburnerProperties;
+import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.mybatis.Employee;
 import nl.stokpop.afterburner.mybatis.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
