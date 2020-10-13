@@ -18,6 +18,7 @@ import java.util.concurrent.Future;
 @Service
 public class AfterburnerRemote {
 
+    // example of custom application metrics counter
     private final Counter counterTotalCalls;
 
     private final RemoteCallHttpClient httpClient;
@@ -27,7 +28,12 @@ public class AfterburnerRemote {
     public AfterburnerRemote(RemoteCallHttpClient httpClient, RemoteCallOkHttp okHttp, MeterRegistry registry, AfterburnerProperties props) {
         this.httpClient = httpClient;
         this.okHttp = okHttp;
-        this.counterTotalCalls = registry.counter("remote.calls", "name", props.getName());
+        String afterburnerName = props.getName();
+        this.counterTotalCalls = Counter.builder("afterburner.remote.calls")
+            .baseUnit("calls")
+            .description("total number of remote calls")
+            .tags("name", afterburnerName)
+            .register(registry);
     }
 
     public String executeCall(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) throws IOException {

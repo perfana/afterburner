@@ -9,6 +9,7 @@ import nl.stokpop.afterburner.service.AfterburnerRemote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,41 +24,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
 public class RemoteCallController {
 
     private static final Logger log = LoggerFactory.getLogger(RemoteCallController.class);
+    public static final String URLCONNECTION_CONFIG = "urlconnection";
+    public static final String HTTPCLIENT_CONFIG = "httpclient";
 
     private final AfterburnerRemote afterburnerRemote;
-    private final RetryRegistry registryHttpClient;
-    private final RetryRegistry registryUrlConnection;
+    private final RetryRegistry retryRegistry;
+    private final String baseUrl;
 
     @Autowired
-    public RemoteCallController(final AfterburnerRemote afterburnerRemote) {
+    public RemoteCallController(@Value("${afterburner.remote.call.base_url:http://localhost:8080}") final String baseUrl, AfterburnerRemote afterburnerRemote, RetryRegistry retryRegistry) {
         this.afterburnerRemote = afterburnerRemote;
+        this.baseUrl = Pattern.compile(":\\d{4}").matcher(baseUrl).replaceFirst(":5599");
+        this.retryRegistry = prepareAndAddRetryRegistries(retryRegistry);
+    }
 
+    private RetryRegistry prepareAndAddRetryRegistries(RetryRegistry retryRegistry) {
         RetryConfig config = RetryConfig.custom()
             .maxAttempts(10)
             .waitDuration(Duration.ofMillis(1000))
             .retryExceptions(SocketTimeoutException.class)
+            // seems to cause a NullPointerException in the actuator metrics, because there is not throwable and toString() is called
             .retryOnResult(result -> { System.out.println("Result (" + result.getClass().getSimpleName() + ") in predicate:" + result); return containsError(result); })
             .build();
 
-        this.registryHttpClient = RetryRegistry.of(config);
-        this.registryHttpClient.getEventPublisher().onEvent(event -> log.warn("Retry for " + event.getEventType()));
+        retryRegistry.addConfiguration(HTTPCLIENT_CONFIG, config);
 
         RetryConfig configUrlConnection = RetryConfig.custom()
             .maxAttempts(10)
             .waitDuration(Duration.ofMillis(1000))
             .retryExceptions(SocketTimeoutException.class, ConnectException.class)
-            .retryOnResult(result -> { System.out.println("Result (" + result.getClass().getSimpleName() + ") in predicate:" + result); return containsError(result); })
             .build();
 
-        this.registryUrlConnection = RetryRegistry.of(configUrlConnection);
-        this.registryHttpClient.getEventPublisher().onEvent(event -> log.warn("Retry for " + event.getEventType()));
+        retryRegistry.addConfiguration(URLCONNECTION_CONFIG, configUrlConnection);
 
+        retryRegistry.getEventPublisher().onEvent(event -> log.warn("Retry for " + event.getEventType()));
+
+        return retryRegistry;
     }
 
     private boolean containsError(Object result) {
@@ -116,10 +125,10 @@ public class RemoteCallController {
         @RequestParam(value = "path", defaultValue = "/delay") String path,
         @RequestParam(value = "type", defaultValue = "httpclient") String type) {
 
-        Retry retryConfig = registryHttpClient.retry("afterburner-retry");
+        Retry retry = retryRegistry.retry("afterburner-retry", HTTPCLIENT_CONFIG);
 
         try {
-            return retryConfig.executeCallable(() -> afterburnerRemote.executeCall(path, type));
+            return retry.executeCallable(() -> afterburnerRemote.executeCall(path, type));
         } catch (Exception e) {
             throw new AfterburnerException("Executing callable failed.", e);
         }
@@ -129,14 +138,15 @@ public class RemoteCallController {
     @GetMapping("remote/call-traffic-light")
     public String remoteCallTrafficLightWithRetries() {
 
-        Retry retryConfig = registryUrlConnection.retry("traffic-light-retry");
+        Retry retryConfig = retryRegistry.retry("traffic-light-retry", URLCONNECTION_CONFIG);
 
         try {
             Callable<String> remoteCall = () -> {
-                URLConnection urlConnection = new URL("http://localhost:5599").openConnection();
+                URLConnection urlConnection = new URL(baseUrl).openConnection();
                 urlConnection.setConnectTimeout(1000);
                 urlConnection.setReadTimeout(1000);
                 try (Scanner scanner = new Scanner(urlConnection.getInputStream())) {
+                    // in regexp \A means start of total text (not line, like ^)s
                     return scanner.useDelimiter("\\A").next();
                 }
             };

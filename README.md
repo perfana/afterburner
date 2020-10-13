@@ -98,6 +98,10 @@ Examples:
 
 note: do not forget to escape & with a backslash using bash and curl
 
+A custom metric is available, counting the total number of remote calls:
+
+* http://localhost:8080/actuator/metrics/afterburner.remote.calls
+
 ## remote call async
 
 Call many remote http(s) endpoint in parallel using `@Async` method.
@@ -190,7 +194,7 @@ Bad request with validation errors (20 + 30 != 40):
 
 Put under load and check if all validates as expected.
 
-## Basket database store
+## basket database store
 
 You can store baskets in a database by calling:
 
@@ -205,6 +209,48 @@ And retrieve all baskets via:
 Use the autonomous worker to investigate the behaviour of @Schedule.
 
 Two methods are in place, one with a fixedRate schedule and one with a fixedDelay schedule.
+
+See what happens when a thread freezes or fails by setting `afterburner.autonomous.worker.stability` to false.
+
+## flaky calls and retries
+
+To cover-up downstream flaky services you can make use of retries. For instance by using the resilience4j library.
+
+A flaky service is available here:
+
+* `flaky\?maxRandomDelay=2000\&flakiness=25` will pick a random delay from 1 to 2000 milliseconds, and will respond with a 500 error status 25% of the time (default is 50% flakiness).
+
+If you set the socket or read timeout of the incoming call to 1000 milliseconds, you will also get timeouts 50% of the calls.
+
+To wrap a flaky call like this with retries, use the following call:
+
+* `localhost:8080/remote/call-retry\?path=flaky\?maxRandomDelay=2000` do a remote call to the baseUrl with the given path and also retry 10 times 
+when failures like timeouts and 500's occur
+
+It will take longer, but it will succeed more often.
+
+The retry metrics are available via actuator:
+
+* http://localhost:8080/actuator/retries
+* http://localhost:8080/actuator/retryevents/afterburner-retry
+
+## connection timeouts and retries
+
+To test connections timeouts when a service is unavailable (e.g. network hickup or remote restart), use this 
+"traffic-light" endpoint:
+
+* `curl -v localhost:5599`
+
+It return a green light during 5 seconds and then goes offline for 5 seconds.
+
+To test this with retries:
+
+* `curl localhost:8080/remote/call-traffic-light`
+
+Check the retry metrics via:
+
+* http://localhost:8080/actuator/retryevents/traffic-light-retry
+
 
 # load test
 To run a gatling load test, go to the `afterburner-loadtest-gatling` directory and run:
@@ -227,7 +273,9 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
 
 # Tracing
 
-Run a jeager instance to see the tracing. For example via docker:
+Run a jeager instance to see the tracing.
+
+For example via docker:
 
     docker run -d --name jaeger \
       -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
@@ -239,7 +287,10 @@ Run a jeager instance to see the tracing. For example via docker:
       -p 14268:14268 \
       -p 14250:14250 \
       -p 9411:9411 \
-      jaegertracing/all-in-one:1.18
+      jaegertracing/all-in-one:1.20
+
+Also set property `spring.sleuth.sampler.probability` higher than 0, 
+set to 1 to capture all traces, or 0.1 for 10% of the traces.
       
 Then see traces here: http://localhost:16686/ 
 
