@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -47,10 +48,28 @@ public class DatabaseConnector {
         return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
-    @ApiOperation(value = "Find employees by first name.")
-    @GetMapping("/db/employee/name")
-    public List<Employee> findEmployeeByFirstName(@RequestParam(value = "firstName", defaultValue = "Anneke") String firstName) {
-        return employeeMapper.selectEmployeeWithFirstName(firstName);
+    @ApiOperation(value = "Find employees by name.")
+    @GetMapping("/db/employee/find-by-name")
+    public List<Employee> findEmployeeByFirstName(
+        @RequestParam(value = "firstName", defaultValue = "") String firstName,
+        @RequestParam(value = "lastName", defaultValue = "") String lastName) {
+        if (firstName.length() == 0 && lastName.length() > 0) {
+            return employeeMapper.selectEmployeeByLastName(lastName);
+        }
+        else if (firstName.length() > 0 && lastName.length() == 0) {
+            return employeeMapper.selectEmployeeByFirstName(firstName);
+        }
+        else if (firstName.length() > 0) {
+            return employeeMapper.selectEmployeeByFirstAndLastName(firstName, lastName);
+        }
+        else {
+            return Collections.emptyList();
+        }
     }
 
+    @ApiOperation(value = "Find employees by last name.")
+    @GetMapping("/db/employee/find-by-last-name")
+    public List<Employee> findEmployeeByLastName(@RequestParam(value = "lastName", defaultValue = "Anneke") String lastName) {
+        return employeeMapper.selectEmployeeByLastName(lastName);
+    }
 }

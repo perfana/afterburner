@@ -144,9 +144,11 @@ Example output:
 
 Call a remote MariaDB database with the MySql employee test database loaded.
 
-* `/db/employee/name\?firstName=Anneke` find employees by first name
+* `/db/employee/find-by-name?firstName=Anneke` find employees by first name
+* `/db/employee/find-by-name?lastName=Preusig` find employees by last name
+* `/db/employee/find-by-name?firstName=Anneke&lastName=Preusig` find by first and last name
 
-Other names to try: Steen, Aamer, Guoxiang (via `SELECT DISTINCT e.first_name FROM employees.employees e`)
+Other first names to try: Steen, Aamer, Guoxiang (via `SELECT DISTINCT e.first_name FROM employees.employees e`)
 
 Example output:
 
@@ -319,7 +321,9 @@ Then ssh into this docker:
 And load the test database:
     
     cd /db
-    mysql -p mypass < employees.sql
+    mysql -t -p  < employees.sql
+
+And provide password: `mypass`
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)

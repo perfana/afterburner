@@ -14,10 +14,10 @@ import org.springframework.jdbc.support.DatabaseStartupValidator;
 
 import javax.sql.DataSource;
 
+@Value
 @ConfigurationProperties(prefix="afterburner.mybatis.datasource")
 @ConstructorBinding
 @MapperScan(value = "nl.stokpop.afterburner.mybatis", sqlSessionFactoryRef="sqlSessionMyBatis")
-@Value
 public class AfterburnerMyBatisConfig {
 
     String url;
