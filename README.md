@@ -269,9 +269,9 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
 * `--server.port=8090` use different port (default 8080)
 * `export SERVER_PORT=8090` use different port via env variable
 
-## Dependencies
+## dependencies
 
-# Tracing
+# tracing
 
 Run a jeager instance to see the tracing.
 
@@ -294,7 +294,11 @@ set to 1 to capture all traces, or 0.1 for 10% of the traces.
       
 Then see traces here: http://localhost:16686/ 
 
-# Database
+# prometheus
+
+The prometheus endpoint: http://localhost:8080/actuator/prometheus
+
+# database
 
 Run MariaDB with the MySql employees database:
 

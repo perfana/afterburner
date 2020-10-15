@@ -46,20 +46,21 @@ public class RemoteCallController {
     }
 
     private RetryRegistry prepareAndAddRetryRegistries(RetryRegistry retryRegistry) {
-        RetryConfig config = RetryConfig.custom()
+        RetryConfig config = RetryConfig.<String>custom()
             .maxAttempts(10)
             .waitDuration(Duration.ofMillis(1000))
             .retryExceptions(SocketTimeoutException.class)
             // seems to cause a NullPointerException in the actuator metrics, because there is not throwable and toString() is called
-            .retryOnResult(result -> { System.out.println("Result (" + result.getClass().getSimpleName() + ") in predicate:" + result); return containsError(result); })
+            .retryOnResult(this::containsError)
             .build();
 
         retryRegistry.addConfiguration(HTTPCLIENT_CONFIG, config);
 
-        RetryConfig configUrlConnection = RetryConfig.custom()
+        RetryConfig configUrlConnection = RetryConfig.<String>custom()
             .maxAttempts(10)
             .waitDuration(Duration.ofMillis(1000))
             .retryExceptions(SocketTimeoutException.class, ConnectException.class)
+            .retryOnResult(result -> result.contains("red"))
             .build();
 
         retryRegistry.addConfiguration(URLCONNECTION_CONFIG, configUrlConnection);
@@ -69,18 +70,8 @@ public class RemoteCallController {
         return retryRegistry;
     }
 
-    private boolean containsError(Object result) {
-        String resultString;
-        if (result instanceof byte[]) {
-            resultString = new String((byte[])result);
-        }
-        else if (result instanceof String) {
-            resultString = (String) result;
-        }
-        else {
-            resultString = "unknown type";
-        }
-        return resultString.contains("500");
+    private boolean containsError(String result) {
+        return result.contains("500");
     }
 
     @ApiOperation(value = "Call one remote service.")

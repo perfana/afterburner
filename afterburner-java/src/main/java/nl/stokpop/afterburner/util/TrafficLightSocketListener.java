@@ -81,8 +81,8 @@ public class TrafficLightSocketListener implements Runnable {
                         if (inputLine.contains("HTTP")) { isHttp = true; }
                         if (inputLine.length() == 0) { break; }
                     }
-
-                    String reply = "The traffic light is green!";
+                    String color = (System.currentTimeMillis() % 100) < 25 ? "red" : "green";
+                    String reply = "The traffic light is "+ color + "!";
                     if (isHttp) {
                         out.println(minimalHttpTextReply(reply));
                     } else {

@@ -21,7 +21,7 @@ class AfterburnerBasicSimulation extends Simulation {
 
     val scn: ScenarioBuilder = scenario("AfterburnerBasicSimulation")
         .exec(http("simple_delay")
-            .get("/delay?duration=555")
+            .get("/delay?duration=222")
             .check(status.is(200)))
         .pause(1)
         .exec(http("basket purchase good")
@@ -83,6 +83,6 @@ class AfterburnerBasicSimulation extends Simulation {
             )
         )
 
-    setUp(scn.inject(constantUsersPerSec(12) during 60)).protocols(httpProtocol)
+    setUp(scn.inject(constantUsersPerSec(6) during 60)).protocols(httpProtocol)
     //setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
 }
