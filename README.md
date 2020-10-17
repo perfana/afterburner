@@ -275,7 +275,7 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
 
 # tracing
 
-Run a jeager instance to see the tracing.
+Run a Jaeger instance to see the tracing.
 
 For example via docker:
 
@@ -291,6 +291,7 @@ For example via docker:
       -p 9411:9411 \
       jaegertracing/all-in-one:1.20
 
+Use `spring.zipkin.enabled=true` to enable sending data to Jaeger.
 Also set property `spring.sleuth.sampler.probability` higher than 0, 
 set to 1 to capture all traces, or 0.1 for 10% of the traces.
       

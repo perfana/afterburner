@@ -125,6 +125,15 @@
             <version>1.18.16</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <!-- This runtime dependency is needed to get rid of the following warning: (:-P) -->
+            <!-- For Jackson Kotlin classes support please add "com.fasterxml.jackson.module:jackson-module-kotlin" to the classpath -->
+            <!-- This is caused by okhttp client having dependency on kotlin std lib... -->
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

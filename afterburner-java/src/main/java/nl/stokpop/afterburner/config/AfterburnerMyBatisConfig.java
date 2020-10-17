@@ -4,7 +4,6 @@ import com.github.gavlyukovskiy.boot.jdbc.decorator.p6spy.P6SpyDataSourceDecorat
 import lombok.Value;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
@@ -18,7 +17,6 @@ import javax.sql.DataSource;
 @Value
 @ConfigurationProperties(prefix="afterburner.mybatis.datasource")
 @ConstructorBinding
-@MapperScan(value = "nl.stokpop.afterburner.mybatis", sqlSessionFactoryRef="sqlSessionMyBatis")
 public class AfterburnerMyBatisConfig {
 
     String url;
