@@ -1,5 +1,6 @@
 package nl.stokpop.afterburner.config;
 
+import com.github.gavlyukovskiy.boot.jdbc.decorator.p6spy.P6SpyDataSourceDecorator;
 import com.zaxxer.hikari.HikariDataSource;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -17,17 +18,20 @@ public class AfterburnerH2Config {
 
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.member")
+    @ConfigurationProperties("afterburner.basket")
     public DataSourceProperties memberDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
     @Primary
-    @ConfigurationProperties("app.datasource.member.configuration")
-    public DataSource memberDataSource() {
-        return memberDataSourceProperties().initializeDataSourceBuilder()
-            .type(HikariDataSource.class).build();
+    @ConfigurationProperties("afterburner.basket.h2")
+    public DataSource memberDataSource(P6SpyDataSourceDecorator p6SpyDecorator) {
+        HikariDataSource hikariDataSource = memberDataSourceProperties()
+            .initializeDataSourceBuilder()
+            .type(HikariDataSource.class)
+            .build();
+        return p6SpyDecorator.decorate("basketH2Db", hikariDataSource);
     }
 
     @Bean
@@ -35,15 +39,5 @@ public class AfterburnerH2Config {
     {
         return new JdbcTemplate(dataSource);
     }
-
-//    @Bean(name = "dataSourceH2")
-//    public DataSource dataSource() {
-//        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-//        dataSourceBuilder.driverClassName("org.mariadb.jdbc.Driver");
-//        dataSourceBuilder.url("jdbc:mariadb://localhost:3306/employees");
-//        dataSourceBuilder.username("root");
-//        dataSourceBuilder.password("mypass");
-//        return dataSourceBuilder.build();
-//    }
 
 }
