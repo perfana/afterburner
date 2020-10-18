@@ -5,6 +5,7 @@ import lombok.Value;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -24,8 +25,7 @@ public class AfterburnerMyBatisConfig {
     String password;
     String driverClassName;
 
-    //@Bean(name = "dataSourceMyBatis")
-    // There is an issue "cannot find symbol method value()" when using Qualifier injection in sqlSessionFactory()
+    @Bean(name = "dataSourceMyBatis")
     public DataSource dataSourceMyBatis(P6SpyDataSourceDecorator p6SpyDecorator) {
         DataSource datasource = DataSourceBuilder.create()
             .driverClassName(driverClassName)
@@ -37,9 +37,9 @@ public class AfterburnerMyBatisConfig {
     }
 
     @Bean(name = "sqlSessionMyBatis")
-    public SqlSessionFactory sqlSessionFactory(P6SpyDataSourceDecorator p6SpyDecorator) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSourceMyBatis") DataSource dataSourceMyBatis) throws Exception {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-        factoryBean.setDataSource(dataSourceMyBatis(p6SpyDecorator));
+        factoryBean.setDataSource(dataSourceMyBatis);
         return factoryBean.getObject();
     }
 
