@@ -253,6 +253,7 @@ Check the retry metrics via:
 
 * http://localhost:8080/actuator/retryevents/traffic-light-retry
 
+Change the traffic light port with property: `afterburner.trafficlight.port`
 
 # load test
 To run a gatling load test, go to the `afterburner-loadtest-gatling` directory and run:

@@ -4,6 +4,7 @@ import nl.stokpop.afterburner.util.Sleeper;
 import nl.stokpop.afterburner.util.TrafficLightSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,8 @@ public class TrafficLightSocketService {
 
     private static final Logger log = LoggerFactory.getLogger(TrafficLightSocketService.class);
 
-    public static final int TRAFFIC_LIGHT_LISTEN_PORT = 5599;
+    @Value("${afterburner.trafficlight.port:5599}")
+    private int trafficLightListenPort;
 
     /**
      * Every 5 seconds the traffic light service is active on port 5599.
@@ -38,7 +40,7 @@ public class TrafficLightSocketService {
      */
     @Scheduled(fixedDelay = 5000)
     public void enableTrafficLightForSomeTime() throws IOException {
-        log.debug("TrafficLightService green on " + TRAFFIC_LIGHT_LISTEN_PORT);
+        log.debug("TrafficLightService green on " + trafficLightListenPort);
 
         final AtomicInteger threadCounter = new AtomicInteger(0);
         final ThreadFactory threadFactory =
@@ -46,7 +48,7 @@ public class TrafficLightSocketService {
 
         ExecutorService executor = Executors.newFixedThreadPool(6, threadFactory);
 
-        TrafficLightSocketListener socketListener = new TrafficLightSocketListener(TRAFFIC_LIGHT_LISTEN_PORT, executor);
+        TrafficLightSocketListener socketListener = new TrafficLightSocketListener(trafficLightListenPort, executor);
         executor.execute(socketListener);
 
         Sleeper.sleep(Duration.of(5, SECONDS));

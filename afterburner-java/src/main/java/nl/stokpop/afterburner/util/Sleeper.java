@@ -12,10 +12,15 @@ public final class Sleeper {
 
     private static final Logger log = LoggerFactory.getLogger(Delay.class);
 
-    public static void sleep(String duration) {
-        Duration sleepInMillis = parseDurationIntoMillis(duration);
-        log.info("About to sleep for [{}] millis (duration = [{}]).", sleepInMillis, duration);
-        sleep(sleepInMillis);
+    public static void sleep(String durationAsString) {
+        Duration sleepDuration = parseDurationIntoMillis(durationAsString);
+        long durationMillis = sleepDuration.toMillis();
+        log.info("About to sleep for [{}] millis (durationAsString = [{}]).", durationMillis, durationAsString);
+        long startTime = System.currentTimeMillis();
+        sleep(sleepDuration);
+        long actualDuration = System.currentTimeMillis() - startTime;
+        long delta = actualDuration - durationMillis;
+        log.info("Actual sleep was [{}] of expected [{}] millis. Delta: [{}]", actualDuration, durationAsString, delta);
     }
 
     public static void sleep(Duration sleepDuration) {
