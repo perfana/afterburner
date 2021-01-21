@@ -1,5 +1,7 @@
 package nl.stokpop.afterburner.client;
 
+import brave.http.HttpTracing;
+import brave.httpclient.TracingHttpClientBuilder;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -44,6 +46,13 @@ public class AfterburnerConfig {
                 .setMaxConnPerRoute(connectionsMax)
                 .setMaxConnTotal(connectionsMax)
                 .build();
+    }
+
+    // WORKAROUND: should be present automatically: traceHttpClientBuilder, via org.springframework.cloud.sleuth.autoconfig.brave.instrument.web.client.BraveWebClientAutoConfiguration
+    // but for some reason not?
+    @Bean
+    HttpClientBuilder traceHttpClientBuilder(HttpTracing httpTracing) {
+        return TracingHttpClientBuilder.create(httpTracing);
     }
 
     @Bean(name = "additionalHttpHeaders")

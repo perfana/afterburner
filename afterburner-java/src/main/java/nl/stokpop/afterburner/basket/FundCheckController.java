@@ -1,11 +1,11 @@
 package nl.stokpop.afterburner.basket;
 
-import brave.Span;
-import brave.Tracer;
 import io.swagger.annotations.ApiOperation;
 import nl.stokpop.afterburner.util.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.sleuth.Span;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class FundCheckController {
         boolean hasFund = false;
 
         Span fundCheckSpan = tracer.nextSpan().name("backend-fund-check").start();
-        try (Tracer.SpanInScope ws = tracer.withSpanInScope(fundCheckSpan.start())) {
+        try (Tracer.SpanInScope ws = tracer.withSpan(fundCheckSpan.start())) {
             // simulate some processing/db check time
             Sleeper.sleep(Duration.ofMillis(10));
             hasFund = random.nextGaussian() < 0.1;
@@ -47,7 +47,7 @@ public class FundCheckController {
             fundCheckSpan.tag("customer", customer)
                     .tag("amount", String.valueOf(amount))
                     .tag("fund-check-result", String.valueOf(hasFund))
-                    .finish();
+                    .end();
         }
 
         FundReply reply = FundReply.builder()
