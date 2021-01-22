@@ -267,7 +267,7 @@ To run a jmeter load test, go to the `afterburner-loadtest-jmeter` directory and
     mvn clean verify
      
 # properties
-* `-Dafterburner.name=Angry-Afterburner` provide a name for the instance
+* `-Dspring.application.name=Angry-Afterburner` provide a name for the instance
 * `-Dafterburner.remote.call.base_url=https://my.remote.site:1234` connect remote calls to this base url
 * `-Dafterburner.autonomous.worker.stability=false` default the autonomous worker is stable, make it unstable by setting this to false
 * `export AFTERBURNER_REMOTE_CALL_BASE_URL=https://my.remote.site:1234` provide base url via environment variable
