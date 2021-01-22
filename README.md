@@ -208,11 +208,13 @@ And retrieve all baskets via:
 
 ## autonomous worker
 
-Use the autonomous worker to investigate the behaviour of @Schedule.
+Use the autonomous worker to investigate the behaviour of `@Schedule`.
 
 Two methods are in place, one with a fixedRate schedule and one with a fixedDelay schedule.
 
 See what happens when a thread freezes or fails by setting `afterburner.autonomous.worker.stability` to false.
+
+Activate the logging of these workers with property: `logging.level.nl.stokpop.afterburner.service.AutonomousWorker=debug`
 
 ## flaky calls and retries
 

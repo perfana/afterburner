@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
+/**
+ * Use -Dlogging.level.nl.stokpop.afterburner.service.AutonomousWorker=debug to see log
+ * lines of this AutonomousWorker.
+ */
 @Slf4j
 @Service
 public class AutonomousWorker {
@@ -18,23 +22,23 @@ public class AutonomousWorker {
     @Scheduled(fixedDelay = 120_000, initialDelay = 5_000)
     public void doSomeFixedDelayWork() {
         String threadName = Thread.currentThread().getName();
-        log.info("\\\\ {} start some fixed delay work", threadName);
+        log.debug("\\\\ {} start some fixed delay work", threadName);
         Sleeper.sleep(Duration.ofSeconds(2));
         if (!stability) {
             maybeThrowExceptionOrHang(threadName, "Some work fixed delay work failed miserably in %s.");
         }
-        log.info("// {} end some fixed delay work", threadName);
+        log.debug("// {} end some fixed delay work", threadName);
     }
 
     @Scheduled(fixedRate = 120_000, initialDelay = 15_000)
     public void doSomeFixedRateWork() {
         String threadName = Thread.currentThread().getName();
-        log.info("++ {} initiated some fixed rate work", threadName);
+        log.debug("++ {} initiated some fixed rate work", threadName);
         Sleeper.sleep(Duration.ofSeconds(2));
         if (!stability) {
             maybeThrowExceptionOrHang(threadName, "Some work fixed rate work in error in %s.");
         }
-        log.info("-- {} finished some fixed rate work", threadName);
+        log.debug("-- {} finished some fixed rate work", threadName);
     }
 
     private void maybeThrowExceptionOrHang(String threadName, String s) {

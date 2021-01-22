@@ -43,18 +43,21 @@ public class TrafficLightSocketService {
         log.debug("TrafficLightService green on " + trafficLightListenPort);
 
         final AtomicInteger threadCounter = new AtomicInteger(0);
-        final ThreadFactory threadFactory =
-            (r) -> new Thread(r, "traffic-light-thread-" + threadCounter.incrementAndGet());
+        final ThreadFactory threadFactory = r -> new Thread(r, "traffic-light-thread-" + threadCounter.incrementAndGet());
 
         ExecutorService executor = Executors.newFixedThreadPool(6, threadFactory);
 
-        TrafficLightSocketListener socketListener = new TrafficLightSocketListener(trafficLightListenPort, executor);
-        executor.execute(socketListener);
+        try {
+            TrafficLightSocketListener socketListener = new TrafficLightSocketListener(trafficLightListenPort, executor);
+            executor.execute(socketListener);
 
-        Sleeper.sleep(Duration.of(5, SECONDS));
+            Sleeper.sleep(Duration.of(5, SECONDS));
 
-        socketListener.stopServing();
-        executor.shutdownNow();
+            socketListener.stopServing();
+            executor.shutdownNow();
+        } catch (IOException e) {
+            log.warn("TrafficLightSocketListener on port {} is not happy: {}", trafficLightListenPort, e.getMessage());
+        }
         log.debug("TrafficLightService red");
     }
 
