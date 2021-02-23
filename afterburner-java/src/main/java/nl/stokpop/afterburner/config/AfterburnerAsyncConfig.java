@@ -15,6 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class AfterburnerAsyncConfig implements AsyncConfigurer {
@@ -40,6 +41,9 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
         if (props.getAsyncQueueSize() != -1) {
             executor.setQueueCapacity(props.getAsyncQueueSize());
         }
+        executor.setKeepAliveSeconds(props.getAsyncKeepAliveSeconds());
+        // if executor is overloaded, run task in callers thread
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setThreadNamePrefix(executorName);
         executor.initialize();
 

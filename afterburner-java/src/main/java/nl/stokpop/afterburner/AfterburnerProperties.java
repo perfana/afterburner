@@ -19,5 +19,6 @@ public class AfterburnerProperties {
     int asyncMaxPoolSize = 10;
     int asyncCorePoolSize = 5;
     int asyncQueueSize = -1;
+    int asyncKeepAliveSeconds = 60;
 
 }
