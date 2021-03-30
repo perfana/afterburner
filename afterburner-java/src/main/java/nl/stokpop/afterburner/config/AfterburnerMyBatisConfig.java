@@ -1,39 +1,33 @@
 package nl.stokpop.afterburner.config;
 
 import com.github.gavlyukovskiy.boot.jdbc.decorator.p6spy.P6SpyDataSourceDecorator;
-import lombok.Value;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.support.DatabaseStartupValidator;
 
 import javax.sql.DataSource;
 
-@Value
-@ConfigurationProperties(prefix="afterburner.mybatis.datasource")
-@ConstructorBinding
-public class AfterburnerMyBatisConfig {
+@Configuration
+@MapperScan(value = "nl.stokpop.afterburner.mybatis", sqlSessionFactoryRef="sqlSessionMyBatis")
+@ConfigurationProperties("afterburner.datasource.employee")
+public class AfterburnerMyBatisConfig extends HikariConfig {
 
-    String url;
-    String username;
-    String password;
-    String driverClassName;
+    private HikariDataSource dbConnectionPoolMyBatis() {
+        return new HikariDataSource(this);
+    }
 
     @Bean(name = "dataSourceMyBatis")
     public DataSource dataSourceMyBatis(P6SpyDataSourceDecorator p6SpyDecorator) {
-        DataSource datasource = DataSourceBuilder.create()
-            .driverClassName(driverClassName)
-            .url(url)
-            .username(username)
-            .password(password)
-            .build();
-        return p6SpyDecorator.decorate("dataSourceMyBatis", datasource);
+        return p6SpyDecorator.decorate("dataSourceMyBatis", dbConnectionPoolMyBatis());
     }
 
     @Bean(name = "sqlSessionMyBatis")

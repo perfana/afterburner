@@ -155,6 +155,12 @@ Example output:
     [{"empNo":10006,"birthDate":"1953-04-20","firstName":"Anneke","lastName":"Preusig","gender":"F","hireDate":"1989-06-02"},{"empNo":10640,"birthDate":"1958-11-09","firstName":"Anneke","lastName":"Meszaros" ... 
 
 See dependencies section how to set up the database component.
+
+There is also a query with configurable long delay. Example call:
+
+* `time curl localhost:8080/db/employee/select-long-time\?durationInSec=10`
+
+Use this end-point for instance to test overloaded connection pools and timeout behaviour.
     
 ## tcp connect
 
@@ -256,6 +262,16 @@ Check the retry metrics via:
 * http://localhost:8080/actuator/retryevents/traffic-light-retry
 
 Change the traffic light port with property: `afterburner.trafficlight.port`
+
+## security filter
+
+The `secure-delay` has a BasicAuthenticationFilter enabled with BCrypt check.
+
+Check what impact this has on latency and cpu usage.
+
+Example call:
+
+* `time curl -u pipo:test123 localhost:8080/secured-delay`
 
 # load test
 To run a gatling load test, go to the `afterburner-loadtest-gatling` directory and run:

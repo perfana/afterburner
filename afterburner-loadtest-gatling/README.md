@@ -8,7 +8,7 @@ This directory contains load tests for afterburner.
 
 Either run the `Engine` scala class or use maven from the `afterburner-loadtest-gatling` directory:
 
-    mvn gatling:test
+    mvn events-gatling:test
      
 ### Creation
 

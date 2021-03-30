@@ -14,14 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
-
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         PasswordEncoder passwordEncoder = passwordEncoder();
         auth.inMemoryAuthentication().withUser("pipo").password(passwordEncoder.encode("test123")).roles("USER");
         auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder.encode("test123")).roles("USER", "ADMIN");
-        auth.inMemoryAuthentication().withUser("suarez").password(passwordEncoder.encode("test123")).roles("USER", "ADMIN");
+        auth.inMemoryAuthentication().withUser("pilot").password(passwordEncoder.encode("test123")).roles("USER", "ADMIN");
     }
 
     @Override
