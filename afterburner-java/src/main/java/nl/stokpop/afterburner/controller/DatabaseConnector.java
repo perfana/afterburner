@@ -6,6 +6,7 @@ import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.mybatis.Employee;
 import nl.stokpop.afterburner.mybatis.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
+@Profile("employee-db")
 public class DatabaseConnector {
 
     private final JdbcTemplate template;

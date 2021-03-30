@@ -9,16 +9,16 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DatabaseDriver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.support.DatabaseStartupValidator;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
 @Configuration
 @MapperScan(value = "nl.stokpop.afterburner.mybatis", sqlSessionFactoryRef="sqlSessionMyBatis")
 @ConfigurationProperties("afterburner.datasource.employee")
+@Profile("employee-db")
 public class AfterburnerMyBatisConfig extends HikariConfig {
 
     private HikariDataSource dbConnectionPoolMyBatis() {
@@ -42,11 +42,4 @@ public class AfterburnerMyBatisConfig extends HikariConfig {
         return configuration -> configuration.setDefaultFetchSize(10);
     }
 
-    @Bean
-    public DatabaseStartupValidator databaseStartupValidator(DataSource dataSource) {
-        DatabaseStartupValidator dsv = new DatabaseStartupValidator();
-        dsv.setDataSource(dataSource);
-        dsv.setValidationQuery(DatabaseDriver.MARIADB.getValidationQuery());
-        return dsv;
-    }
 }
