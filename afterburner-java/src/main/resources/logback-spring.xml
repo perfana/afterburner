@@ -18,10 +18,10 @@
         </appender>
         <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
             <param name="Encoding" value="UTF-8"/>
-            <remoteHost>logstash</remoteHost>
-            <port>9600</port>
+            <remoteHost>${afterburner.logback.logstash.remotehost:-logstash}</remoteHost>
+            <port>${afterburner.logback.logstash.port:-4560}</port>
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-                <customFields>{"app_name":"YourApp", "app_port": "YourPort"}</customFields>
+                <customFields>{"system_under_test":"${management.metrics.tags.system_under_test}", "test_environment": "${management.metrics.tags.test_environment}", "service": "${management.metrics.tags.service}"}</customFields>
             </encoder>
         </appender>
 

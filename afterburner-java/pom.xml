@@ -185,7 +185,7 @@
                         <image>gcr.io/distroless/java:11</image>
                     </from>
                     <to>
-                        <image>registry.hub.docker.com/stokpop/afterburner:${version}</image>
+                        <image>registry.hub.docker.com/stokpop/afterburner:${project.version}</image>
                     </to>
                     <container>
                         <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>

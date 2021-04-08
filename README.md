@@ -32,7 +32,17 @@ Most examples below can be run with curl. Or check out swagger for the calls wit
 The swagger-ui is here after starting afterburner:
 
     http://localhost:8080/swagger-ui/
-    
+
+# profiles
+
+Two profiles can be set via `spring.profiles.active`:
+* `employee-db` activates the employee database controller (only do so when the mariadb employee database is running)
+* `logstash` activates logstash in logback on `logstash:9600` (only activate when logstash is available) 
+
+For logstash the following properties (or env vars) can be set:
+* `afterburner.logback.logstash.remotehost` 
+* ``
+
 # functions
 
 ## delay
