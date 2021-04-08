@@ -18,7 +18,7 @@
         </appender>
         <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
             <param name="Encoding" value="UTF-8"/>
-            <remoteHost>localhost</remoteHost>
+            <remoteHost>logstash</remoteHost>
             <port>9600</port>
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <customFields>{"app_name":"YourApp", "app_port": "YourPort"}</customFields>
