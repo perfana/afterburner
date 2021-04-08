@@ -144,7 +144,11 @@
             <artifactId>jackson-module-kotlin</artifactId>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>6.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -173,24 +177,19 @@
                 <version>4.0.4</version>
             </plugin>
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>2.8.0</version>
                 <configuration>
-                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}-exec.jar</include>
-                        </resource>
-                    </resources>
-                    <buildArgs>
-                        <JAR_FILE>${project.build.finalName}-exec.jar</JAR_FILE>
-                    </buildArgs>
-                    <serverId>${docker.registry}</serverId>
-                    <registryUrl>https://${docker.registry}</registryUrl>
+                    <from>
+                        <image>gcr.io/distroless/java:11</image>
+                    </from>
+                    <to>
+                        <image>registry.hub.docker.com/stokpop/afterburner:${version}</image>
+                    </to>
+                    <container>
+                        <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                    </container>
                 </configuration>
             </plugin>
             <plugin>
@@ -200,5 +199,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

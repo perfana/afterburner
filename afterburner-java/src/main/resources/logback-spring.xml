@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{dd-MM-yyyy HH:mm:ss.SSSZ} %highlight(%-5level) %green([%20.20thread]) --- %30.30logger{10}::%-20.20M - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="Console" />
+    </root>
+
+    <springProfile name="logstash">
+        <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%red(%d{dd-MM-yyyy HH:mm:ss.SSSZ}) %highlight(%-5level) %green([%20.20thread]) --- %30.30logger{10}::%-20.20M - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+            <param name="Encoding" value="UTF-8"/>
+            <remoteHost>localhost</remoteHost>
+            <port>9600</port>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"app_name":"YourApp", "app_port": "YourPort"}</customFields>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="Stash" />
+        </root>
+    </springProfile>
+</configuration>
+
