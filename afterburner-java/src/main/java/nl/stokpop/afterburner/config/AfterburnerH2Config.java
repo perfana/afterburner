@@ -1,6 +1,5 @@
 package nl.stokpop.afterburner.config;
 
-import com.github.gavlyukovskiy.boot.jdbc.decorator.p6spy.P6SpyDataSourceDecorator;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,14 +14,10 @@ import javax.sql.DataSource;
 @ConfigurationProperties("afterburner.datasource.basket")
 public class AfterburnerH2Config extends HikariConfig {
 
-    public HikariDataSource basketHikariDataSource() {
-        return new HikariDataSource(this);
-    }
-
     @Bean
     @Primary
-    public DataSource dataSource(P6SpyDataSourceDecorator p6SpyDecorator) {
-        return p6SpyDecorator.decorate("basketDataSource", basketHikariDataSource());
+    public HikariDataSource basketHikariDataSource() {
+        return new HikariDataSource(this);
     }
 
     @Bean

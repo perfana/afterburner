@@ -1,12 +1,11 @@
 package nl.stokpop.afterburner.mybatis;
 
-import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
-@CacheNamespace(readWrite = false)
+//@CacheNamespace(readWrite = false)
 public interface EmployeeMapper {
     @Select("SELECT * FROM employees.employees WHERE first_name = #{firstName}")
     //@Transactional(timeout = 1)
