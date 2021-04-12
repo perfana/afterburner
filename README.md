@@ -355,5 +355,19 @@ And load the test database:
 
 And provide password: `mypass`
 
+# docker
+
+To create a docker image, from the `afterburner-java` directory locally:
+
+    ../mvnw clean package jib:dockerBuild 
+
+or to push docker remotely:
+
+    ../mvnw clean package jib:build 
+
+(add `-DskipTests` to speed it up, if you know what you are doing 😉)
+
+If you jib multiple times with same (SNAPSHOT) label, use `docker pull <image-path>` to get most recent version.
+
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)
