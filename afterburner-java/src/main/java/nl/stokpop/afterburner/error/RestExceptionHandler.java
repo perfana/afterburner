@@ -22,7 +22,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ClientAbortException.class)
     public void handleClientAbortException(ClientAbortException exception, final WebRequest request) {
-        log.warn("ClientAbortException for {} with message {}", request.getDescription(true), exception.getMessage());
+        log.warn("ClientAbortException for [{}] with message {}", request.getDescription(true), exception.getMessage());
+    }
+
+    @ExceptionHandler(AfterburnerCiruitBreakerException.class)
+    public void handleCircuitBreakerException(AfterburnerCiruitBreakerException exception, final WebRequest request) {
+        log.error("CircuitBreakerException for [{}] with message: {}", request.getDescription(true), exception.getMessage());
+    }
+
+    @ExceptionHandler(AfterburnerTimeoutException.class)
+    public void handleTimeoutException(AfterburnerTimeoutException exception, final WebRequest request) {
+        log.error("TimeoutException for [{}] with message: {}", request.getDescription(true), exception.getMessage());
     }
 
     @ExceptionHandler(value = { Exception.class })
@@ -37,7 +47,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         final String devMessageToUse;
         if (ex instanceof AfterburnerException) {
             devMessageToUse = devMessageShort;
-            log.error(devMessageToUse);
+            log.error(devMessageToUse, ex);
         }
         else if (ex instanceof ClientAbortException) {
             devMessageToUse = devMessageShort;

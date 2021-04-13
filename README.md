@@ -273,6 +273,21 @@ Check the retry metrics via:
 
 Change the traffic light port with property: `afterburner.trafficlight.port`
 
+## circuit breaker
+
+To test resiliencej4 circuit breaker, call the following url *many* times in fast succession
+(here making use of [wrk2](https://github.com/giltene/wrk2): 
+
+* wrk -t1 -d120s -c10 -R20 http://localhost:8080/remote/call-circuit-breaker\?path=delay\?duration=7000
+
+The log will show:
+
+    13-04-2021 16:25:51.124+0200 ERROR [ttp-nio-8080-exec-24] ---   n.s.a.e.RestExceptionHandler::ndleTimeoutException - TimeoutException for uri=/remote/call-circuit-breaker;client=0:0:0:0:0:0:0:1 with message For [delay?duration=7000]: Read timed out
+
+and some time later:
+
+    13-04-2021 16:26:15.237+0200 ERROR [http-nio-8080-exec-4] ---   n.s.a.e.RestExceptionHandler::cuitBreakerException - CircuitBreakerException for uri=/remote/call-circuit-breaker;client=0:0:0:0:0:0:0:1 with message For [delay?duration=7000]: CircuitBreaker 'afterburner-circuit-breaker' is OPEN and does not permit further calls
+
 ## security filter
 
 The `secure-delay` has a BasicAuthenticationFilter enabled with BCrypt check.
