@@ -278,7 +278,7 @@ Change the traffic light port with property: `afterburner.trafficlight.port`
 To test resiliencej4 circuit breaker, call the following url *many* times in fast succession
 (here making use of [wrk2](https://github.com/giltene/wrk2): 
 
-* wrk -t1 -d120s -c10 -R20 http://localhost:8080/remote/call-circuit-breaker\?path=delay\?duration=7000
+* wrk -t10 -d120s -c10 -R20 http://localhost:8080/remote/call-circuit-breaker\?path=delay\?duration=7000
 
 The log will show:
 

@@ -18,6 +18,21 @@ import java.util.List;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private static final HttpHeaders retryHeaders;
+    private static final ResponseEntity<Object> systemBusyResponse;
+
+    static {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Retry-After", "120");
+        retryHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
+
+        systemBusyResponse = ResponseEntity
+            .status(HttpStatus.SERVICE_UNAVAILABLE)
+            .headers(retryHeaders)
+            .body("Sorry, system is busy, please try again in a little while.");
+
+    }
+
     private final static Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(ClientAbortException.class)
@@ -26,13 +41,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AfterburnerCiruitBreakerException.class)
-    public void handleCircuitBreakerException(AfterburnerCiruitBreakerException exception, final WebRequest request) {
+    public ResponseEntity<Object> handleCircuitBreakerException(AfterburnerCiruitBreakerException exception, final WebRequest request) {
         log.error("CircuitBreakerException for [{}] with message: {}", request.getDescription(true), exception.getMessage());
+        return systemBusyResponse;
     }
 
     @ExceptionHandler(AfterburnerTimeoutException.class)
-    public void handleTimeoutException(AfterburnerTimeoutException exception, final WebRequest request) {
+    public ResponseEntity<Object> handleTimeoutException(AfterburnerTimeoutException exception, final WebRequest request) {
         log.error("TimeoutException for [{}] with message: {}", request.getDescription(true), exception.getMessage());
+       return systemBusyResponse;
     }
 
     @ExceptionHandler(value = { Exception.class })
