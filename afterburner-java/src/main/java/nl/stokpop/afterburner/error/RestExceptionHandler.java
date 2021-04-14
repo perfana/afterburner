@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -18,18 +19,22 @@ import java.util.List;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final HttpHeaders retryHeaders;
     private static final ResponseEntity<Object> systemBusyResponse;
+    private static final ResponseEntity<Object> accessDeniedResponse;
 
     static {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Retry-After", "120");
-        retryHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
+        HttpHeaders retryHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
 
         systemBusyResponse = ResponseEntity
             .status(HttpStatus.SERVICE_UNAVAILABLE)
             .headers(retryHeaders)
             .body("Sorry, system is busy, please try again in a little while.");
+
+        accessDeniedResponse = ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body("Sorry, system does not know who you are.");
 
     }
 
@@ -50,6 +55,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleTimeoutException(AfterburnerTimeoutException exception, final WebRequest request) {
         log.error("TimeoutException for [{}] with message: {}", request.getDescription(true), exception.getMessage());
        return systemBusyResponse;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException exception, final WebRequest request) {
+        log.warn("Access denied [{}] with message: {}", request.getDescription(true), exception.getMessage());
+        return accessDeniedResponse;
     }
 
     @ExceptionHandler(value = { Exception.class })

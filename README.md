@@ -37,11 +37,11 @@ The swagger-ui is here after starting afterburner:
 
 Two profiles can be set via `spring.profiles.active`:
 * `employee-db` activates the employee database controller (only do so when the mariadb employee database is running)
-* `logstash` activates logstash in logback on `logstash:9600` (only activate when logstash is available) 
+* `logstash` activates logstash in logback on `logstash:4560` (only activate when logstash is available) 
 
 For logstash the following properties (or env vars) can be set:
 * `afterburner.logback.logstash.remotehost` 
-* ``
+* `afterburner.logback.logstash.port`
 
 # functions
 
@@ -290,7 +290,7 @@ and some time later:
 
 ## security filter
 
-The `secure-delay` has a BasicAuthenticationFilter enabled with BCrypt check.
+The `secured-delay` has a BasicAuthenticationFilter enabled with BCrypt check.
 
 Check what impact this has on latency and cpu usage.
 

@@ -16,7 +16,8 @@ public class ErrorPage implements ErrorController {
 	  }
 
 	  @Override
+	  @Deprecated
 	  public String getErrorPath() {
-		  return PATH;
+		  return null; // deprecated: return is ignored
 	  }
 }

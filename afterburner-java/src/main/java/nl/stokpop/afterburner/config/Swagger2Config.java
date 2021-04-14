@@ -29,7 +29,7 @@ public class Swagger2Config {
             .contact(new Contact("Peter Paul Bakker", "www.stokpop.nl", "peter.paul.bakker[at]stokpop.nl"))
             .license("Apache 2.0")
             .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-            .version("1.0.0")
+            .version("2.0.0")
             .build();
 
     }

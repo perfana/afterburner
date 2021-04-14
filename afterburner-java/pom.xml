@@ -189,7 +189,7 @@
                     </to>
                     <container>
                         <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
-                        <user>1002</user>
+                        <user>nobody</user>
                     </container>
                 </configuration>
             </plugin>
