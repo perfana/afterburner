@@ -1,0 +1,28 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - 2.4.4
+  - dependency-name: com.github.gavlyukovskiy:p6spy-spring-boot-starter
+    versions:
+    - 1.6.3
+    - 1.6.4
+  - dependency-name: org.springframework.cloud:spring-cloud-dependencies
+    versions:
+    - 2020.0.1
+  - dependency-name: io.gatling.highcharts:gatling-charts-highcharts
+    versions:
+    - 3.5.0
+  - dependency-name: org.mariadb.jdbc:mariadb-java-client
+    versions:
+    - 2.7.1
+  - dependency-name: pl.project13.maven:git-commit-id-plugin
+    versions:
+    - 4.0.3
