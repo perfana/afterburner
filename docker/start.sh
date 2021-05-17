@@ -1,5 +1,9 @@
 #!/bin/bash
 
+mkdir -p -v dumps
+mkdir -p -v byteman
+mkdir -p -v mariadb
+
 if [ ! -f employee-db/test_db/employees.sql ]; then
     echo "First download and unpack employees db"
     ./download-emp-db.sh
