@@ -368,7 +368,7 @@ And load the test database:
     cd /db
     mysql -t -p  < employees.sql
 
-And provide password: `mypass`
+And provide password: `password123`
 
 # docker
 

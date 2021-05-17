@@ -1,0 +1,82 @@
+---
+version: '3.7'
+services:
+  mariadb:
+    image: mariadb:10.5.5
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+    ports:
+      - 3306:3306
+    restart: always
+    networks:
+      - topgun
+    volumes:
+      - ./employee-db:/docker-entrypoint-initdb.d
+      - ./mariadb:/etc/mysql/conf.d
+      - ./dumps:/dumps
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+  afterburner:
+    image: registry.hub.docker.com/stokpop/afterburner-jdk:2.0.0-SNAPSHOT
+    expose:
+      - 8080
+      - 5005
+    ports:
+      - 8080:8080
+      - 5005:5005
+    environment:
+      spring.application.name: "F18 Hornet"
+      afterburner.name: "F18 Hornet"
+      spring.profiles.active: "employee-db"
+      afterburner.remote.call.base_url: "http://localhost:8080"
+      afterburner.remote.call.httpclient.socket.timeout.millis: 6000
+      # JAVA_OPTS: -Xmx512m -XX:StartFlightRecording:filename=/dumps/recording.jfr,duration=10m 
+      spring.jmx.enabled: "true"
+      JAVA_TOOL_OPTIONS: >
+        -Dcom.sun.management.jmxremote 
+        -Dcom.sun.management.jmxremote.port=5005 
+        -Dcom.sun.management.jmxremote.rmi.port=5005 
+        -Dcom.sun.management.jmxremote.local.only=false 
+        -Dcom.sun.management.jmxremote.authenticate=false 
+        -Dcom.sun.management.jmxremote.ssl=false 
+        -Dcom.sun.management.jmxremote.host=0.0.0.0 
+        -Djava.rmi.server.hostname=0.0.0.0
+        -Dorg.jboss.byteman.transform.all=true
+        -XX:FlightRecorderOptions=stackdepth=128
+      afterburner.datasource.employee.jdbc-url: "jdbc:mariadb://mariadb:3306/employees"
+      afterburner.datasource.employee.username: "root"
+      afterburner.datasource.employee.password: "password123"
+      afterburner.datasource.employee.connection-timeout: 1000
+      afterburner.datasource.employee.idle-timeout: 30000
+      afterburner.datasource.employee.max-lifetime: 60000
+      afterburner.datasource.employee.maximum-pool-size: 4
+      afterburner.datasource.employee.minimum-idle: 4
+      afterburner.datasource.employee.auto-commit: "false"
+      afterburner.datasource.basket.auto-commit: "false"
+      logging.level.p6spy: "INFO"
+    restart: always
+    networks:
+      - topgun
+    volumes:
+      - ./dumps:/dumps
+      - ./byteman:/byteman
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 512M
+  wrk2:
+    image: registry.hub.docker.com/stokpop/wrk2:0.0.1-SNAPSHOT
+    restart: always
+    # tty to leave it running
+    stdin_open: true
+    tty: true
+    networks:
+      - topgun
+
+networks:
+  topgun:
+    driver: bridge

@@ -53,8 +53,8 @@ public class DatabaseConnector {
     @ApiOperation(value = "Find employees by name.")
     @GetMapping("/db/employee/find-by-name")
     public List<Employee> findEmployeeByFirstName(
-        @RequestParam(value = "firstName", defaultValue = "") String firstName,
-        @RequestParam(value = "lastName", defaultValue = "") String lastName) {
+        @RequestParam(value = "firstName", defaultValue = "Anneke") String firstName,
+        @RequestParam(value = "lastName", defaultValue = "Kolvik") String lastName) {
         if (firstName.length() == 0 && lastName.length() > 0) {
             return employeeMapper.selectEmployeeByLastName(lastName);
         }
@@ -71,7 +71,7 @@ public class DatabaseConnector {
 
     @ApiOperation(value = "Find employees by last name.")
     @GetMapping("/db/employee/find-by-last-name")
-    public List<Employee> findEmployeeByLastName(@RequestParam(value = "lastName", defaultValue = "Anneke") String lastName) {
+    public List<Employee> findEmployeeByLastName(@RequestParam(value = "lastName", defaultValue = "Kolvik") String lastName) {
         return employeeMapper.selectEmployeeByLastName(lastName);
     }
 

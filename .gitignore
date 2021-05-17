@@ -1,5 +1,8 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
+docker/employee-db/test_db/
+docker/dumps
+docker/byteman/btm
 
 azure/config/config.yaml
 azure/config/credentials.yaml
@@ -16,3 +19,4 @@ azure/config/jmeterpool/
 afterburner-loadtest-jmeter/tmp/
 
 .idea/
+

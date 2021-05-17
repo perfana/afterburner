@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -60,13 +61,13 @@ public class GoParallel {
     @GetMapping("/parallel")
     public BurnerMessage goParallel(
         @RequestParam(value = "primeDelayMillis", defaultValue = "2") int primeDelayMillis,
-        @RequestParam(value = "maxPrime", defaultValue = "10000") long maxPrime) {
+        @RequestParam(value = "maxPrime", defaultValue = "10000") int maxPrime) {
         long startTime = System.currentTimeMillis();
 
         List<Long> numbers = Collections.synchronizedList(
             LongStream.range(1, maxPrime)
                 .boxed()
-                .collect(Collectors.toList()));
+                .collect(Collectors.toCollection(() -> new ArrayList<>(maxPrime))));
 
         long sum = numbers.parallelStream()
             .filter(n -> Calculator.isPrime(n, primeDelayMillis))

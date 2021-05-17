@@ -182,14 +182,20 @@
                 <version>3.0.0</version>
                 <configuration>
                     <from>
-                        <image>adoptopenjdk:11-jre</image>
+                        <image>adoptopenjdk:11-jdk</image>
                     </from>
                     <to>
-                        <image>registry.hub.docker.com/stokpop/afterburner:${project.version}</image>
+                        <image>registry.hub.docker.com/stokpop/afterburner-jdk:${project.version}</image>
                     </to>
                     <container>
                         <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
                         <user>nobody</user>
+<!--                        &lt;!&ndash; make JAVA_OPTS available to the process &ndash;&gt;-->
+<!--                        <entrypoint>-->
+<!--                            <arg>/bin/sh</arg>-->
+<!--                            <arg>-c</arg>-->
+<!--                            <arg>exec java $JAVA_OPTS -cp /app/resources:/app/classes:/app/libs/* nl.stokpop.afterburner.Afterburner</arg>-->
+<!--                        </entrypoint>-->
                     </container>
                 </configuration>
             </plugin>
