@@ -185,7 +185,7 @@
                         <image>adoptopenjdk:11-jdk</image>
                     </from>
                     <to>
-                        <image>registry.hub.docker.com/stokpop/afterburner-jdk:${project.version}</image>
+                        <image>stokpop/afterburner-jdk:${project.version}</image>
                     </to>
                     <container>
                         <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>

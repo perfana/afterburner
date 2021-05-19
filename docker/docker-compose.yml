@@ -20,7 +20,7 @@ services:
           cpus: '2'
           memory: 512M
   afterburner:
-    image: registry.hub.docker.com/stokpop/afterburner-jdk:2.0.0-SNAPSHOT
+    image: stokpop/afterburner-jdk:2.0.0-SNAPSHOT
     expose:
       - 8080
       - 5005
@@ -56,7 +56,7 @@ services:
       afterburner.datasource.employee.minimum-idle: 4
       afterburner.datasource.employee.auto-commit: "false"
       afterburner.datasource.basket.auto-commit: "false"
-      logging.level.p6spy: "INFO"
+      logging.level.p6spy: "ERROR"
     restart: always
     networks:
       - topgun
@@ -69,13 +69,15 @@ services:
           cpus: '2'
           memory: 512M
   wrk2:
-    image: registry.hub.docker.com/stokpop/wrk2:0.0.1-SNAPSHOT
+    image: stokpop/wrk2:0.0.1-SNAPSHOT
     restart: always
     # tty to leave it running
     stdin_open: true
     tty: true
     networks:
       - topgun
+    volumes:
+      - ./workshop:/workshop
 
 networks:
   topgun:
