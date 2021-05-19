@@ -1,0 +1,7 @@
+RULE sleep db read
+CLASS org.mariadb.jdbc.internal.io.input.ReadAheadBufferedStream
+METHOD fillBuffer(int)
+AT ENTRY
+IF true
+DO Thread.sleep(10000)
+ENDRULE
