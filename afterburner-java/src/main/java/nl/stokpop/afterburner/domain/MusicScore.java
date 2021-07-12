@@ -2,12 +2,12 @@ package nl.stokpop.afterburner.domain;
 
 import java.util.Calendar;
 
-public class BigThing {
+public class MusicScore {
 
     private final Calendar creationDate;
     private final long[] valuesOnDate;
 
-    public BigThing(final long... valuesOnDate) {
+    public MusicScore(final long... valuesOnDate) {
         this.valuesOnDate = valuesOnDate;
         this.creationDate = Calendar.getInstance();
     }
