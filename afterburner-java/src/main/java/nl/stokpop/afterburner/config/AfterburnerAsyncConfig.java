@@ -33,25 +33,38 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
 
-        final String executorName = "afterburner-executor";
+        if (props.isCustomExecutorEnabled()) {
+            final String executorName = "afterburner-executor";
 
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(props.getAsyncMaxPoolSize());
-        executor.setCorePoolSize(props.getAsyncCorePoolSize());
-        if (props.getAsyncQueueSize() != -1) {
-            executor.setQueueCapacity(props.getAsyncQueueSize());
+            ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+            executor.setMaxPoolSize(props.getAsyncMaxPoolSize());
+            executor.setCorePoolSize(props.getAsyncCorePoolSize());
+            if (props.getAsyncQueueSize() != -1) {
+                executor.setQueueCapacity(props.getAsyncQueueSize());
+            }
+            executor.setKeepAliveSeconds(props.getAsyncKeepAliveSeconds());
+            // if executor is overloaded, run task in callers thread
+            executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+            executor.setThreadNamePrefix(executorName);
+            executor.initialize();
+
+            // enable metrics for this executor
+            Executor monitoredExecutor = ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);
+
+            // enable tracing for @Async: have one parent trace instead of all separate traces
+            return new LazyTraceExecutor(this.beanFactory, monitoredExecutor);
         }
-        executor.setKeepAliveSeconds(props.getAsyncKeepAliveSeconds());
-        // if executor is overloaded, run task in callers thread
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setThreadNamePrefix(executorName);
-        executor.initialize();
-
-        // enable metrics for this executor
-        Executor monitoredExecutor = ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);
-
-        // enable tracing for @Async: have one parent trace instead of all separate traces
-        return new LazyTraceExecutor(this.beanFactory, monitoredExecutor);
+        else {
+            // "simulate" the default task executor or the executor created via spring xml config
+            // thread.pool.size=10
+            // thread.pool.keep.alive=30
+            // <task:executor id="threadPoolTaskExecutor" pool-size="${thread.pool.size}" keep-alive="${thread.pool.keep.alive}"  />
+            ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+            threadPoolTaskExecutor.setCorePoolSize(10);
+            threadPoolTaskExecutor.setKeepAliveSeconds(30);
+            threadPoolTaskExecutor.initialize();
+            return threadPoolTaskExecutor;
+        }
     }
 
     // needed to reactivate the jvm metrics after registering executor (???)

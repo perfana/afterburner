@@ -36,7 +36,14 @@ public class AfterburnerRemote {
             .register(registry);
     }
 
-    public String executeCall(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) throws IOException {
+    @Async
+    public Future<String> executeCallAsync(@RequestParam(value = "path", defaultValue = "/") String path,
+                                           @RequestParam(value = "type", defaultValue = "httpclient") String type) throws IOException {
+        return new AsyncResult<>(executeCall(path, type));
+    }
+
+    public String executeCall(@RequestParam(value = "path", defaultValue = "/") String path,
+                              @RequestParam(value = "type", defaultValue = "httpclient") String type) throws IOException {
 
         counterTotalCalls.increment();
 
@@ -50,8 +57,4 @@ public class AfterburnerRemote {
         }
     }
 
-    @Async
-    public Future<String> executeCallAsync(@RequestParam(value = "path", defaultValue = "/") String path, @RequestParam(value = "type", defaultValue = "httpclient") String type) throws IOException {
-        return new AsyncResult<>(executeCall(path, type));
-    }
 }

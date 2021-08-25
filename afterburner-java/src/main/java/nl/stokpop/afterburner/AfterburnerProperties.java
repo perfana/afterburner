@@ -16,6 +16,10 @@ public class AfterburnerProperties {
     String name = "Afterburner";
     String databaseConnectQuery = "SELECT 1";
 
+    // simulate the default Spring executor by not using the custom
+    // executor
+    boolean isCustomExecutorEnabled = true;
+
     int asyncMaxPoolSize = 10;
     int asyncCorePoolSize = 5;
     int asyncQueueSize = -1;

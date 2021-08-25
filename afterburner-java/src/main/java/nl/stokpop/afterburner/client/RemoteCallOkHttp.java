@@ -7,45 +7,30 @@ import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component("remote-call-okhttp-client")
 public class RemoteCallOkHttp implements RemoteCall {
 
     private final static Logger log = LoggerFactory.getLogger(RemoteCallOkHttp.class);
 
-    private final String baseUrl;
-    private final Map<String, String> headers;
+    private AfterburnerConfig afterburnerConfig;
 
     private final OkHttpClient okHttpClient;
 
-    public RemoteCallOkHttp(String baseUrl, Map<String, String> headers, OkHttpClient okHttpClient) {
-            this.okHttpClient = okHttpClient;
-            this.baseUrl = baseUrl;
-            this.headers = new HashMap<>(headers);
-            log.info("Created RemoteCallOkHttp with baseUrl [{}] headers [{}] okHttpClient [{}]",
-                    baseUrl, headers, okHttpClient);
-        }
-
     @Autowired
-    public RemoteCallOkHttp(
-            @Value("${afterburner.remote.call.base_url:http://localhost:8080}") final String baseUrl) {
-            this(baseUrl, Collections.emptyMap());
-        }
-
-    public RemoteCallOkHttp(final String baseUrl, final Map<String, String> headers) {
-            this(baseUrl, headers, new OkHttpClient());
-        }
+    public RemoteCallOkHttp(AfterburnerConfig config, OkHttpClient okHttpClient) {
+        this.okHttpClient = okHttpClient;
+        this.afterburnerConfig = config;
+        log.info("Created RemoteCallOkHttp with baseUrl [{}] headers [{}] okHttpClient [{}]",
+                afterburnerConfig.getBaseUrl(), afterburnerConfig.getAdditionalHeaders(), okHttpClient);
+    }
 
     @Override
     public String call(final String path) throws RemoteCallException, IOException {
-        final String completeUrl = RemoteCallUtil.createCompleteUrl(baseUrl, path);
+        final String completeUrl = RemoteCallUtil.createCompleteUrl(afterburnerConfig.getBaseUrl(), path);
         log.info("Remote call via OkHttp [{}]", completeUrl);
         String result = get(completeUrl);
         log.debug("Result: [{}]", result);

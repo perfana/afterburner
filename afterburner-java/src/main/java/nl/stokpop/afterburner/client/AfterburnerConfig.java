@@ -2,9 +2,16 @@ package nl.stokpop.afterburner.client;
 
 import brave.http.HttpTracing;
 import brave.httpclient.TracingHttpClientBuilder;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.binder.httpcomponents.MicrometerHttpClientInterceptor;
+import io.micrometer.core.instrument.binder.httpcomponents.PoolingHttpClientConnectionManagerMetricsBinder;
+import lombok.Getter;
+import okhttp3.OkHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Map;
 
 @Configuration
+@Getter
 public class AfterburnerConfig {
 
     @Value("${afterburner.remote.call.httpclient.connect.timeout.millis:5000}")
@@ -27,9 +35,12 @@ public class AfterburnerConfig {
     @Value("${afterburner.remote.call.httpclient.connections.max:20}")
     private int connectionsMax;
 
+    @Value("${afterburner.remote.call.base_url:http://localhost:8080}")
+    private String baseUrl;
+
     // {:} is empty map, which is default if additional header not present
     @Value("#{${afterburner.remote.call.additional.headers:{:}}}")
-    Map<String, String> additionalHeaders;
+    private Map<String, String> additionalHeaders;
 
     // Need to inject traceHttpClientBuilder to have spans in http headers
     @Bean
@@ -41,11 +52,28 @@ public class AfterburnerConfig {
                 .setConnectionRequestTimeout(connectionRequestTimeoutMillis)
                 .build();
 
-        return builder
-                .setDefaultRequestConfig(defaultRequestConfig)
-                .setMaxConnPerRoute(connectionsMax)
-                .setMaxConnTotal(connectionsMax)
-                .build();
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+
+        MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
+            request -> request.getRequestLine().getUri(),
+            Tags.empty(),
+            true);
+
+        CloseableHttpClient httpClient = builder
+            .setConnectionManager(connectionManager)
+            .setDefaultRequestConfig(defaultRequestConfig)
+            .setMaxConnPerRoute(connectionsMax)
+            .setMaxConnTotal(connectionsMax)
+            .addInterceptorFirst(interceptor.getRequestInterceptor())
+            .addInterceptorLast(interceptor.getResponseInterceptor())
+            .build();
+
+        String ipAddress = RemoteCallUtil.getIpAddress(baseUrl);
+        PoolingHttpClientConnectionManagerMetricsBinder metrics =
+            new PoolingHttpClientConnectionManagerMetricsBinder(connectionManager, "afterburner-http-client", Tags.of("IP", ipAddress == null ? "unknown" : ipAddress));
+        metrics.bindTo(Metrics.globalRegistry);
+
+        return httpClient;
     }
 
     // WORKAROUND: should be present automatically: traceHttpClientBuilder, via org.springframework.cloud.sleuth.autoconfig.brave.instrument.web.client.BraveWebClientAutoConfiguration
@@ -58,6 +86,11 @@ public class AfterburnerConfig {
     @Bean(name = "additionalHttpHeaders")
     public Map<String, String> additionalHttpHeaders() {
         return additionalHeaders;
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient() {
+        return new OkHttpClient();
     }
 
 }

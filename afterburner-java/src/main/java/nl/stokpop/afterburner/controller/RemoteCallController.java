@@ -124,7 +124,7 @@ public class RemoteCallController {
             }
             return results.stream().map(futureString -> {
                 try {
-                    return futureString.get(60, TimeUnit.SECONDS);
+                    return futureString.get(10, TimeUnit.SECONDS);
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     throw new AfterburnerException("Execute async failed.", e);
                 }
