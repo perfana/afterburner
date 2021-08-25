@@ -172,11 +172,6 @@
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>4.9.10</version>
                 </plugin>
-                <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
-                    <version>4.9.10</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -244,7 +239,7 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
                     <from>
-                        <image>adoptopenjdk:11-jdk</image>
+                        <image>amazoncorretto:11@sha256:75558b1ec7aa332e62f57f708fb82aa1a648a4e4840ada287a00b8c656e066a0</image>
                     </from>
                     <to>
                         <image>stokpop/afterburner-jdk:${project.version}</image>
