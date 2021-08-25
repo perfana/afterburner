@@ -1,5 +1,11 @@
 # Afterburner with jMeter
 
+# maven
+
+To run with maven:
+
+    $ mvn clean verify
+
 # docker
 
 Run the afterburner jMeter script in a docker instance.

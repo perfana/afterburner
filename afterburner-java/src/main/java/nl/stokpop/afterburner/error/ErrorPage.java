@@ -15,9 +15,4 @@ public class ErrorPage implements ErrorController {
 		  return ResponseEntity.status(HttpStatus.NOT_FOUND).body("<h1>Not a valid Afterburner url</h2><p>Please try another url... or check the swagger docs: <a href = 'swagger-ui/'>swagger-ui/</a></p>");
 	  }
 
-	  @Override
-	  @Deprecated
-	  public String getErrorPath() {
-		  return null; // deprecated: return is ignored
-	  }
 }

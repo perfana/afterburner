@@ -17,9 +17,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <events-gatling.version>3.1.0-events-3</events-gatling.version>
-        <gatling-plugin.version>3.4.1</gatling-plugin.version>
+        <!-- going above 3.4.2 (e.g. 2.5.0) breaks compilation on "value ancestor is not a member of java.nio.file.Path" -->
+        <gatling-plugin.version>3.4.2</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <scala-maven-plugin.version>4.4.0</scala-maven-plugin.version>
+        <scala-maven-plugin.version>4.5.3</scala-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -47,8 +48,24 @@
 
         <plugins>
             <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
