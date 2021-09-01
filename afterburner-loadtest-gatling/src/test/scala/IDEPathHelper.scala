@@ -1,4 +1,3 @@
-package io.perfana.afterburner.gatling.helpers
 
 import java.nio.file.{Path, Paths}
 
