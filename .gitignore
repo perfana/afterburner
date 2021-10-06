@@ -20,3 +20,4 @@ afterburner-loadtest-jmeter/tmp/
 
 .idea/
 
+/afterburner-java/src/main/jib/pyroscope.jar

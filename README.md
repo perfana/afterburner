@@ -384,5 +384,13 @@ or to push docker remotely:
 
 If you jib multiple times with same (SNAPSHOT) label, use `docker pull <image-path>` to get most recent version.
 
+To start:
+
+    docker run -it -p 8080:8080 stokpop/afterburner-jdk:2.1.0
+
+To start with an agent:
+
+    docker run -it -p 8080:8080 -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" stokpop/afterburner-jdk:2.1.0
+
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)
