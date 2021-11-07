@@ -1,9 +1,0 @@
-job_specifications:
-- id: myjmeterjob
-  tasks:
-  - environment_variables:
-      JMETER_FILES_PATH: /mnt/batch/tasks/mounts/azfile-[STORAGE_NAME]-[JMETER_SHARE]/run00001/
-      JMETER_SCRIPT_NAME: afterburner-simple.jmx
-      JMETER_JMX_DOMAIN: [AFTERBURNER_URL]
-    docker_image: [DOCKER_REGISTRY]/jmeter
-    command: -n -Jjmx.domain=$JMETER_JMX_DOMAIN -t $JMETER_FILES_PATH/afterburner-simple.jmx -l $JMETER_FILES_PATH/tmp/result.jtl -j $JMETER_FILES_PATH/tmp/jmeter.log
