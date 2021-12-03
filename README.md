@@ -84,6 +84,11 @@ the response times and cpu effort will increase significantly above these sizes.
 Note that the current implementation is doing the calculation within one thread (core).
 You can exercise multiple cores by calling multiple concurrent requests.
 
+An experimental feature is present to short-cut the matric calculation when one 
+if the given matrices is an identity matrix. It will just return the other matrix as-is.
+This also avoids the need to create a new result matrix.
+Activate by supplying an _environment_ property: `featureToggleIdentityMatrix=true`
+
 Examples:
 * `/cpu/magic-identity-check` checks identity and simple magic square multiplication with default size 10
 * `/cpu/magic-identity-check?matrixSize=100` check for size 100, currently takes around 100 milli sec on a simple laptop

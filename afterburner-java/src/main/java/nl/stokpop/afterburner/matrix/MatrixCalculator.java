@@ -2,6 +2,8 @@ package nl.stokpop.afterburner.matrix;
 
 public class MatrixCalculator {
 
+    public static final boolean featureToggleIdentityMatrix = "true".equalsIgnoreCase(System.getenv().getOrDefault("featureToggleIdentityMatrix", "false"));
+
     private MatrixCalculator() {
     }
 
@@ -39,6 +41,15 @@ public class MatrixCalculator {
             throw new InvalidMatrixException(message);
         }
 
+        if (featureToggleIdentityMatrix) {
+            if (isIdentitySquare(matrixA)) {
+                return matrixB;
+            }
+            if (isIdentitySquare(matrixB)) {
+                return matrixA;
+            }
+        }
+
         final long[][] matrixC = new long[matrixAm][matrixBp];
 
         for (int m = 0; m < matrixAm; m++) {
@@ -56,6 +67,10 @@ public class MatrixCalculator {
             }
         }
         return matrixC;
+    }
+
+    private static boolean isIdentitySquare(long[][] matrix) throws InvalidMatrixException {
+        return areEqual(identitySquare(matrix.length), matrix).areEqual();
     }
 
     public static MatrixEqualResult areEqual(final long[][] matrixA, final long[][] matrixB) throws InvalidMatrixException {

@@ -233,10 +233,10 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
                     <from>
-                        <image>amazoncorretto:11@sha256:75558b1ec7aa332e62f57f708fb82aa1a648a4e4840ada287a00b8c656e066a0</image>
+                        <image>amazoncorretto:17</image>
                     </from>
                     <to>
-                        <image>stokpop/afterburner-jdk:${project.version}</image>
+                        <image>stokpop/afterburner-jdk:${project.version}-jdk17</image>
                     </to>
                     <container>
                         <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
