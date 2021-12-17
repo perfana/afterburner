@@ -9,7 +9,11 @@ Simple self-running test jar to use in load test environments to tune and explor
 # start
 Start in the afterburner-java directory:
     
-    mvn spring-boot:run
+    ../mvnw spring-boot:run
+
+To run with profile:
+
+    ../mvnw spring-boot:run -Dspring-boot.run.profiles=employee-db
     
 Or build or download an executable jar and run with java, so you can also change jvm settings such as the garbage collector:
 
@@ -158,6 +162,7 @@ Example output:
 ## remote database
 
 Call a remote MariaDB database with the MySql employee test database loaded.
+Note: only works with Spring profile `employee-db` active.
 
 * `/db/employee/find-by-name?firstName=Anneke` find employees by first name
 * `/db/employee/find-by-name?lastName=Preusig` find employees by last name
@@ -338,7 +343,7 @@ For example via docker:
       -p 14268:14268 \
       -p 14250:14250 \
       -p 9411:9411 \
-      jaegertracing/all-in-one:1.20
+      jaegertracing/all-in-one:1.29
 
 Use `spring.zipkin.enabled=true` to enable sending data to Jaeger.
 Also set property `spring.sleuth.sampler.probability` higher than 0, 
@@ -355,10 +360,10 @@ The prometheus endpoint: http://localhost:8080/actuator/prometheus
 Run MariaDB with the MySql employees database:
 
     docker run -d --name mariadbtest \
-      -e MYSQL_ROOT_PASSWORD=mypass \
+      -e MYSQL_ROOT_PASSWORD=nabrander123 \
       -v /path/to/git/test_db:/db \
       -p 3306:3306 \
-      mariadb:10.5.5
+      mariadb:10.6.5
 
 Clone https://github.com/datacharmer/test_db into /path/to/git/
 
@@ -373,7 +378,7 @@ And load the test database:
     cd /db
     mysql -t -p  < employees.sql
 
-And provide password: `password123`
+And provide password: `nabrander123`
 
 # docker
 
