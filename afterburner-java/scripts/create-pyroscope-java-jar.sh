@@ -15,5 +15,5 @@ function finish() {
 trap finish EXIT
 
 ./gradlew shadowJar
-mv agent/build/libs/pyroscope.jar ../../../afterburner-java/src/main/jib/
+mv agent/build/libs/pyroscope.jar ../../afterburner-java/src/main/jib/
 

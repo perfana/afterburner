@@ -16,10 +16,42 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <events-gatling.version>3.1.0-events-3</events-gatling.version>
-        <gatling-plugin.version>3.6.1</gatling-plugin.version>
+        <events-gatling.version>4.1.0-events-1</events-gatling.version>
+        <gatling-plugin.version>3.7.3</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <scala-maven-plugin.version>4.5.3</scala-maven-plugin.version>
+        <kotlin.version>1.6.10</kotlin.version>
+
+        <!-- By default enable events -->
+        <eventsEnabled>true</eventsEnabled>
+        <eventScheduleScript></eventScheduleScript>
+
+        <!-- Default load settings -->
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetUsersPerSecond>1</targetUsersPerSecond>
+        <rampupTimeInSeconds>60</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>900</constantLoadTimeInSeconds>
+
+        <!-- Settings for the Perfana Dashboard -->
+        <systemUnderTest>Afterburner</systemUnderTest>
+        <testEnvironment>test</testEnvironment>
+        <version>1.0</version>
+        <tags></tags>
+        <apiKey></apiKey>
+        <wiremockUrl>http://wiremock:8080</wiremockUrl>
+        <buildResultsUrl>http://jenkins:8080</buildResultsUrl>
+        <influxDbHost>influxdb</influxDbHost>
+
+        <scenario>cpu</scenario>
+        <workload>loadTestCpu</workload>
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetUsersPerSecond>10</targetUsersPerSecond>
+        <rampupTimeInSeconds>30</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+        <perfanaEnabled>true</perfanaEnabled>
+        <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+        <eventsEnabled>true</eventsEnabled>
+        <annotations></annotations>
+        <tags>load-test,micro-service</tags>
     </properties>
 
     <dependencies>
@@ -29,23 +61,40 @@
             <version>${gatling-plugin.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>nl.stokpop</groupId>
-                    <artifactId>events-gatling-maven-plugin</artifactId>
-                    <version>${events-gatling.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
-
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>yyyyMMdd-HHmmss</pattern>
+                            <timeZone>CET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -67,35 +116,92 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>${scala-maven-plugin.version}</version>
+                <groupId>io.perfana</groupId>
+                <artifactId>events-gatling-maven-plugin</artifactId>
+                <version>${events-gatling.version}</version>
+                <configuration>
+                    <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
+                    <eventSchedulerConfig>
+                        <debugEnabled>true</debugEnabled>
+                        <schedulerEnabled>true</schedulerEnabled>
+                        <failOnError>true</failOnError>
+                        <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
+                        <scheduleScript>
+                            PT5S|restart|{ server:'myserver' replicas:2 tags: [ 'first', 'second' ] }
+                            PT10S|scale-down
+                            PT30S|heapdump|server=myserver.example.com;port=1567
+                            PT1M|scale-up|{ replicas:2 }
+                        </scheduleScript>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
+                        <eventConfigs>
+                            <eventConfig implementation="io.perfana.helloworld.event.HelloWorldEventConfig">
+                                <name>HelloWorldEvent1</name>
+                                <helloInitialSleepSeconds>40</helloInitialSleepSeconds>
+                                <myRestService>https://my-rest-api</myRestService>
+                                <myCredentials>secret</myCredentials>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
+                                <name>PerfanaEvent1</name>
+                                <perfanaUrl>http://localhost:8888</perfanaUrl>
+                                <assertResultsEnabled>false</assertResultsEnabled>
+                                <variables>
+                                    <var1>my_value</var1>
+                                </variables>
+                            </eventConfig>
+                        </eventConfigs>
+                    </eventSchedulerConfig>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-hello-world</artifactId>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>2.0.1-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
                 <executions>
                     <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
                         <goals>
-                            <goal>testCompile</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
                         </goals>
                         <configuration>
-                            <jvmArgs>
-                                <jvmArg>-Xss100M</jvmArg>
-                            </jvmArgs>
-                            <args>
-                                <arg>-target:jvm-1.8</arg>
-                                <arg>-deprecation</arg>
-                                <arg>-feature</arg>
-                                <arg>-unchecked</arg>
-                                <arg>-language:implicitConversions</arg>
-                                <arg>-language:postfixOps</arg>
-                            </args>
+                            <sourceDirs>
+                                <source>src/test/kotlin</source>
+                            </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>nl.stokpop</groupId>
-                <artifactId>events-gatling-maven-plugin</artifactId>
                 <configuration>
-                    <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
+                    <jvmTarget>1.8</jvmTarget>
                 </configuration>
             </plugin>
         </plugins>
