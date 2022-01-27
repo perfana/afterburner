@@ -6,10 +6,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@ConditionalOnProperty(value = "management.metrics.export.prometheus.enabled", havingValue = "true")
 @Configuration
-@ConditionalOnProperty(value = "management.metrics.export.prometheus.enabled", matchIfMissing = true)
 @EnableScheduling
 class PerformanceMetricsConfiguration {
+
+    @Bean
+    PushConfig pushConfig() {
+        return PushConfig.fromCfEnv();
+    }
+
     @Bean
     RequestStatistics requestStatistics(final CustomThroughputGauge customThroughputGauge) {
         return new RequestStatistics(customThroughputGauge);

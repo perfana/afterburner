@@ -1,12 +1,14 @@
 package nl.stokpop.afterburner.metrics;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static io.prometheus.client.Collector.Type.SUMMARY;
 
+@ConditionalOnProperty(value = "management.metrics.export.prometheus.enabled", havingValue = "true")
 @RequiredArgsConstructor
 class CustomThroughputGauge {
 
@@ -25,23 +27,27 @@ class CustomThroughputGauge {
     }
 
     void setRps() {
-        totalRequestCount.set(getCurrentRequestCount().longValue());
-        rps.set(calculateRPS().longValue());
+        totalRequestCount.set(getCurrentRequestCount());
+        rps.set(calculateRPS());
         processedRequestCount.set(totalRequestCount.get());
     }
 
-    private AtomicLong calculateRPS() {
-        return new AtomicLong(totalRequestCount.get() - processedRequestCount.get());
+    public long getRps() {
+        return rps.get();
     }
 
-    public AtomicLong getCurrentRequestCount() {
-        return new AtomicLong(Collections.list(meterRegistry.getPrometheusRegistry().metricFamilySamples()).stream()
+    private long calculateRPS() {
+        return totalRequestCount.get() - processedRequestCount.get();
+    }
+
+    public long getCurrentRequestCount() {
+        return Collections.list(meterRegistry.getPrometheusRegistry().metricFamilySamples()).stream()
                 .filter(samples -> METRIC.equals(samples.name))
                 .filter(samples -> SUMMARY == samples.type)
                 .flatMap(samples -> samples.samples.stream())
                 .filter(sample -> COUNT.equals(sample.name))
                 .filter(sample -> sample.labelValues.stream().anyMatch(label -> label.startsWith(PATH)))
                 .mapToLong(sample -> (long) sample.value)
-                .sum());
+                .sum();
     }
 }

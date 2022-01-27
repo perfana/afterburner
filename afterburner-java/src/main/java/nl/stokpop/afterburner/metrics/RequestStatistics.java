@@ -10,7 +10,7 @@ class RequestStatistics {
 
     public final CustomThroughputGauge customThroughputGauge;
 
-    @Scheduled(fixedDelayString = "${app.statistics.throughput.schedule:1000}")
+    @Scheduled(fixedDelay = 1000)
     void measure() {
         customThroughputGauge.setRps();
     }
