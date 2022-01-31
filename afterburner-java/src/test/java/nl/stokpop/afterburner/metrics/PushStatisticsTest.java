@@ -2,11 +2,14 @@ package nl.stokpop.afterburner.metrics;
 
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class PushStatisticsTest {
 
+    // disabled: only works when having a real connection
     @Test
+    @Disabled
     public void testPush() {
         PrometheusConfig config = key -> null;
         String user = System.getenv("AFTB_CF_USER");
@@ -21,7 +24,7 @@ class PushStatisticsTest {
             appId
         );
         CustomThroughputGauge customThroughputGauge = new CustomThroughputGauge(new PrometheusMeterRegistry(config));
-        PushStatistics pushStatistics = new PushStatistics(customThroughputGauge, pushConfig);
+        PushStatistics pushStatistics = new PushStatistics(customThroughputGauge, pushConfig, PushStatistics.RemotingType.J11HttpClient);
         pushStatistics.push();
     }
 

@@ -20,15 +20,19 @@ public class PushConfig {
     public static PushConfig fromCfEnv() {
         CfEnv cfEnv = new CfEnv();
         CfCredentials credentials = cfEnv.findServiceByLabel("app-autoscaler").getCredentials();
+
+        @SuppressWarnings("unchecked")
         Map<String, Object> customMetrics = (Map<String, Object>) credentials.getMap().get("custom_metrics");
+
         String scalerUrl = ((String) customMetrics.getOrDefault("url", "no-url"));
         String scalerUser = (String) customMetrics.get("username");
         String scalerPassword = (String) customMetrics.get("password");
+
         String appId = cfEnv.getApp().getApplicationId();
         int appIndex = cfEnv.getApp().getInstanceIndex();
-        PushConfig pushConfig = new PushConfig(scalerUrl, scalerUser, scalerPassword, encodeBasicAuth(scalerUser, scalerPassword), appIndex, appId);
-        System.out.println("***" + pushConfig);
-        return pushConfig;
+
+        String basicAuth = encodeBasicAuth(scalerUser, scalerPassword);
+        return new PushConfig(scalerUrl, scalerUser, scalerPassword, basicAuth, appIndex, appId);
     }
 
     public static String encodeBasicAuth(String user, String password) {

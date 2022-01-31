@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 @Slf4j
 @RequiredArgsConstructor
 @Component
+@ConditionalOnProperty(value = "management.metrics.export.prometheus.enabled", havingValue = "true")
 public class PushStatistics {
 
     public static final Duration TIMEOUT_DURATION = Duration.ofMillis(800);
@@ -32,15 +35,28 @@ public class PushStatistics {
         .connectTimeout(TIMEOUT_DURATION)
         .build();
 
-    private final OkHttpClient okHttpClient = new OkHttpClient();
+    private final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+        .connectTimeout(TIMEOUT_DURATION)
+        .readTimeout(TIMEOUT_DURATION)
+        .writeTimeout(TIMEOUT_DURATION).build();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
+
+    public enum RemotingType { J11HttpClient, OkHttpClient }
+
+    @Value("afterburner.custom.metrics.remoting-type")
+    private final RemotingType remotingType;
 
     @Scheduled(fixedDelay = 1000)
     void push() {
-        sendMetricOkHttp(customThroughputGauge.getRps());
+        if (remotingType == RemotingType.J11HttpClient) {
+            sendMetric(customThroughputGauge.getRps());
+        }
+        else {
+            sendMetricOkHttp(customThroughputGauge.getRps());
+        }
     }
 
     private void sendMetric(long rps) {
@@ -55,7 +71,7 @@ public class PushStatistics {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .timeout(TIMEOUT_DURATION).build();
 
-            // this fails on certain jvm's, causing timout exceptions, maybe due to: https://bugs.openjdk.java.net/browse/JDK-8231449
+            // this fails on certain jvm's, causing time out exceptions, maybe due to: https://bugs.openjdk.java.net/browse/JDK-8231449
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
@@ -80,7 +96,7 @@ public class PushStatistics {
         try {
             String json = createJson(rps);
 
-            RequestBody body = RequestBody.create(JSON, json);
+            RequestBody body = RequestBody.create(json, JSON);
             Request request = new Request.Builder()
                 .url(totalUrl)
                 .header("Authorization", "Basic " + config.getBasicAuth())
