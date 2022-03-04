@@ -20,6 +20,9 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
+        <docker-base-image>bellsoft/liberica-openjdk-alpine-musl:17@sha256:12d833d112d45c76b1138128e14d2425d589e63b9ea9fb9dbb626c61dd846d43</docker-base-image>
+        <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk17</docker-target-image>
+        <docker-arch>amd64</docker-arch>
     </properties>
 
     <dependencyManagement>
@@ -172,6 +175,11 @@
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>4.9.10</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -212,44 +220,93 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>Generate pyroscope jar and copy to jib dir</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${basedir}/scripts/create-pyroscope-java-jar.sh</executable>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <configuration>
-                    <from>
-                        <image>amazoncorretto:17</image>
-                    </from>
-                    <to>
-                        <image>stokpop/afterburner-jdk:${project.version}-jdk17</image>
-                    </to>
-                    <container>
-                        <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
-                        <user>nobody</user>
-<!--                        &lt;!&ndash; make JAVA_OPTS available to the process &ndash;&gt;-->
-<!--                        <entrypoint>-->
-<!--                            <arg>/bin/sh</arg>-->
-<!--                            <arg>-c</arg>-->
-<!--                            <arg>exec java $JAVA_OPTS -cp /app/resources:/app/classes:/app/libs/* nl.stokpop.afterburner.Afterburner</arg>-->
-<!--                        </entrypoint>-->
-                    </container>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>local-docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <configuration>
+                            <from>
+                                <image>${docker-base-image}</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>${docker-arch}</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
+                            </from>
+                            <to>
+                                <image>${docker-target-image}</image>
+                            </to>
+                            <container>
+                                <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                                <user>nobody</user>
+                            </container>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>multi-arch-docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <configuration>
+                            <from>
+                                <image>${docker-base-image}</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>amd64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                    <platform>
+                                        <architecture>arm64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
+                            </from>
+                            <to>
+                                <image>${docker-target-image}</image>
+                            </to>
+                            <container>
+                                <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                                <user>nobody</user>
+                            </container>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>pyroscope</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>Generate pyroscope jar and copy to jib dir</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${basedir}/scripts/create-pyroscope-java-jar.sh</executable>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

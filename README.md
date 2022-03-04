@@ -382,25 +382,28 @@ And provide password: `nabrander123`
 
 # docker
 
-To create a docker image, from the `afterburner-java` directory locally:
+To create a docker image, from the `afterburner-java` directory locally (choose `amd64` or `arm64`):
 
-    ../mvnw clean package jib:dockerBuild 
+    ../mvnw -Plocal-docker -Ddocker-arch=amd64 clean package jib:dockerBuild 
 
-or to push docker remotely:
+or to push docker remotely (we use the multi-arch build for both `amd64` and `arm64`):
 
-    ../mvnw clean package jib:build 
+     ../mvnw -Pmulti-arch-docker,pyroscope clean package jib:build
 
 (add `-DskipTests` to speed it up, if you know what you are doing 😉)
 
-If you jib multiple times with same (SNAPSHOT) label, use `docker pull <image-path>` to get most recent version.
+Note: if you jib multiple times with same (SNAPSHOT) label, use `docker pull <image-path>` to get most recent version
+on a remote location.
 
-To start:
+To start the docker:
 
-    docker run -it -p 8080:8080 stokpop/afterburner-jdk:2.1.0
+    docker run --rm -d -p 8080:8080 --name afterburner stokpop/afterburner-jdk:2.1.2
 
-To start with an agent:
+To start with the pyroscope agent (make sure to build with profile `pyroscope`: `-Ppyroscope`):
 
-    docker run -it -p 8080:8080 -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" stokpop/afterburner-jdk:2.1.0
+    docker run -rm -d -p 8080:8080 \
+      -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" \
+      --name afterburner stokpop/afterburner-jdk:2.1.2
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)

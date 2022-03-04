@@ -26,12 +26,11 @@ public class Swagger2Config {
     private ApiInfo apiEndPointsInfo() {
         return new ApiInfoBuilder().title("Spring Boot REST API")
             .description("Afterburner REST API")
-            .contact(new Contact("Peter Paul Bakker", "www.stokpop.nl", "peter.paul.bakker[at]stokpop.nl"))
+            .contact(new Contact("Peter Paul Bakker", "https://www.stokpop.nl", "peter.paul.bakker[at]stokpop.nl"))
             .license("Apache 2.0")
             .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
             .version("2.0.0")
             .build();
-
     }
 
 }
