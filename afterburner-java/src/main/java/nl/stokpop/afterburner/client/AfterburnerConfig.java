@@ -53,6 +53,8 @@ public class AfterburnerConfig {
                 .build();
 
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setDefaultMaxPerRoute(connectionsMax);
+        connectionManager.setMaxTotal(connectionsMax);
 
         MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
             request -> request.getRequestLine().getUri(),
@@ -62,8 +64,6 @@ public class AfterburnerConfig {
         CloseableHttpClient httpClient = builder
             .setConnectionManager(connectionManager)
             .setDefaultRequestConfig(defaultRequestConfig)
-            .setMaxConnPerRoute(connectionsMax)
-            .setMaxConnTotal(connectionsMax)
             .addInterceptorFirst(interceptor.getRequestInterceptor())
             .addInterceptorLast(interceptor.getResponseInterceptor())
             .build();
