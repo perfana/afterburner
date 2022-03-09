@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.binder.httpcomponents.MicrometerHttpClientI
 import io.micrometer.core.instrument.binder.httpcomponents.PoolingHttpClientConnectionManagerMetricsBinder;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -16,7 +17,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 
 @Configuration
@@ -57,9 +61,9 @@ public class AfterburnerConfig {
         connectionManager.setMaxTotal(connectionsMax);
 
         MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
-            request -> request.getRequestLine().getUri(),
-            Tags.empty(),
-            true);
+                this::extractUriWithoutParamsAsString,
+                Tags.empty(),
+                true);
 
         CloseableHttpClient httpClient = builder
             .setConnectionManager(connectionManager)
@@ -74,6 +78,12 @@ public class AfterburnerConfig {
         metrics.bindTo(Metrics.globalRegistry);
 
         return httpClient;
+    }
+
+    private String extractUriWithoutParamsAsString(HttpRequest request) {
+        String uri = request.getRequestLine().getUri();
+        URI realUri = UriComponentsBuilder.fromUriString(uri).replaceQuery(null).build(Collections.emptyMap());
+        return String.valueOf(realUri);
     }
 
     // WORKAROUND: should be present automatically: traceHttpClientBuilder, via org.springframework.cloud.sleuth.autoconfig.brave.instrument.web.client.BraveWebClientAutoConfiguration
