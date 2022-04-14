@@ -20,7 +20,7 @@ services:
           cpus: '0.75'
           memory: 512M
   afterburner:
-    image: stokpop/afterburner-jdk:2.0.0-SNAPSHOT
+    image: stokpop/afterburner-jdk:2.1.5-jdk17
     expose:
       - 8080
       - 5005
