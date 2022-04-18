@@ -20,8 +20,8 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
-        <docker-base-image>bellsoft/liberica-openjdk-alpine:17@sha256:ef10c4ba399fb5b81d610a950c0ed76a1f2f1e6c2dcdd3391b9ddeb8d9b366ae</docker-base-image>
-        <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk17</docker-target-image>
+        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:3463a0c4fb127a9b71dbf5ced6888ca48e6b561068f5b683b079238b17154af8</docker-base-image>
+        <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk11</docker-target-image>
         <docker-arch>amd64</docker-arch>
     </properties>
 
@@ -168,7 +168,7 @@
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>jib-maven-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>pl.project13.maven</groupId>
