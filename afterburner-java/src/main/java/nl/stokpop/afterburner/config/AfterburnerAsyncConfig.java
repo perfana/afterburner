@@ -66,21 +66,4 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
             return threadPoolTaskExecutor;
         }
     }
-
-    // needed to reactivate the jvm metrics after registering executor (???)
-    // tip from stackoverflow below, but that is about security
-    // https://stackoverflow.com/questions/57607445/spring-actuator-jvm-metrics-not-showing-when-globalmethodsecurity-is-enabled
-    @Bean
-    InitializingBean forcePrometheusPostProcessor(BeanPostProcessor meterRegistryPostProcessor, PrometheusMeterRegistry registry) {
-        return () -> meterRegistryPostProcessor.postProcessAfterInitialization(registry, "");
-    }
-
-    @Bean(destroyMethod = "shutdown")
-    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(3);
-        threadPoolTaskScheduler.setThreadNamePrefix("AfterburnerTaskScheduler-");
-        return threadPoolTaskScheduler;
-    }
-
 }

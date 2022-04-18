@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.httpcomponents.MicrometerHttpClientInterceptor;
 import io.micrometer.core.instrument.binder.httpcomponents.PoolingHttpClientConnectionManagerMetricsBinder;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
 import org.apache.http.HttpRequest;
@@ -13,10 +14,13 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -101,6 +105,22 @@ public class AfterburnerConfig {
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient();
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(3);
+        threadPoolTaskScheduler.setThreadNamePrefix("AfterburnerTaskScheduler-");
+        return threadPoolTaskScheduler;
+    }
+
+    // needed to reactivate the jvm metrics after registering executor (???)
+    // tip from stackoverflow below, but that is about security
+    // https://stackoverflow.com/questions/57607445/spring-actuator-jvm-metrics-not-showing-when-globalmethodsecurity-is-enabled
+    @Bean
+    InitializingBean forcePrometheusPostProcessor(BeanPostProcessor meterRegistryPostProcessor, PrometheusMeterRegistry registry) {
+        return () -> meterRegistryPostProcessor.postProcessAfterInitialization(registry, "");
     }
 
 }
