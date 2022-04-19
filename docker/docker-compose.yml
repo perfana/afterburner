@@ -31,7 +31,7 @@ services:
       spring.application.name: "F18 Hornet"
       afterburner.name: "F18 Hornet"
       spring.profiles.active: "employee-db"
-      afterburner.remote.call.base_url: "http://localhost:8080"
+      afterburner.remote.call.base_url: "http://afterburner-reactive:8080"
       afterburner.remote.call.httpclient.socket.timeout.millis: 6000
       # JAVA_OPTS: -Xmx512m -XX:StartFlightRecording:filename=/dumps/recording.jfr,duration=10m 
       spring.jmx.enabled: "true"
