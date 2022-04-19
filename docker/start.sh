@@ -12,8 +12,8 @@ fi
 export COMPOSE_PROJECT_NAME=workshop
 
 # only sleep when image does not exit yet, need time to load database
-SLEEP=60
-MARIADB_DOCKER_NAME="${COMPOSE_PROJECT_NAME}_mariadb_1"
+SLEEP=30
+MARIADB_DOCKER_NAME="${COMPOSE_PROJECT_NAME}-mariadb-1"
 [[ "$(docker ps)" =~ $MARIADB_DOCKER_NAME ]] && SLEEP=0
 
 docker compose up -d mariadb
@@ -22,4 +22,6 @@ if [ $SLEEP -ne 0 ]; then
     sleep $SLEEP
 fi
 docker compose up -d afterburner
+docker compose up -d afterburner-reactive
 docker compose up -d wrk2
+docker compose up -d prometheus

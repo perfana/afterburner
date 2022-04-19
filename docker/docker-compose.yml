@@ -20,7 +20,7 @@ services:
           cpus: '0.75'
           memory: 512M
   afterburner:
-    image: stokpop/afterburner-jdk:2.1.5-jdk17
+    image: stokpop/afterburner-jdk:2.1.5-jdk11
     expose:
       - 8080
       - 5005
@@ -35,7 +35,7 @@ services:
       afterburner.remote.call.httpclient.socket.timeout.millis: 6000
       # JAVA_OPTS: -Xmx512m -XX:StartFlightRecording:filename=/dumps/recording.jfr,duration=10m 
       spring.jmx.enabled: "true"
-      JAVA_TOOL_OPTIONS: >
+      JDK_JAVA_OPTIONS: >
         -Dcom.sun.management.jmxremote 
         -Dcom.sun.management.jmxremote.port=5005 
         -Dcom.sun.management.jmxremote.rmi.port=5005 
@@ -57,6 +57,7 @@ services:
       afterburner.datasource.employee.auto-commit: "false"
       afterburner.datasource.basket.auto-commit: "false"
       logging.level.p6spy: "ERROR"
+      server.tomcat.threads.max: 10
     restart: always
     networks:
       - topgun
@@ -68,6 +69,37 @@ services:
         limits:
           cpus: '2'
           memory: 512M
+  afterburner-reactive:
+    image: stokpop/afterburner-reactive-jdk:0.0.1-jdk11
+    expose:
+      - 8081
+      - 5006
+    ports:
+      - 8081:8080
+      - 5006:5005
+    environment:
+      spring.application.name: "F18 Reactor"
+      afterburner.name: "F18 Reactor"
+      spring.jmx.enabled: "true"
+      spring.zipkin.base-url: "http://jaeger:9411/"
+      spring.zipkin.enabled: false
+      JDK_JAVA_OPTIONS: >
+        -Dcom.sun.management.jmxremote
+        -Dcom.sun.management.jmxremote.port=5005
+        -Dcom.sun.management.jmxremote.rmi.port=5005
+        -Dcom.sun.management.jmxremote.local.only=false
+        -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false
+        -Dcom.sun.management.jmxremote.host=0.0.0.0
+        -Djava.rmi.server.hostname=0.0.0.0
+        -Dorg.jboss.byteman.transform.all=true
+        -XX:FlightRecorderOptions=stackdepth=128
+    restart: always
+    networks:
+      - topgun
+    volumes:
+      - ./dumps-reactive:/dumps
+      - ./byteman-reactive:/byteman
   wrk2:
     image: stokpop/wrk2:0.0.1-SNAPSHOT
     restart: always
@@ -78,7 +110,20 @@ services:
       - topgun
     volumes:
       - ./workshop:/workshop
-
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus:/prometheus
+      - ./prometheus-data:/data
+    command:
+      - '--config.file=/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/data'
+      - '--web.enable-admin-api'
+    ports:
+      - 9090:9090
+    restart: always
+    networks:
+      - topgun
 networks:
   topgun:
     driver: bridge
