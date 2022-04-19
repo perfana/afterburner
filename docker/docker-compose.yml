@@ -82,7 +82,7 @@ services:
       afterburner.name: "F18 Reactor"
       spring.jmx.enabled: "true"
       spring.zipkin.base-url: "http://jaeger:9411/"
-      spring.zipkin.enabled: false
+      spring.zipkin.enabled: "false"
       JDK_JAVA_OPTIONS: >
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.port=5005
