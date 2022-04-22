@@ -32,7 +32,7 @@ public class RemoteCallUtil {
             InetAddress ipAddress = socket.getLocalAddress();
             return ipAddress.getHostAddress();
         } catch (IOException e) {
-            log.warn("Cannot determine IP address: {}", e.getMessage());
+            log.warn("Cannot determine IP address for remote host: {}:{} : {}", remoteHostName, remotePort, e.getMessage());
             return null;
         }
     }
@@ -49,7 +49,7 @@ public class RemoteCallUtil {
             if (host.equals("localhost") || host.equals("127.0.0.1")) {
                 return "127.0.0.1";
             } else {
-                return getIpAddress(host, parsedUrl.getPort());
+                return getIpAddress(host, parsedUrl.getPort() == -1 ? 80 : parsedUrl.getPort());
             }
 
         } catch (MalformedURLException e) {
