@@ -1,0 +1,14 @@
+# prometheus global config
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  # scrape_timeout is set to the global default (10s).
+
+scrape_configs:
+  - job_name: afterburner
+    scrape_interval: 1s
+    scrape_timeout: 1s
+    honor_labels: true
+    metrics_path: /actuator/prometheus
+    static_configs:
+     - targets: ['afterburner:8080']
