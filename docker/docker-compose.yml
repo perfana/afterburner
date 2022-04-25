@@ -1,51 +1,37 @@
 ---
 version: '3.7'
 services:
-  mariadb:
-    image: mariadb:10.5.5
-    environment:
-      MYSQL_ROOT_PASSWORD: password123
-    ports:
-      - 3306:3306
-    restart: always
-    networks:
-      - topgun
-    volumes:
-      - ./employee-db:/docker-entrypoint-initdb.d
-      - ./mariadb:/etc/mysql/conf.d
-      - ./dumps:/dumps
-    deploy:
-      resources:
-        limits:
-          cpus: '0.75'
-          memory: 512M
   afterburner:
-    image: stokpop/afterburner-jdk:2.1.5-jdk11
-    expose:
-      - 8080
-      - 5005
+    image: stokpop/afterburner-jdk:2.1.6-SNAPSHOT-jdk11
     ports:
-      - 8080:8080
-      - 5005:5005
+      - 38080:80
+      - 35005:35005
     environment:
+      server.port: 80
+      server.tomcat.threads.max: 200
       spring.application.name: "F18 Hornet"
       afterburner.name: "F18 Hornet"
       spring.profiles.active: "employee-db"
-      afterburner.remote.call.base_url: "http://afterburner-reactive:8080"
+      afterburner.remote.call.base_url: "http://afterburner-reactive"
       afterburner.remote.call.httpclient.socket.timeout.millis: 6000
-      # JAVA_OPTS: -Xmx512m -XX:StartFlightRecording:filename=/dumps/recording.jfr,duration=10m 
       spring.jmx.enabled: "true"
       JDK_JAVA_OPTIONS: >
+        -XX:ActiveProcessorCount=4
+        -Xmx149852K
+        -Xss1M
+        -XX:ReservedCodeCacheSize=240M
+        -XX:MaxDirectMemorySize=10M
+        -XX:MaxMetaspaceSize=124579K
         -Dcom.sun.management.jmxremote 
-        -Dcom.sun.management.jmxremote.port=5005 
-        -Dcom.sun.management.jmxremote.rmi.port=5005 
+        -Dcom.sun.management.jmxremote.port=35005 
+        -Dcom.sun.management.jmxremote.rmi.port=35005 
         -Dcom.sun.management.jmxremote.local.only=false 
         -Dcom.sun.management.jmxremote.authenticate=false 
         -Dcom.sun.management.jmxremote.ssl=false 
-        -Dcom.sun.management.jmxremote.host=0.0.0.0 
+        -Dcom.sun.management.jmxremote.host=0.0.0.0
         -Djava.rmi.server.hostname=0.0.0.0
         -Dorg.jboss.byteman.transform.all=true
-        -XX:FlightRecorderOptions=stackdepth=128
+        -XX:FlightRecorderOptions=stackdepth=256
       afterburner.datasource.employee.jdbc-url: "jdbc:mariadb://mariadb:3306/employees"
       afterburner.datasource.employee.username: "root"
       afterburner.datasource.employee.password: "password123"
@@ -57,8 +43,8 @@ services:
       afterburner.datasource.employee.auto-commit: "false"
       afterburner.datasource.basket.auto-commit: "false"
       logging.level.p6spy: "ERROR"
-      server.tomcat.threads.max: 10
-    restart: always
+      spring.zipkin.enabled: "true"
+      spring.zipkin.base-url: "http://jaeger:9411/"
     networks:
       - topgun
     volumes:
@@ -71,19 +57,23 @@ services:
           memory: 512M
   afterburner-reactive:
     image: stokpop/afterburner-reactive-jdk:0.0.1-jdk11
-    expose:
-      - 8081
-      - 5006
     ports:
-      - 8081:8080
-      - 5006:5005
+      - 38081:80
+      - 35006:5005
     environment:
+      server.port: 80
       spring.application.name: "F18 Reactor"
       afterburner.name: "F18 Reactor"
       spring.jmx.enabled: "true"
       spring.zipkin.base-url: "http://jaeger:9411/"
       spring.zipkin.enabled: "false"
       JDK_JAVA_OPTIONS: >
+        -XX:ActiveProcessorCount=4
+        -Xmx149852K
+        -Xss1M
+        -XX:ReservedCodeCacheSize=240M
+        -XX:MaxDirectMemorySize=10M
+        -XX:MaxMetaspaceSize=124579K
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote.port=5005
         -Dcom.sun.management.jmxremote.rmi.port=5005
@@ -94,15 +84,13 @@ services:
         -Djava.rmi.server.hostname=0.0.0.0
         -Dorg.jboss.byteman.transform.all=true
         -XX:FlightRecorderOptions=stackdepth=128
-    restart: always
     networks:
       - topgun
     volumes:
-      - ./dumps-reactive:/dumps
-      - ./byteman-reactive:/byteman
+      - ./dumps:/dumps
+      - ./byteman:/byteman
   wrk2:
-    image: stokpop/wrk2:0.0.1-SNAPSHOT
-    restart: always
+    image: stokpop/wrk2:0.0.2-SNAPSHOT
     # tty to leave it running
     stdin_open: true
     tty: true
@@ -120,10 +108,37 @@ services:
       - '--storage.tsdb.path=/data'
       - '--web.enable-admin-api'
     ports:
-      - 9090:9090
-    restart: always
+      - 39090:9090
     networks:
       - topgun
+  jaeger:
+    image: jaegertracing/all-in-one:1.22
+    ports:
+      - "36686:16686"
+    command:
+      - '--log-level=debug'
+    networks:
+      - topgun
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: ":9411"
+  mariadb:
+    image: mariadb:10.5.5
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+    ports:
+      - 33306:3306
+    networks:
+      - topgun
+    volumes:
+      - ./employee-db:/docker-entrypoint-initdb.d
+      - ./mariadb:/etc/mysql/conf.d
+      - ./dumps:/dumps
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
 networks:
   topgun:
     driver: bridge
+

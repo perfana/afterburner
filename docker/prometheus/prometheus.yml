@@ -11,4 +11,11 @@ scrape_configs:
     honor_labels: true
     metrics_path: /actuator/prometheus
     static_configs:
-     - targets: ['afterburner:8080']
+     - targets: ['afterburner:80']
+  - job_name: afterburner-reactive
+    scrape_interval: 1s
+    scrape_timeout: 1s
+    honor_labels: true
+    metrics_path: /actuator/prometheus
+    static_configs:
+     - targets: ['afterburner-reactive:80']
