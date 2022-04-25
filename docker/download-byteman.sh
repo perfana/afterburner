@@ -14,5 +14,5 @@ curl -O -L $BYTEMAN_URL
 echo "unzip $BYTEMAN_ZIP"
 unzip $BYTEMAN_ZIP
 rm -v $BYTEMAN_ZIP
-mv -v $MAIN_DIR btm
+mv -v $MAIN_DIR btm/
 
