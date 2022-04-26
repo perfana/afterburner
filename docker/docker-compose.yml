@@ -41,6 +41,7 @@ services:
       afterburner.datasource.employee.maximum-pool-size: 4
       afterburner.datasource.employee.minimum-idle: 4
       afterburner.datasource.employee.auto-commit: "false"
+      afterburner.datasource.employee.initializationFailTimeout: -1
       afterburner.datasource.basket.auto-commit: "false"
       logging.level.p6spy: "ERROR"
       spring.zipkin.enabled: "true"
@@ -50,6 +51,9 @@ services:
     volumes:
       - ./dumps:/dumps
       - ./byteman:/byteman
+    depends_on:
+      - "mariadb"
+      - "jaeger"
     deploy:
       resources:
         limits:
