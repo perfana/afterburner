@@ -11,16 +11,7 @@ fi
 
 export COMPOSE_PROJECT_NAME=workshop
 
-# only sleep when image does not exit yet, need time to load database
-SLEEP=20
-MARIADB_DOCKER_NAME="${COMPOSE_PROJECT_NAME}-mariadb-1"
-[[ "$(docker ps)" =~ $MARIADB_DOCKER_NAME ]] && SLEEP=0
-
 docker compose up -d mariadb
-if [ $SLEEP -ne 0 ]; then
-    echo "sleep for $SLEEP seconds for employee db to load"
-    sleep $SLEEP
-fi
 docker compose up -d jaeger
 docker compose up -d afterburner
 docker compose up -d afterburner-reactive
