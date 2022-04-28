@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.basket;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.util.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class FundCheckController {
         this.tracer = tracer;
     }
 
-    @ApiOperation(value = "Check funds for customer.")
+    @Operation(description = "Check funds for customer.")
     @GetMapping(value = "/fund/check", produces = "application/json")
     public ResponseEntity<FundReply> checkFund(@RequestParam String customer, @RequestParam long amount) {
         long startTime = System.currentTimeMillis();

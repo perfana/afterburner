@@ -2,21 +2,18 @@ package nl.stokpop.afterburner.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
+import lombok.extern.slf4j.Slf4j;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.sleuth.instrument.async.LazyTraceExecutor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
+@Slf4j
 @Configuration
 public class AfterburnerAsyncConfig implements AsyncConfigurer {
 
@@ -32,7 +29,6 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
 
     @Override
     public Executor getAsyncExecutor() {
-
         if (props.isCustomExecutorEnabled()) {
             final String executorName = "afterburner-executor";
 
@@ -47,6 +43,9 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
             executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
             executor.setThreadNamePrefix(executorName);
             executor.initialize();
+            executor.setDaemon(true);
+
+            log.info("created async pool: " + executor);
 
             // enable metrics for this executor
             Executor monitoredExecutor = ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);

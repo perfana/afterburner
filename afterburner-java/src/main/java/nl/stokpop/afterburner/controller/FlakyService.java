@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import nl.stokpop.afterburner.AfterburnerException;
 import nl.stokpop.afterburner.AfterburnerProperties;
@@ -28,7 +28,7 @@ public class FlakyService {
         this.props = props;
     }
 
-    @ApiOperation(value = "The flaky call fails most of the time.")
+    @Operation(summary = "The flaky call fails most of the time.")
 
     @GetMapping(value = "/flaky", produces = "application/json")
     public BurnerMessage flaky(

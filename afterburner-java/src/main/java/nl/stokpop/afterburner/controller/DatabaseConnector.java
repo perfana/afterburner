@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.mybatis.Employee;
@@ -32,7 +32,7 @@ public class DatabaseConnector {
         this.employeeMapper = employeeMapper;
     }
 
-    @ApiOperation(value = "Execute trivial query on remote database and measure the response time.")
+    @Operation(summary = "Execute trivial query on remote database and measure the response time.")
     @GetMapping("/db/connect")
     public BurnerMessage checkDatabaseConnection() {
         long startTime = System.currentTimeMillis();
@@ -50,7 +50,7 @@ public class DatabaseConnector {
         return new BurnerMessage(message, props.getName(), durationMillis);
     }
 
-    @ApiOperation(value = "Find employees by name.")
+    @Operation(summary = "Find employees by name.")
     @GetMapping("/db/employee/find-by-name")
     public List<Employee> findEmployeeByFirstName(
         @RequestParam(required = false, defaultValue = "") String firstName,
@@ -70,13 +70,13 @@ public class DatabaseConnector {
         }
     }
 
-    @ApiOperation(value = "Find employees by last name.")
+    @Operation(description = "Find employees by last name.")
     @GetMapping("/db/employee/find-by-last-name")
     public List<Employee> findEmployeeByLastName(@RequestParam(defaultValue = "") String lastName) {
         return employeeMapper.selectEmployeeByLastName(lastName);
     }
 
-    @ApiOperation(value = "Execute long query.")
+    @Operation(description = "Execute long query.")
     @GetMapping("/db/employee/select-long-time")
     public int longQuery(@RequestParam int durationInSec) {
         return employeeMapper.selectLongTime(durationInSec);

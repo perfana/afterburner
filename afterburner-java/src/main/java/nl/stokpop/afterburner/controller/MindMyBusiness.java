@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.util.Sleeper;
@@ -22,7 +22,7 @@ public class MindMyBusiness {
         this.props = props;
     }
 
-    @ApiOperation(value = "Mind my business for 'duration' milliseconds.")
+    @Operation(summary = "Mind my business for 'duration' milliseconds.")
     @GetMapping(value = "/mind-my-business", produces = "application/json" )
     public BurnerMessage mindMyBusiness(@RequestParam(value = "duration", defaultValue = "5") String duration) {
         long startTime = System.currentTimeMillis();
@@ -37,7 +37,7 @@ public class MindMyBusiness {
     }
 
     @Secured("ROLE_USER")
-    @ApiOperation(value = "Mind my business for 'duration' milliseconds.")
+    @Operation(summary = "Mind my business for 'duration' milliseconds.")
     @GetMapping(value = "/mind-my-business-s", produces = "application/json" )
     public BurnerMessage mindMyBusinesss(@RequestParam(value = "duration", defaultValue = "5") String duration) {
         return mindMyBusiness(duration);

@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.domain.SystemInfo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @RestController
 public class SystemInfoController {
 
-    @ApiOperation(value = "Show system info for this jvm, memory, cpu and threads.")
+    @Operation(summary = "Show system info for this jvm, memory, cpu and threads.")
     @GetMapping("system-info")
     public SystemInfo systemInfo() {
         Runtime runtime = Runtime.getRuntime();

@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class AbundantLogger {
         this.props = props;
     }
 
-    @ApiOperation(value = "This will log abundantly!")
+    @Operation(summary = "This will log abundantly!")
     @PostMapping(value = "/log-some", produces = "application/json" )
     public BurnerMessage logSomeBody(@RequestBody String body, @RequestParam(value = "logLines", defaultValue = "10") int logLines) {
         long startTime = System.currentTimeMillis();
@@ -31,7 +31,7 @@ public class AbundantLogger {
         return new BurnerMessage(String.format("Logging of %d lines took some time.", logLines), props.getName(), durationMillis);
     }
 
-    @ApiOperation(value = "This will log abundantly!")
+    @Operation(summary = "This will log abundantly!")
     @GetMapping(value = "/log-some", produces = "application/json" )
     public BurnerMessage logSome(@RequestParam(value = "logLines", defaultValue = "10") int logLines,
                                  @RequestParam(value = "logSize", defaultValue = "1000") int logSize) {

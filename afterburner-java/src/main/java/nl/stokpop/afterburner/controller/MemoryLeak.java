@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.domain.MusicMachine;
@@ -28,7 +28,7 @@ public class MemoryLeak {
                 : props.getName();
     }
 
-    @ApiOperation(value = "Simulate a memory leak.")
+    @Operation(summary = "Simulate a memory leak.")
     @GetMapping("/memory/grow")
     public BurnerMessage memoryGrow(
             @RequestParam(value = "objects", defaultValue = "10") int objects,
@@ -48,7 +48,7 @@ public class MemoryLeak {
         return new BurnerMessage(message, name, durationMillis);
     }
 
-    @ApiOperation(value = "Clear the memory leak.")
+    @Operation(summary = "Clear the memory leak.")
     @GetMapping("/memory/clear")
     public BurnerMessage memoryClear() {
         log.info("Clear object list with size [{}].", MusicMachine.getMusicMachineMemories().size());

@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.util.Sleeper;
@@ -29,7 +29,7 @@ public class MemoryChurn {
         this.props = props;
     }
 
-    @ApiOperation(value = "Simulate high object churn: lots of objects created per request.")
+    @Operation(summary = "Simulate high object churn: lots of objects created per request.")
     @GetMapping("/memory/churn")
     public BurnerMessage delay(@RequestParam(value = "objects", defaultValue = "181") int objects,
                                @RequestParam(value = "duration", defaultValue = "100") String duration) {

@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.matrix.InvalidMatrixException;
@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CpuBurner {
 
     private static final Logger log = LoggerFactory.getLogger(CpuBurner.class);
-    
+    public static final String MATRIX_SIZE_TAG = "matrix-size";
+
     private final AfterburnerProperties props;
 
     Tracer tracer;
@@ -28,7 +29,7 @@ public class CpuBurner {
         this.tracer = tracer;
     }
 
-    @ApiOperation(value = "Spend some time on CPU doing some magic matrix calculations.")
+    @Operation(summary = "Spend some time on CPU doing some magic matrix calculations.")
     @GetMapping("/cpu/magic-identity-check")
     public BurnerMessage magicIdentityCheck(
             @RequestParam(value = "matrixSize", defaultValue = "10") int matrixSize) throws InvalidMatrixException {
@@ -46,7 +47,7 @@ public class CpuBurner {
             identitySquare = MatrixCalculator.identitySquare(matrixSize);
         }
         finally {
-            matrixInitSpan.tag("matrix-size", String.valueOf(matrixSize)).end();
+            matrixInitSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
         }
 
         long[][] multiplyMatrix;
@@ -55,7 +56,7 @@ public class CpuBurner {
             multiplyMatrix = MatrixCalculator.multiply(simpleMagicSquare, identitySquare);
         }
         finally {
-            matrixMultiplySpan.tag("matrix-size", String.valueOf(matrixSize)).end();
+            matrixMultiplySpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
         }
 
         MatrixEqualResult matrixEqualResult;
@@ -64,7 +65,7 @@ public class CpuBurner {
             matrixEqualResult = MatrixCalculator.areEqual(simpleMagicSquare, multiplyMatrix);
         }
         finally {
-            matrixEqualCheckSpan.tag("matrix-size", String.valueOf(matrixSize)).end();
+            matrixEqualCheckSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
         }
 
         String message = String.format("A simple magic square multiplied by an identity square of size [%d] [%s] to the magic square.",

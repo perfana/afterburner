@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import nl.stokpop.afterburner.domain.ParallelInfo;
@@ -29,7 +29,7 @@ public class GoParallel {
         this.props = props;
     }
 
-    @ApiOperation(value = "Show current information of the common fork join pool.")
+    @Operation(summary = "Show current information of the common fork join pool.")
     @GetMapping("/parallel-info")
     public ParallelInfo parallelInfo() {
         ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
@@ -57,7 +57,7 @@ public class GoParallel {
         return parallelInfo;
     }
 
-    @ApiOperation(value = "Calculate the sum of prime numbers, with some additional delay, using parallel stream (common fork join pool).")
+    @Operation(summary = "Calculate the sum of prime numbers, with some additional delay, using parallel stream (common fork join pool).")
     @GetMapping("/parallel")
     public BurnerMessage goParallel(
         @RequestParam(value = "primeDelayMillis", defaultValue = "2") int primeDelayMillis,
@@ -77,7 +77,7 @@ public class GoParallel {
         return new BurnerMessage(String.format("The sum of prime numbers up to %d: %d", maxPrime, sum), props.getName(), durationMillis);
     }
 
-    @ApiOperation(value = "Calculate the sum of prime numbers, with some additional delay, using a regular (serial) stream.")
+    @Operation(summary = "Calculate the sum of prime numbers, with some additional delay, using a regular (serial) stream.")
     @GetMapping("/serial-stream")
     public BurnerMessage goSerialStream(
         @RequestParam(value = "primeDelayMillis", defaultValue = "5") int primeDelayMillis,

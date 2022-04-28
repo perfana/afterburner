@@ -1,7 +1,6 @@
 package nl.stokpop.afterburner.basket;
 
-import io.swagger.annotations.ApiOperation;
-import nl.stokpop.afterburner.AfterburnerProperties;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.domain.Basket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,19 +18,16 @@ public class BasketController {
 
     private static final Logger log = LoggerFactory.getLogger(BasketController.class);
 
-    private final AfterburnerProperties props;
-
     private final BasketValidator basketValidator;
 
     private final BasketService basketService;
 
-    public BasketController(AfterburnerProperties props, BasketValidator basketValidator, BasketService basketService) {
-        this.props = props;
+    public BasketController(BasketValidator basketValidator, BasketService basketService) {
         this.basketValidator = basketValidator;
         this.basketService = basketService;
     }
 
-    @ApiOperation(value = "Simulates a basket purchase request with validation. What can possibly go wrong?")
+    @Operation(summary = "Simulates a basket purchase request with validation. What can possibly go wrong?")
     @PostMapping(value = "/basket/purchase", produces = "application/json", consumes = "application/json")
     public ResponseEntity<BasketReply> purchase(@RequestBody BasketRequest request) {
         long startTime = System.currentTimeMillis();
@@ -46,13 +42,13 @@ public class BasketController {
             message = "All is fine " + customer + ", happy purchase! " + request.getProducts();
         }
         long durationMillis = System.currentTimeMillis() - startTime;
-        log.info("Basket purchase " + (validateSuccess ? "success" : "failure") + ". For " + customer + ". Duration ms: " + durationMillis);
+        log.info("Basket purchase {} For {}. Duration ms: {}", (validateSuccess ? "success" : "failure"), customer, durationMillis);
         HttpStatus status = validateSuccess ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
         BasketReply basketReply = new BasketReply(message, request.getTotalPrice(), customer);
         return new ResponseEntity<>(basketReply, status);
     }
 
-    @ApiOperation(value = "Store a purchase in the database.")
+    @Operation(description = "Store a purchase in the database.")
     @PostMapping(value = "/basket/store", produces = "application/json", consumes = "application/json")
     public ResponseEntity<BasketReply> store(@RequestBody BasketRequest request) {
         long startTime = System.currentTimeMillis();
@@ -65,20 +61,20 @@ public class BasketController {
                 .build();
         basketService.addBasket(basket);
         long durationMillis = System.currentTimeMillis() - startTime;
-        log.info("Basket store for " + customer + ". Duration ms: " + durationMillis);
+        log.info("Basket store for {}. Duration ms: {}", customer, durationMillis);
         String message = "Basket stored: " + basket;
         BasketReply basketReply = new BasketReply(message, request.getTotalPrice(), customer);
         return new ResponseEntity<>(basketReply, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Store a purchase in the database.")
+    @Operation(description = "Store a purchase in the database.")
     @GetMapping(value = "/basket/all", produces = "application/json")
     public ResponseEntity<BasketListReply> all() {
         long startTime = System.currentTimeMillis();
         List<Basket> allBaskets = basketService.findAllBaskets();
         BasketListReply reply = new BasketListReply(allBaskets);
         long durationMillis = System.currentTimeMillis() - startTime;
-        log.info("Basket find all. Duration ms: " + durationMillis);
+        log.info("Basket find all. Duration ms: {}", durationMillis);
         return new ResponseEntity<>(reply, HttpStatus.OK);
     }
 

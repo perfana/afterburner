@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerProperties;
 import nl.stokpop.afterburner.domain.BurnerMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class TcpConnector {
         this.props = props;
     }
 
-    @ApiOperation(value = "Check connection to remote port. This measures the TCP handshake (socket.connect()) to the remote system.")
+    @Operation(summary = "Check connection to remote port. This measures the TCP handshake (socket.connect()) to the remote system.")
     @GetMapping("/tcp/connect")
     public BurnerMessage tcpConnect(
             @RequestParam(value = "host", defaultValue = "localhost") String host,

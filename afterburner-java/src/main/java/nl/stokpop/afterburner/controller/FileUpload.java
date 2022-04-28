@@ -1,6 +1,6 @@
 package nl.stokpop.afterburner.controller;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class FileUpload {
         }
     }
 
-    @ApiOperation(value = "Upload a file using multipart/form-data and store in temp directory.")
+    @Operation(description = "Upload a file using multipart/form-data and store in temp directory.")
     @PostMapping(value = "/files/upload", consumes = "multipart/form-data")
     public ResponseEntity<String> upload(@RequestParam("upload") MultipartFile file) {
         String filename = file.getOriginalFilename();
@@ -77,7 +77,7 @@ public class FileUpload {
         }
     }
 
-    @ApiOperation(value = "Download a file.", notes = "Download an already uploaded file by name.")
+    @Operation(summary = "Download a file.", description = "Download an already uploaded file by name.")
     @GetMapping(value = "/files/download/{filename:.+}")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         Resource file = loadAsResource(filename);

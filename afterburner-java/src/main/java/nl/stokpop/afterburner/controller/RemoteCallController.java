@@ -7,7 +7,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import nl.stokpop.afterburner.AfterburnerException;
 import nl.stokpop.afterburner.error.AfterburnerCiruitBreakerException;
 import nl.stokpop.afterburner.error.AfterburnerTimeoutException;
@@ -95,7 +95,7 @@ public class RemoteCallController {
         return result.contains("500");
     }
 
-    @ApiOperation(value = "Call one remote service.")
+    @Operation(summary = "Call one remote service.")
     @GetMapping("remote/call")
     public String remoteCallHttpClient(
             @RequestParam(value = "path", defaultValue = "/delay") String path,
@@ -107,7 +107,7 @@ public class RemoteCallController {
         }
     }
 
-    @ApiOperation(value = "Call many remote services in parallel using CompletableFutures.")
+    @Operation(summary = "Call many remote services in parallel using CompletableFutures.")
     @GetMapping("remote/call-many")
     public String remoteCallHttpClientMany(
             @RequestParam(value = "path", defaultValue = "/delay?duration=33") String path,
@@ -131,7 +131,7 @@ public class RemoteCallController {
             }).collect(Collectors.joining(","));
     }
 
-    @ApiOperation(value = "Call remote service with retries.")
+    @Operation(summary = "Call remote service with retries.")
     @GetMapping("remote/call-retry")
     public String remoteCallWithRetries(
         @RequestParam(value = "path", defaultValue = "/flaky") String path,
@@ -146,7 +146,7 @@ public class RemoteCallController {
         }
     }
 
-    @ApiOperation(value = "Call remote service with circuit breaker.")
+    @Operation(summary = "Call remote service with circuit breaker.")
     @GetMapping("remote/call-circuit-breaker")
     public String remoteCallWithCircuitBreaker(
         @RequestParam(value = "path", defaultValue = "/delay") String path,
@@ -165,7 +165,7 @@ public class RemoteCallController {
         }
     }
 
-    @ApiOperation(value = "Call traffic light with retries.")
+    @Operation(summary = "Call traffic light with retries.")
     @GetMapping("remote/call-traffic-light")
     public String remoteCallTrafficLightWithRetries() {
 
