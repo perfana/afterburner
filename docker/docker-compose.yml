@@ -2,7 +2,7 @@
 version: '3.7'
 services:
   afterburner:
-    image: stokpop/afterburner-jdk:2.1.6-SNAPSHOT-jdk11
+    image: stokpop/afterburner-jdk:2.1.6-jdk11
     ports:
       - 38080:80
       - 35005:35005
