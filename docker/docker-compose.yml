@@ -56,7 +56,6 @@ services:
       - ./dumps:/dumps
       - ./byteman:/byteman
     depends_on:
-      - "mariadb"
       - "jaeger"
     deploy:
       resources:
@@ -99,7 +98,7 @@ services:
       - ./dumps:/dumps
       - ./byteman:/byteman
   wrk2:
-    image: stokpop/wrk2:0.0.2-SNAPSHOT
+    image: docker.io/stokpop/wrk2-aarch:0.0.2
     # tty to leave it running
     stdin_open: true
     tty: true
