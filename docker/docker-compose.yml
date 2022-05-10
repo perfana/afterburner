@@ -10,7 +10,7 @@ services:
       server.port: 80
       spring.application.name: "F18 Hornet"
       afterburner.name: "F18 Hornet"
-      spring.profiles.active: "employee-db"
+      # spring.profiles.active: "employee-db"
       # server.tomcat.threads.max: 200
       afterburner.async_max_pool_size: 10
       afterburner.async_core_pool_size: 5
@@ -99,7 +99,7 @@ services:
       - ./byteman:/byteman
   wrk2:
     # do not forget to update the sed replace when updating image
-    image: docker.io/stokpop/wrk2:0.0.3
+    image: docker.io/stokpop/wrk2-aarch:0.0.2
     # tty to leave it running
     stdin_open: true
     tty: true
