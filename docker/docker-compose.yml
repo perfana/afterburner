@@ -99,7 +99,7 @@ services:
       - ./byteman:/byteman
   wrk2:
     # do not forget to update the sed replace when updating image
-    image: docker.io/stokpop/wrk2-aarch:0.0.2
+    image: docker.io/stokpop/wrk2:0.0.3
     # tty to leave it running
     stdin_open: true
     tty: true
