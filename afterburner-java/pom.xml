@@ -15,7 +15,7 @@
 
     <properties>
         <java.version>8</java.version>
-        <spring-cloud.version>2021.0.1</spring-cloud.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
         <spring-boot.version>2.6.6</spring-boot.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -56,6 +56,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -179,13 +183,9 @@
         </pluginManagement>
         <plugins>
             <plugin>
+                <!-- to insert version number into open api page -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>templating-maven-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>${basedir}/src/main/java/nl/stokpop/afterburner/config/OpenApiConfig.java</include>
-                    </includes>
-                </configuration>
                 <executions>
                     <execution>
                         <id>filter-src</id>
