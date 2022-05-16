@@ -51,38 +51,40 @@ public class AfterburnerConfig {
     private Map<String, String> additionalHeaders;
 
     // Need to inject traceHttpClientBuilder to have spans in http headers
-    @Bean
-    public CloseableHttpClient createHttpClient(@Qualifier("traceHttpClientBuilder") HttpClientBuilder builder) {
 
-        RequestConfig defaultRequestConfig = RequestConfig.custom()
-                .setConnectTimeout(connectTimeoutMillis)
-                .setSocketTimeout(socketTimeoutMillis)
-                .setConnectionRequestTimeout(connectionRequestTimeoutMillis)
-                .build();
-
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(connectionsMax);
-        connectionManager.setMaxTotal(connectionsMax);
-
-        MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
-                this::extractUriWithoutParamsAsString,
-                Tags.empty(),
-                true);
-
-        CloseableHttpClient httpClient = builder
-            .setConnectionManager(connectionManager)
-            .setDefaultRequestConfig(defaultRequestConfig)
-            .addInterceptorFirst(interceptor.getRequestInterceptor())
-            .addInterceptorLast(interceptor.getResponseInterceptor())
-            .build();
-
-        String ipAddress = RemoteCallUtil.getIpAddress(baseUrl);
-        PoolingHttpClientConnectionManagerMetricsBinder metrics =
-            new PoolingHttpClientConnectionManagerMetricsBinder(connectionManager, "afterburner-http-client", Tags.of("IP", ipAddress == null ? "unknown" : ipAddress));
-        metrics.bindTo(Metrics.globalRegistry);
-
-        return httpClient;
-    }
+    // DISABLED BECAUSE OF THE CLASH WITH FEIGN CLIENT CloseableHttpClient
+//    @Bean
+//    public CloseableHttpClient createHttpClient(@Qualifier("traceHttpClientBuilder") HttpClientBuilder builder) {
+//
+//        RequestConfig defaultRequestConfig = RequestConfig.custom()
+//                .setConnectTimeout(connectTimeoutMillis)
+//                .setSocketTimeout(socketTimeoutMillis)
+//                .setConnectionRequestTimeout(connectionRequestTimeoutMillis)
+//                .build();
+//
+//        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+//        connectionManager.setDefaultMaxPerRoute(connectionsMax);
+//        connectionManager.setMaxTotal(connectionsMax);
+//
+//        MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
+//                this::extractUriWithoutParamsAsString,
+//                Tags.empty(),
+//                true);
+//
+//        CloseableHttpClient httpClient = builder
+//            .setConnectionManager(connectionManager)
+//            .setDefaultRequestConfig(defaultRequestConfig)
+//            .addInterceptorFirst(interceptor.getRequestInterceptor())
+//            .addInterceptorLast(interceptor.getResponseInterceptor())
+//            .build();
+//
+//        String ipAddress = RemoteCallUtil.getIpAddress(baseUrl);
+//        PoolingHttpClientConnectionManagerMetricsBinder metrics =
+//            new PoolingHttpClientConnectionManagerMetricsBinder(connectionManager, "afterburner-http-client", Tags.of("IP", ipAddress == null ? "unknown" : ipAddress));
+//        metrics.bindTo(Metrics.globalRegistry);
+//
+//        return httpClient;
+//    }
 
     private String extractUriWithoutParamsAsString(HttpRequest request) {
         String uri = request.getRequestLine().getUri();
