@@ -38,7 +38,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-    private final static Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(RestExceptionHandler.class);
 
     @ExceptionHandler(ClientAbortException.class)
     public void handleClientAbortException(ClientAbortException exception, final WebRequest request) {
@@ -61,6 +61,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleAccessDenied(AccessDeniedException exception, final WebRequest request) {
         log.warn("Access denied [{}] with message: {}", request.getDescription(true), exception.getMessage());
         return accessDeniedResponse;
+    }
+
+    @ExceptionHandler(OutOfResourcesException.class)
+    public ResponseEntity<Object> handleOutOfResources(OutOfResourcesException exception, final WebRequest request) {
+        log.warn("Resources depleted [{}] with message: {}", request.getDescription(true), exception.getMessage());
+        return systemBusyResponse;
     }
 
     @ExceptionHandler(value = { Exception.class })
