@@ -39,6 +39,7 @@
 
     <modules>
         <module>afterburner-java</module>
+        <module>afterburner-stub</module>
         <module>afterburner-loadtest-gatling</module>
         <module>afterburner-loadtest-jmeter</module>
     </modules>
