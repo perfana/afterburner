@@ -405,5 +405,52 @@ To start with the pyroscope agent (make sure to build with profile `pyroscope`: 
       -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" \
       --name afterburner stokpop/afterburner-jdk:2.1.2
 
+# mutual TLS
+
+The Afterburner-stub is set up with mutual TLS certificates. You can use this to test mutual TLS communication from
+Afterburner itself.
+
+The certificates for the stub (aka server) are generated as follows:
+
+    keytool -genkeypair -alias server -keyalg RSA -keysize 4096 -validity 365 -ext "SAN:c=DNS:localhost,IP:127.0.0.1" -dname "CN=Server,OU=Server,O=Examples,L=,S=CA,C=U" -keypass changeit -keystore server.p12 -storeType PKCS12 -storepass changeit
+
+To export public server key:
+
+    keytool -exportcert -alias server -file server.cer -keystore server.p12 -storepass changeit
+
+The certificates for Afterburner (aks client) are generated as follows:
+
+    keytool -genkeypair -alias client -keyalg RSA -keysize 4096 -validity 365 -dname "CN=Client,OU=Server,O=Examples,L=,S=CA,C=U" -keypass changeit -keystore client.p12 -storeType PKCS12 -storepass changeit
+
+Export the public client key:
+
+    keytool -exportcert -alias client -file client.cer -keystore client.p12 -storepass changeit
+
+Next, import the server public key into the client truststore:
+
+    keytool -importcert -keystore client-truststore.p12 -alias server-public -file server.cer -storepass changeit -noprompt
+
+Then, import the client public key into the server truststore:
+
+     keytool -importcert -keystore server-truststore.p12 -alias client-public -file client.cer -storepass changeit -noprompt
+
+The p12 keystores are part of the github repository in `src/main/resources/keystore`
+
+For TLS debugging use:
+
+    -Djavax.net.debug=all
+
+Note that only the delay call is present in the Afterburner-stub. In Afterburner the Feign client delay
+call can be used to test mTLS via: `http://localhost:8080/client/delay`. 
+Set the remote url of Afterburner-Stub to Afterburner itself via: `-Dafterburner.remote.call.base_url=https://localhost:8844`
+Notice the use of `https`.
+
+To switch between Feign default (using HttpsConnectionUrl) or Apache HttpClient 4 use: `-Dafterburner.feign.client-type=DEFAULT` or
+`-Dafterburner.feign.client-type=HC4`.
+
+To trace INetAddress calls with Byteman:
+
+    -javaagent:$BYTEMAN_HOME/lib/byteman.jar=script:$AFTERBURNER_HOME/afterburner-java/src/main/byteman/inetaddress.btm,boot:$BYTEMAN_HOME/lib/byteman.jar
+
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)

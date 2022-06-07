@@ -1,0 +1,19 @@
+RULE InetAddress init
+CLASS java.net.InetAddress
+METHOD <init>()
+AT EXIT
+IF TRUE
+DO
+   incrementCounter("InetAddress.init");
+   traceln("*** InetAddress init count: " + readCounter("InetAddress.init"))
+ENDRULE
+
+RULE InetAddress getByName
+CLASS java.net.InetAddress
+METHOD java.net.InetAddress getByName(String)
+AT EXIT
+IF TRUE
+DO
+   incrementCounter("InetAddress.getByName");
+   traceln("*** InetAddress get by name: " + $1 + " count: " + readCounter("InetAddress.getByName"))
+ENDRULE
