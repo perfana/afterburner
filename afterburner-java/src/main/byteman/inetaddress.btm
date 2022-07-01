@@ -1,19 +1,49 @@
-RULE InetAddress init
-CLASS java.net.InetAddress
-METHOD <init>()
-AT EXIT
-IF TRUE
+#RULE InetAddress init
+#CLASS InetAddress
+#METHOD <init>()
+#AT EXIT
+#IF TRUE
+#DO
+#   incrementCounter("InetAddress.init");
+#   traceln("*** InetAddress init count: " + readCounter("InetAddress.init"))
+#ENDRULE
+
+RULE InetAddress getAllByName
+CLASS InetAddress
+METHOD getAllByName
+IF true
 DO
-   incrementCounter("InetAddress.init");
-   traceln("*** InetAddress init count: " + readCounter("InetAddress.init"))
+    traceln("*** InetAddress getAllByName")
 ENDRULE
 
 RULE InetAddress getByName
 CLASS java.net.InetAddress
-METHOD java.net.InetAddress getByName(String)
-AT EXIT
-IF TRUE
+METHOD getByName
+IF true
 DO
-   incrementCounter("InetAddress.getByName");
-   traceln("*** InetAddress get by name: " + $1 + " count: " + readCounter("InetAddress.getByName"))
+    traceln("*** InetAddress getByName")
+ENDRULE
+
+#RULE InetAddress getAddress
+#CLASS ^InetAddress
+#METHOD getAddress
+#IF true
+#DO
+#    traceln("*** InetAddress getAddress")
+#ENDRULE
+
+RULE trace main entry
+CLASS Afterburner
+METHOD main
+AT ENTRY
+IF true
+DO traceln("*** entering main")
+ENDRULE
+
+RULE trace main exit
+CLASS Afterburner
+METHOD main
+AT EXIT
+IF true
+DO traceln("*** exiting main")
 ENDRULE
