@@ -357,6 +357,10 @@ The prometheus endpoint: http://localhost:8080/actuator/prometheus
 
 # database
 
+Clone https://github.com/datacharmer/test_db into /path/to/git/
+
+    git clone https://github.com/datacharmer/test_db.git
+
 Run MariaDB with the MySql employees database:
 
     docker run -d --name mariadbtest \
@@ -365,10 +369,6 @@ Run MariaDB with the MySql employees database:
       -p 3306:3306 \
       mariadb:10.6.5
 
-Clone https://github.com/datacharmer/test_db into /path/to/git/
-
-    git clone https://github.com/datacharmer/test_db.git
-    
 Then ssh into this docker:
     
     docker exec -it mariadbtest /bin/bash

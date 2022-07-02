@@ -2,7 +2,7 @@
 
 export COMPOSE_PROJECT_NAME=workshop
 
-ACTIVATE_EMPLOYEE_DB=false
+ACTIVATE_EMPLOYEE_DB=true
 
 # update wrk2 image for apple silicon
 if [[ $(uname -m) == 'arm64' ]]; then
@@ -25,8 +25,9 @@ if [ "$ACTIVATE_EMPLOYEE_DB" = true ]; then
     docker compose up -d mariadb
 fi
 docker compose up -d jaeger
+docker compose up -d prometheus
+docker compose up -d wrk2
 docker compose up -d afterburner
 docker compose up -d afterburner-reactive
-docker compose up -d wrk2
-docker compose up -d prometheus
+
 

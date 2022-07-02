@@ -2,7 +2,7 @@
 version: '3.7'
 services:
   afterburner:
-    image: stokpop/afterburner-jdk:2.1.6-jdk11
+    image: stokpop/afterburner-jdk:2.1.9-jdk11
     ports:
       - 38080:80
       - 35005:35005
@@ -10,7 +10,7 @@ services:
       server.port: 80
       spring.application.name: "F18 Hornet"
       afterburner.name: "F18 Hornet"
-      # spring.profiles.active: "employee-db"
+      spring.profiles.active: "employee-db"
       # server.tomcat.threads.max: 200
       afterburner.async_max_pool_size: 10
       afterburner.async_core_pool_size: 5
@@ -46,10 +46,10 @@ services:
       afterburner.datasource.employee.auto-commit: "false"
       afterburner.datasource.employee.initializationFailTimeout: -1
       afterburner.datasource.basket.auto-commit: "false"
-      logging.level.p6spy: "ERROR"
+      logging.level.p6spy: "INFO"
+      spring.sleuth.sampler.probability: 100
       spring.zipkin.enabled: "true"
       spring.zipkin.base-url: "http://jaeger:9411/"
-      spring.sleuth.sampler.probability: 100
     networks:
       - topgun
     volumes:
@@ -99,7 +99,7 @@ services:
       - ./byteman:/byteman
   wrk2:
     # do not forget to update the sed replace when updating image
-    image: docker.io/stokpop/wrk2:0.0.3
+    image: docker.io/stokpop/wrk2-aarch:0.0.2
     # tty to leave it running
     stdin_open: true
     tty: true

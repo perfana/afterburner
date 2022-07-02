@@ -16,11 +16,12 @@
     <properties>
         <java.version>8</java.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
-        <spring-boot.version>2.6.6</spring-boot.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
-        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:3463a0c4fb127a9b71dbf5ced6888ca48e6b561068f5b683b079238b17154af8</docker-base-image>
+        <!-- find latest here: https://hub.docker.com/r/bellsoft/liberica-openjdk-alpine/tags -->
+        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:321160f18a520a49a13f4b73fd87e4565fa20e1c528d343800a41393f40f819c</docker-base-image>
         <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk11</docker-target-image>
         <docker-arch>amd64</docker-arch>
     </properties>
@@ -46,6 +47,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.gavlyukovskiy</groupId>
+            <artifactId>p6spy-spring-boot-starter</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
@@ -70,7 +76,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>3.0.4</version>
+            <version>3.0.5</version>
         </dependency>
         <!-- Micrometer Prometheus registry  -->
         <dependency>
@@ -80,7 +86,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.6.8</version>
+            <version>1.6.9</version>
         </dependency>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -129,12 +135,12 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.10.0-RC1</version>
+            <version>4.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -148,7 +154,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>6.6</version>
+            <version>7.2</version>
         </dependency>
     </dependencies>
 
