@@ -28,6 +28,7 @@
         <revision>2.1.9</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <encoding>UTF-8</encoding>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -41,6 +42,7 @@
         <module>afterburner-java</module>
         <module>afterburner-loadtest-gatling</module>
         <module>afterburner-loadtest-jmeter</module>
+        <module>afterburner-wiremock</module>
     </modules>
     
 </project>

@@ -16,7 +16,7 @@
     <properties>
         <java.version>8</java.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
+        <spring-boot.version>2.7.1</spring-boot.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
