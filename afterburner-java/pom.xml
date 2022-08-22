@@ -21,7 +21,8 @@
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
         <!-- find latest here: https://hub.docker.com/r/bellsoft/liberica-openjdk-alpine/tags -->
-        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:321160f18a520a49a13f4b73fd87e4565fa20e1c528d343800a41393f40f819c</docker-base-image>
+        <!-- to find the digest of the manifest LIST for multi-arch builds use: docker buildx imagetools inspect bellsoft/liberica-openjdk-alpine:11 -->
+        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:c77c9415ebfedd4ae13104228baf5a3a736e28c03265bb2609636beb4ceb5632</docker-base-image>
         <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk11</docker-target-image>
         <docker-arch>amd64</docker-arch>
     </properties>
