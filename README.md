@@ -397,13 +397,13 @@ on a remote location.
 
 To start the docker:
 
-    docker run --rm -d -p 8080:8080 --name afterburner stokpop/afterburner-jdk:2.1.2
+    docker run --rm -d -p 8080:8080 --name afterburner stokpop/afterburner-jdk:2.1.11-jdk11
 
 To start with the pyroscope agent (make sure to build with profile `pyroscope`: `-Ppyroscope`):
 
     docker run -rm -d -p 8080:8080 \
       -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" \
-      --name afterburner stokpop/afterburner-jdk:2.1.2
+      --name afterburner stokpop/afterburner-jdk:2.1.11-jdk11
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)
