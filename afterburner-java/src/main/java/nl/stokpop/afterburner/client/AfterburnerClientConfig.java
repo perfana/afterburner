@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.util.Enumeration;
 
 @Configuration
 public class AfterburnerClientConfig {
@@ -51,7 +52,7 @@ public class AfterburnerClientConfig {
 
         SSLContext sslContext = setupSSLContextForMutualTLS();
 
-        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext,  new DefaultHostnameVerifier());
+        SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, new String[] { "TLSv1.2", "TLSv1.3" }, null, new DefaultHostnameVerifier());
 
         Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
                 .register("https", socketFactory)
@@ -81,6 +82,7 @@ public class AfterburnerClientConfig {
             KeyStore keyStore = loadKeyStore("/keystore/client.p12", password);
 
             return SSLContexts.custom()
+                    .setProtocol("TLSv1.3")
                     .loadKeyMaterial(keyStore, password.toCharArray())
                     .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
                     .build();
