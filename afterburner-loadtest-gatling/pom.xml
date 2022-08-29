@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>nl.stokpop</groupId>
+        <groupId>io.perfana</groupId>
         <artifactId>afterburner</artifactId>
         <version>${revision}</version>
     </parent>

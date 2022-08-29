@@ -2,7 +2,7 @@
 version: '3.7'
 services:
   afterburner:
-    image: stokpop/afterburner-jdk:2.1.9-jdk11
+    image: perfana/afterburner-jdk:2.1.9-jdk11
     ports:
       - 38080:80
       - 35005:35005
@@ -63,7 +63,7 @@ services:
           cpus: '2'
           memory: 512M
   afterburner-reactive:
-    image: stokpop/afterburner-reactive-jdk:0.0.1-jdk11
+    image: perfana/afterburner-reactive-jdk:0.0.1-jdk11
     ports:
       - 38081:80
       - 35006:5005

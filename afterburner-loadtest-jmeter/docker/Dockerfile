@@ -2,7 +2,7 @@ FROM alpine:3.8
 
 LABEL maintainer=incenzo.marrazzo@domain.personal
 LABEL http_origin=https://www.blazemeter.com/blog/make-use-of-docker-with-jmeter-learn-how
-LABEL modified_by=peter.paul.bakker@stokpop.nl
+LABEL modified_by=peterpaul@perfana.io
 
 ARG JMETER_VERSION="5.0"
 

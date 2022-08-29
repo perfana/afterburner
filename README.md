@@ -2,8 +2,6 @@
 
 Simple self-running test jar to use in load test environments to tune and explore monitor and analysis tools.
 
-[![Build Status](https://travis-ci.com/stokpop/afterburner.svg?branch=master)](https://travis-ci.com/stokpop/afterburner)
-
 # afterburner-java
 
 # start
@@ -23,7 +21,7 @@ With gc log enabled:
     
     java -jar -Xlog:gc:file=gc.log:time,uptime target/afterburner-java-1.1-SNAPSHOT-exec.jar 
     
-Download a ready build afterburner here: https://github.com/stokpop/afterburner/releases 
+Download a ready build afterburner here: https://github.com/perfana/afterburner/releases 
 
 # test
 Default port number is 8080, so test if it is working using curl:
@@ -240,7 +238,7 @@ Two methods are in place, one with a fixedRate schedule and one with a fixedDela
 
 See what happens when a thread freezes or fails by setting `afterburner.autonomous.worker.stability` to false.
 
-Activate the logging of these workers with property: `logging.level.nl.stokpop.afterburner.service.AutonomousWorker=debug`
+Activate the logging of these workers with property: `logging.level.service.io.perfana.afterburner.AutonomousWorker=debug`
 
 ## flaky calls and retries
 
@@ -397,13 +395,13 @@ on a remote location.
 
 To start the docker:
 
-    docker run --rm -d -p 8080:8080 --name afterburner stokpop/afterburner-jdk:2.1.11-jdk11
+    docker run --rm -d -p 8080:8080 --name afterburner perfana/afterburner-jdk:2.2.0-jdk11
 
 To start with the pyroscope agent (make sure to build with profile `pyroscope`: `-Ppyroscope`):
 
     docker run -rm -d -p 8080:8080 \
       -e JAVA_TOOL_OPTIONS="-javaagent:/pyroscope.jar" \
-      --name afterburner stokpop/afterburner-jdk:2.1.11-jdk11
+      --name afterburner perfana/afterburner-jdk:2.2.0-jdk11
 
 ##### credits
 * fire favicon from [freefavicon](http://www.freefavicon.com)

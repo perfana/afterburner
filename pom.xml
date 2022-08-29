@@ -4,7 +4,7 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>nl.stokpop</groupId>
+    <groupId>io.perfana</groupId>
     <artifactId>afterburner</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -13,19 +13,19 @@
 
     <description>Demo project to be used in performance test and tuning exercises.</description>
 
-    <url>https://github.com/stokpop/afterburner</url>
+    <url>https://github.com/perfana/afterburner</url>
 
     <developers>
         <developer>
             <name>Peter Paul Bakker</name>
-            <email>peter.paul.bakker@stokpop.nl</email>
-            <organization>Stokpop Software Solutions</organization>
-            <organizationUrl>https://www.stokpop.nl</organizationUrl>
+            <email>peterpaul@perfana.io</email>
+            <organization>Perfana</organization>
+            <organizationUrl>https://www.perfana.io</organizationUrl>
         </developer>
     </developers>
 
     <properties>
-        <revision>2.1.11</revision>
+        <revision>2.2.0-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <encoding>UTF-8</encoding>

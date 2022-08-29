@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>nl.stokpop</groupId>
+        <groupId>io.perfana</groupId>
         <artifactId>afterburner</artifactId>
         <version>${revision}</version>
     </parent>
@@ -23,7 +23,7 @@
         <!-- find latest here: https://hub.docker.com/r/bellsoft/liberica-openjdk-alpine/tags -->
         <!-- to find the digest of the manifest LIST for multi-arch builds use: docker buildx imagetools inspect bellsoft/liberica-openjdk-alpine:11 -->
         <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:c77c9415ebfedd4ae13104228baf5a3a736e28c03265bb2609636beb4ceb5632</docker-base-image>
-        <docker-target-image>stokpop/afterburner-jdk:${project.version}-jdk11</docker-target-image>
+        <docker-target-image>perfana/afterburner-jdk:${project.version}-jdk11</docker-target-image>
         <docker-arch>amd64</docker-arch>
     </properties>
 
@@ -195,7 +195,7 @@
                 <artifactId>templating-maven-plugin</artifactId>
                 <configuration>
                     <includes>
-                        <include>${basedir}/src/main/java/nl/stokpop/afterburner/config/OpenApiConfig.java</include>
+                        <include>${basedir}/src/main/java/io/perfana/afterburner/config/OpenApiConfig.java</include>
                     </includes>
                 </configuration>
                 <executions>
@@ -230,7 +230,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                    <mainClass>io.perfana.afterburner.Afterburner</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -268,7 +268,7 @@
                                 <image>${docker-target-image}</image>
                             </to>
                             <container>
-                                <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                                <mainClass>io.perfana.afterburner.Afterburner</mainClass>
                                 <user>nobody</user>
                             </container>
                         </configuration>
@@ -301,7 +301,7 @@
                                 <image>${docker-target-image}</image>
                             </to>
                             <container>
-                                <mainClass>nl.stokpop.afterburner.Afterburner</mainClass>
+                                <mainClass>io.perfana.afterburner.Afterburner</mainClass>
                                 <user>nobody</user>
                             </container>
                         </configuration>

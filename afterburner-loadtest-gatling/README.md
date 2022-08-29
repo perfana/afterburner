@@ -18,10 +18,10 @@ These tests are created using:
      -DarchetypeGroupId=io.gatling.highcharts \
      -DarchetypeArtifactId=gatling-highcharts-maven-archetype \
      -DarchetypeVersion=2.3.1 \
-     -DgroupId=nl.stokpop \
+     -DgroupId=io.perfana \
      -DartifactId=afterburner-loadtest \
      -Dversion=1.0-SNAPSHOT \
-     -Dpackage=nl.stokpop
+     -Dpackage=io.perfana
 
 ### Updates after creation
 
