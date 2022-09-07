@@ -5,6 +5,8 @@ import io.perfana.afterburner.AfterburnerProperties;
 import io.perfana.afterburner.domain.BurnerMessage;
 import io.perfana.afterburner.error.OutOfResourcesException;
 import io.perfana.afterburner.util.Sleeper;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +29,10 @@ public class Delay {
         this.semaphore = new Semaphore(props.getDelayCallLimit());
     }
 
-    @Operation(summary = "The delay call does a simple java sleep in request thread for 'duration' milliseconds.")
+    @Operation(summary = "The delay call does a simple java sleep in request thread for 'duration' milliseconds.",
+                extensions=@Extension(name = "x-performance",
+                        properties = { @ExtensionProperty(name = "x-response-time", value = "PT2S") })
+    )
     @GetMapping(value = "/delay", produces = "application/json" )
     public BurnerMessage delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
         return sleep(duration);

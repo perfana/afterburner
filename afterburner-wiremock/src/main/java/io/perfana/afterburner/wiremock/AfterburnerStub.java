@@ -1,7 +1,6 @@
 package io.perfana.afterburner.wiremock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 
 import java.util.Scanner;
 
@@ -9,14 +8,14 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 
 public class AfterburnerStub {
     public static void main(String[] args) {
-        WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(8060));
+        int portNumber = 8060;
+        WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(portNumber));
         wireMockServer.start();
 
         Scanner s = new Scanner(System.in);
-        System.out.println("Press enter to continue.....");
+        System.out.println("Listening on port: " + portNumber + " Press enter to stop Wiremock.....");
         s.nextLine();
 
-        WireMock.reset();
         wireMockServer.stop();
     }
 }
