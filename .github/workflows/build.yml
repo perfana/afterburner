@@ -35,6 +35,16 @@ jobs:
         run: |
           git fetch --all --tags
           git checkout tags/${{ env.TAG_NAME }} -b ${{ env.TAG_NAME }}-tmp-branch
+      - name: Write tag to file
+        uses: "finnp/create-file-action@master"
+        env:
+          FILE_NAME: "version.txt"
+          FILE_DATA: "${{ env.TAG_NAME }}-${{ github.sha }}"
+      - name: Upload versions.txt to use in performance-test job
+        uses: actions/upload-artifact@v1
+        with:
+          name: version
+          path: version.txt
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -50,3 +60,107 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: ../mvnw -Pmulti-arch-docker,pyroscope clean package jib:build
+
+      ## checkout perfana-gitops
+      - name: Checkout perfana-gitops
+        uses: actions/checkout@v2
+        with:
+          repository: perfana/perfana-gitops
+          token: ${{ secrets.GITHUB_PAT }}
+          path: perfana-gitops
+      - name: Replace image snapshot
+        working-directory: perfana-gitops
+        run: |
+          repository="repository: perfana/afterburner"
+          tag="tag: ${{ env.TAG_NAME }}-${{ github.sha }} # date: $(date +'%Y-%m-%dT%H:%M:%S')"
+          echo "$repository"
+          echo "$tag"
+          ls -all
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/optimus-prime-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/optimus-prime-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-be/values.yaml
+      - name: Commit files
+        working-directory: perfana-gitops
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Bumped afterburner OptimusPrimes to ${{ env.TAG_NAME }} in demo environment" -a
+          git push
+          
+    performance-test:
+      needs: build
+      runs-on: self-hosted
+
+      steps:
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          id: install
+        - name: Checkout code from code branch
+          uses: actions/checkout@v2
+          with:
+            path: main
+            fetch-depth: 0
+        - name: Download version file
+          uses: actions/download-artifact@v1
+          with:
+            name: version
+
+        - name: Get version from file
+          run: |
+            ls -all
+            cat /runner/_work/afterburner/afterburner/version/version.txt
+            echo "TAG_NAME=$(cat /runner/_work/afterburner/afterburner/version/version.txt)" >> $GITHUB_ENV
+        - name: Get commit message
+          working-directory: main
+          run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+        - uses: actions/checkout@v3
+        - name: Set up JDK
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17.0.4+101'
+            distribution: 'temurin'
+            cache: maven
+        - name: Setup Maven Action
+          uses: s4u/setup-maven-action@v1.2.1
+          with:
+            java-version: 17.0.4+101
+            maven-version: 3.6.3
+        - name: get KUBECONFIG from secrets
+          env:
+            KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+        - name: Check deployed version
+          env:
+            KUBECONFIG: /runner/_work/afterburner/afterburner/config
+            IMAGE: perfana/afterburner:${{ env.TAG_NAME }}-${{ github.sha }}
+          run: |
+            while true; do
+               echo "Waiting for deployment ..."
+               if [[ $(kubectl get deployment optimus-prime-fe -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                  echo "Deployment ready, waiting 120s to make sure pod has started"
+                  sleep 120
+                  break
+               fi
+               sleep 10
+            done
+        - name: Build with Maven
+          env:
+            KUBECONFIG: /runner/_work/afterburner/afterburner/config
+          run: |
+            cd afterburner-loadtest-gatling
+            mvn clean install -U events-gatling:test -Ptest-env-tst,test-type-load,assert-results \
+            -Dsut-config=optimus-prime \
+            -DtestRunId="${{ github.job }}-${{ github.run_number }}" \
+            -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -Dversion="${{ env.TAG_NAME }}-${{ github.sha }}" \
+            -DsystemUnderTest=OptimusPrime \
+            -DtestEnvironment=tst \
+            -Dannotations="${{ env.COMMIT_MESSAGE }}" \
+            -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+            -DtargetBaseUrl=http://optimus-prime-fe-afterburner.perfana:8080 \
+            -DinfluxUrl=http://influxdb.perfana:8086 \
+            -DinfluxUser=admin \
+            -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
+            -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
+            -DperfanaUrl=http://perfana-fe.perfana:3000

@@ -286,6 +286,10 @@
                         <configuration>
                             <from>
                                 <image>${docker-base-image}</image>
+                                <auth>
+                                    <username>${env.DOCKER_USER}</username>
+                                    <password>${env.DOCKER_PASSWORD}</password>
+                                </auth>
                                 <platforms>
                                     <platform>
                                         <architecture>amd64</architecture>
@@ -296,10 +300,6 @@
                                         <os>linux</os>
                                     </platform>
                                 </platforms>
-                                <auth>
-                                    <username>${env.DOCKER_USER}</username>
-                                    <password>${env.DOCKER_PASSWORD}</password>
-                                </auth>
                             </from>
                             <to>
                                 <image>${docker-target-image}</image>
