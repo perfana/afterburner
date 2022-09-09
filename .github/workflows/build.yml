@@ -136,14 +136,23 @@ jobs:
           IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
           while true; do
-             echo "Waiting for deployment ..."
-             if [[ $(kubectl get deployment optimus-prime-fe -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ready, waiting 120s to make sure pod has started"
-                sleep 120
+             echo "Waiting for deployment optimus-prime-fe-afterburner ..."
+             if [[ $(kubectl get deployment optimus-prime-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment optimus-prime-fe-afterburner ready"
                 break
              fi
              sleep 10
           done
+          while true; do
+             echo "Waiting for deployment optimus-prime-be-afterburner ..."
+             if [[ $(kubectl get deployment optimus-prime-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment optimus-prime-be-afterburner ready"
+                break
+             fi
+             sleep 10
+          done
+          echo "Deployment ready, waiting 120s to make sure pods have started"
+          sleep 120
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
