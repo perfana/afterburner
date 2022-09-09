@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: perfana/perfana-gitops
-          token: ${{ secrets.GITHUB_PAT }}
+          token: ${{ secrets.PAT_GITHUB }}
           path: perfana-gitops
       - name: Replace image snapshot
         working-directory: perfana-gitops
@@ -133,7 +133,7 @@ jobs:
       - name: Check deployed version
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
-          IMAGE: perfana/afterburner:${{ env.TAG_NAME }}-${{ github.sha }}
+          IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
           while true; do
              echo "Waiting for deployment ..."
@@ -153,7 +153,7 @@ jobs:
           -Dsut-config=optimus-prime \
           -DtestRunId="${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-          -Dversion="${{ env.TAG_NAME }}-${{ github.sha }}" \
+          -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=OptimusPrime \
           -DtestEnvironment=tst \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
