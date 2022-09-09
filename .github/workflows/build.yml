@@ -1,10 +1,7 @@
 ---
-# This is a basic workflow to help you get started with Actions
 
 name: Build
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the develop branch
 on:
   push:
     branches: [main]
@@ -47,16 +44,9 @@ jobs:
         working-directory: afterburner-java
         run: ../mvnw clean install
       # Build docker image
-      - name: Create local docker image
+      - name: Create and push docker image
         working-directory: afterburner-java
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: ../mvnw -Pmulti-arch-docker,pyroscope clean package jib:build
-      # push to github
-      - name: Login docker
-        run: |
-          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push the tagged Docker image
-        if: contains(env.TAG_NAME, 'SNAPSHOT')
-        run: docker push perfana/afterburner:${{ env.TAG_NAME }}-${{ github.sha }}
-      - name: Push the Docker image
-        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
-        run: docker push perfana/afterburner:${{ env.TAG_NAME }}
