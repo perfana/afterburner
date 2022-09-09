@@ -8,7 +8,8 @@ import java.time.Duration
 
 class AfterburnerBasicSimulation : Simulation() {
 
-    private val baseUrl = "http://localhost:8080"
+    private val baseUrl = System.getenv()["targetBaseUrl"] ?: "http://localhost:8080"
+
     private val contentType = "application/json"
 
     val httpProtocol = http

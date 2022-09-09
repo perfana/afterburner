@@ -153,7 +153,8 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
                                 <name>PerfanaEvent1</name>
-                                <perfanaUrl>http://localhost:8888</perfanaUrl>
+                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
+                                <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>false</assertResultsEnabled>
                                 <variables>
                                     <var1>my_value</var1>
