@@ -168,8 +168,8 @@ jobs:
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://optimus-prime-fe-afterburner.acme:8080 \
-          -DinfluxUrl=https://influxdb.perfana.cloud:8086 \
+          -DinfluxUrl=https://influxdb.perfana.cloud \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=https://demo.perfana.cloud:3000
+          -DperfanaUrl=https://demo.perfana.cloud
