@@ -44,9 +44,11 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Build local
+        working-directory: afterburner-java
         run: ./mvnw clean install
       # Build docker image
       - name: Create local docker image
+        working-directory: afterburner-java
         run: ./mvnw -Pmulti-arch-docker,pyroscope clean package jib:build
       # push to github
       - name: Login docker
