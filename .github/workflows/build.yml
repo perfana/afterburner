@@ -54,4 +54,9 @@ jobs:
       - name: Login docker
         run: |
           docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push
+      - name: Push the tagged Docker image
+        if: contains(env.TAG_NAME, 'SNAPSHOT')
+        run: docker push perfana/afterburner:${{ env.TAG_NAME }}-${{ github.sha }}
+      - name: Push the Docker image
+        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
+        run: docker push perfana/afterburner:${{ env.TAG_NAME }}
