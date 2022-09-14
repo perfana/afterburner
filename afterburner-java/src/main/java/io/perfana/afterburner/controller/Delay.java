@@ -31,7 +31,7 @@ public class Delay {
 
     @Operation(summary = "The delay call does a simple java sleep in request thread for 'duration' milliseconds.",
                 extensions=@Extension(name = "x-performance",
-                        properties = { @ExtensionProperty(name = "x-response-time", value = "PT2S") })
+                        properties = { @ExtensionProperty(name = "response-time-millis", value = "100") })
     )
     @GetMapping(value = "/delay", produces = "application/json" )
     public BurnerMessage delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
