@@ -164,7 +164,7 @@ jobs:
           
           cd cicd/k6
 
-          mvn clean install -U events-gatling:test -Ptest-env-tst,test-type-load,assert-results \
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load \
           -Dsut-config=optimus-prime \
           -DtestRunId="${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
