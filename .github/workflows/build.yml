@@ -170,7 +170,7 @@ jobs:
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=OptimusPrime \
-          -DtestEnvironment=tst \
+          -DtestEnvironment=acme \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://optimus-prime-fe-afterburner.acme:8080 \
