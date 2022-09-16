@@ -82,9 +82,9 @@ jobs:
           -DtestEnvironment=acme \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
-          -DtargetBaseUrl=http://optimus-prime-fe-afterburner.perfana:8080 \
-          -DinfluxUrl=http://influxdb.perfana:8086 \
+          -DtargetBaseUrl=http://optimus-prime-fe-afterburner.acme:8080 \
+          -DinfluxUrl=https://influxdb.demo.perfana.cloud \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=http://perfana-fe.perfana:3000
+          -DperfanaUrl=https://demo.perfana.cloud
