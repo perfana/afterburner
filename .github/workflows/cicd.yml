@@ -15,7 +15,6 @@ jobs:
 
   build:
     uses: perfana/afterburner/.github/workflows/build-deploy.yml@main
-    needs: build
     secrets: inherit
 
   performance-test-gatling:
