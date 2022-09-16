@@ -73,6 +73,8 @@ jobs:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
+          wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
+          chmod +x g2i
           mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-load,assert-results \
           -Dsut-config=optimus-prime \
           -DtestRunId="${{ github.job }}-${{ github.run_number }}" \
