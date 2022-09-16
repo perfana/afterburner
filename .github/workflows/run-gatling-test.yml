@@ -7,7 +7,6 @@ on:
 jobs:
 
   performance-test-gatling:
-    needs: build
     runs-on: self-hosted
     steps:
       - name: Install kubectl
@@ -22,7 +21,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: version
-      - name: Get version from file
+      - name: Set version from file
         run: |
           ls -all
           cat /runner/_work/afterburner/afterburner/version/version.txt
