@@ -1,0 +1,82 @@
+---
+name: Run performance tests with Gatling
+
+on:
+  workflow_call:
+
+jobs:
+
+  performance-test-gatling:
+    runs-on: self-hosted
+    steps:
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+      - name: Checkout code from code branch
+        uses: actions/checkout@v2
+        with:
+          path: main
+          fetch-depth: 0
+      - name: Download version file
+        uses: actions/download-artifact@v1
+        with:
+          name: version
+      - name: Get version from file
+        working-directory: main
+        run: |
+          ls -all
+          cat /runner/_work/perfana-fe/perfana-fe/version/version.txt
+          echo "TAG_NAME=$(cat /runner/_work/perfana-fe/perfana-fe/version/version.txt)" >> $GITHUB_ENV
+      - name: Get commit message
+        working-directory: main
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - uses: actions/checkout@v3
+      - name: Set up JDK 13
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.0.4+101'
+          distribution: 'temurin'
+          cache: maven
+      - name: Setup Maven Action
+        uses: s4u/setup-maven-action@v1.2.1
+        with:
+          java-version: 17.0.4+101
+          maven-version: 3.6.3
+      - name: get KUBECONFIG from secrets
+        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/perfana-fe/perfana-fe/config
+        env:
+          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG}}
+      - name: Check deployed version
+        env:
+          KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config
+          IMAGE: perfana/perfana-fe-test:${{ env.TAG_NAME }}
+        run: |
+          while true; do
+             echo "Waiting for deployment ..."
+             if [[ $(kubectl get deployment perfana-fe -n perfana -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment ready, waiting 120s to make sure pod has started"
+                sleep 60
+                break
+             fi
+             sleep 10
+          done
+      - name: Build with Maven
+        env:
+          KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config
+        run: |
+          cd cicd/gatling
+          mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-load,assert-results \
+          -Dsut-config=optimus-prime \
+          -DtestRunId="${{ github.job }}-${{ github.run_number }}" \
+          -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          -Dversion="${{ env.TAG_NAME }}" \
+          -DsystemUnderTest=OptimusPrime \
+          -DtestEnvironment=acme \
+          -Dannotations="${{ env.COMMIT_MESSAGE }}" \
+          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+          -DtargetBaseUrl=http://optimus-prime-fe-afterburner.perfana:8080 \
+          -DinfluxUrl=http://influxdb.perfana:8086 \
+          -DinfluxUser=admin \
+          -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
+          -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
+          -DperfanaUrl=http://perfana-fe.perfana:3000
