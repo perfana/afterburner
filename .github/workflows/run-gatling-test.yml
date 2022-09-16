@@ -66,8 +66,8 @@ jobs:
              fi
              sleep 10
           done
-          echo "Deployment ready, waiting 120s to make sure pods have started"
-          sleep 120
+          echo "Deployment ready, waiting 60s to make sure pods have started"
+          sleep 60
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config

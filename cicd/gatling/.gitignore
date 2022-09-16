@@ -3,8 +3,6 @@
 # Simple Build Tool
 # http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
 
-.idea 
-
 dist/*
 target/
 lib_managed/
@@ -33,32 +31,12 @@ buildNumber.properties
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-# User-specific stuff:
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
-
-# Sensitive or high-churn files:
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.xml
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-
-# Gradle:
-.idea/**/gradle.xml
-.idea/**/libraries
+.idea/
 
 # CMake
 cmake-build-debug/
 cmake-build-release/
 
-# Mongo Explorer plugin:
-.idea/**/mongoSettings.xml
-
-## File-based project format:
 *.iws
 
 ## Plugin-specific files:

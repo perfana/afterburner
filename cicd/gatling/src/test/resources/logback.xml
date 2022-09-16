@@ -1,20 +1,45 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{15} - %msg%n%rEx</pattern>
-			<immediateFlush>false</immediateFlush>
-		</encoder>
+	<appender name="ELASTIC" class="ElasticGatlingAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>DEBUG</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<url>http://elastic:${elasticPassword}@elasticsearch-master.logging:9200/_bulk</url>
+		<authentication class="com.internetitem.logback.elasticsearch.config.BasicAuthentication" />
+		<index>gatling-%date{yyyy.MM.dd}</index>
+		<type>gatling</type>
+		<errorsToStderr>true</errorsToStderr>
+		<properties>
+			<property>
+				<name>systemUnderTest</name>
+				<value>${systemUnderTest}</value>
+				<allowEmpty>false</allowEmpty>
+			</property>
+			<property>
+				<name>testEnvironment</name>
+				<value>${testEnvironment}</value>
+				<allowEmpty>false</allowEmpty>
+			</property>
+		</properties>
+		<headers>
+			<header>
+				<name>Content-Type</name>
+				<value>application/json</value>
+			</header>
+		</headers>
 	</appender>
 
-	<!-- Uncomment for logging ALL HTTP request and responses -->
-	 	<!--<logger name="io.gatling.http" level="TRACE" />-->
-	<!-- Uncomment for logging ONLY FAILED HTTP request and responses -->
-	<!-- 	<logger name="io.gatling.http" level="DEBUG" /> -->
+	<logger name="io.gatling.http.engine.response" level="DEBUG"/>
+
+	<appender name="ASYNC ELK" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="ELASTIC"/>
+	</appender>
 
 	<root level="WARN">
-		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="ASYNC ELK"/>
 	</root>
 
 </configuration>

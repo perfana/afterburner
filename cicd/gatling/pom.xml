@@ -6,6 +6,15 @@
     <artifactId>gatling-afterburner</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
     <pluginRepositories>
         <pluginRepository>
             <id>sonatype-snapshots</id>
@@ -20,17 +29,20 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <events-jmeter-maven-plugin.version>3.6.1-events-1</events-jmeter-maven-plugin.version>
+        <gatling.version>3.7.3</gatling.version>
+        <events-gatling-maven-plugin.version>4.1.0-events-3-SNAPSHOT</events-gatling-maven-plugin.version>
+        <scala-maven-plugin.version>4.5.6</scala-maven-plugin.version>
         <perfana-java-client.version>2.0.5-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>2.0.0</test-events-wiremock.version>
+        <test-events-wiremock.version>[2.0.0,2.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>1.0.1-SNAPSHOT</test-events-springboot.version>
+        <test-events-command-runner.version>1.0.2-SNAPSHOT</test-events-command-runner.version>
         <test-events-test-run-config-command.version>1.0.0-SNAPSHOT</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
-        <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
+        <perfanaUrl>http://perfana:3000</perfanaUrl>
 
         <!-- Default Simulation class  -->
-        <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.StarScream</systemUnderTestSimulation>
+        <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.OptimusPrime</systemUnderTestSimulation>
 
         <!-- By default Jenkins build Url is used -->
         <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
@@ -62,30 +74,64 @@
 
         <!-- Default load settings -->
         <initialUsersPerSecond>1</initialUsersPerSecond>
-        <targetConcurrency>1</targetConcurrency>
-        <!-- these are turned into minutes in jmeter script for bmz-Concurrent Thread Group plugin! -->
-        <!-- via: ${__groovy(vars.get("test.rampUp") == null ? 3 : Integer.valueOf(vars.get("test.rampUp")) / 60)} -->
+        <targetUsersPerSecond>1</targetUsersPerSecond>
         <rampupTimeInSeconds>60</rampupTimeInSeconds>
         <constantLoadTimeInSeconds>900</constantLoadTimeInSeconds>
 
         <!-- Settings for the Perfana Dashboard -->
-        <systemUnderTest>StarScream</systemUnderTest>
+        <systemUnderTest>Afterburner</systemUnderTest>
         <version>1.0</version>
         <tags></tags>
         <apiKey></apiKey>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <influxDbHost>influxdb</influxDbHost>
+        <influxUrl>http://influxdb:8086</influxUrl>
+        <influxUser></influxUser>
+        <influxPassword></influxPassword>
 
-        <influxDbUrl>http://influxdb:8086/write?db=jmeter</influxDbUrl>
 
     </properties>
 
+    <dependencyManagement>
+
+        <dependencies>
+            <dependency>
+                <groupId>io.gatling.highcharts</groupId>
+                <artifactId>gatling-charts-highcharts</artifactId>
+                <version>${gatling.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>2.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.29</version>
+        </dependency>
+        <dependency>
+            <groupId>io.perfana</groupId>
+            <artifactId>gatling-elasticsearch-logs</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-core</artifactId>
+            <version>1.12.131</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.12.1</version>
         </dependency>
     </dependencies>
 
@@ -97,11 +143,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>io.perfana</groupId>
-                    <artifactId>events-jmeter-maven-plugin</artifactId>
-                    <version>${events-jmeter-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -126,52 +167,60 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>io.perfana</groupId>
-                <artifactId>events-jmeter-maven-plugin</artifactId>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${scala-maven-plugin.version}</version>
                 <executions>
-                    <!--- needed to generate target/config.json -->
                     <execution>
-                        <id>configuration</id>
                         <goals>
-                            <goal>configure</goal>
+                            <goal>testCompile</goal>
                         </goals>
-                    </execution>
-                    <!-- Run JMeter tests -->
-                    <execution>
-                        <id>jmeter-tests</id>
-                        <goals>
-                            <goal>jmeter</goal>
-                        </goals>
-                    </execution>
-                    <!-- Fail build on errors in test -->
-                    <execution>
-                        <id>jmeter-check-results</id>
-                        <goals>
-                            <goal>results</goal>
-                        </goals>
+                        <configuration>
+                            <jvmArgs>
+                                <jvmArg>-Xss100M</jvmArg>
+                            </jvmArgs>
+                            <args>
+                                <arg>-target:jvm-1.8</arg>
+                                <arg>-deprecation</arg>
+                                <arg>-feature</arg>
+                                <arg>-unchecked</arg>
+                                <arg>-language:implicitConversions</arg>
+                                <arg>-language:postfixOps</arg>
+                            </args>
+                        </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.perfana</groupId>
+                <artifactId>events-gatling-maven-plugin</artifactId>
+                <version>${events-gatling-maven-plugin.version}</version>
                 <configuration>
-                    <errorRateThresholdInPercent>2</errorRateThresholdInPercent>
-                    <propertiesUser>
-                        <test.testRunId>${testRunId}</test.testRunId>
-                        <test.duration>${constantLoadTimeInSeconds}</test.duration>
-                        <test.targetConcurrency>${targetConcurrency}</test.targetConcurrency>
-                        <test.rampUpTime>${rampupTimeInSeconds}</test.rampUpTime>
-                        <test.influxdb.url>${influxDbUrl}</test.influxdb.url>
-                        <test.influxdb.user>${influxDbUser}</test.influxdb.user>
-                        <test.influxdb.password>${influxDbPassword}</test.influxdb.password>
-                        <test.systemUnderTest>${systemUnderTest}</test.systemUnderTest>
-                        <test.testEnvironment>${testEnvironment}</test.testEnvironment>
-                        <test.protocol>${targetProtocol}</test.protocol>
-                        <test.server_name>${targetDomain}</test.server_name>
-                        <test.port>${targetPort}</test.port>
-                    </propertiesUser>
-                    <jmeterExtensions>
-                        <artifact>kg.apc:jmeter-plugins-casutg:2.9</artifact>
-                    </jmeterExtensions>
-                    <downloadExtensionDependencies>false</downloadExtensionDependencies>
-                    <overrideRootLogLevel>debug</overrideRootLogLevel>
+                    <resultsFolder>target/gatling/results</resultsFolder>
+                    <simulationsFolder>src/test/scala</simulationsFolder>
+                    <noReports>true</noReports>
+                    <simulationClass>${systemUnderTestSimulation}</simulationClass>
+                    <jvmArgs>
+                        <jvmArg>-Dscenario=${scenario}</jvmArg>
+                        <jvmArg>-DtestRunId=${testRunId}</jvmArg>
+                        <jvmArg>-DtestEnvironment=${testEnvironment}</jvmArg>
+                        <jvmArg>-DsystemUnderTest=${systemUnderTest}</jvmArg>
+                        <jvmArg>-DtargetBaseUrl=${targetBaseUrl}</jvmArg>
+                        <jvmArg>-DinitialUsersPerSecond=${initialUsersPerSecond}</jvmArg>
+                        <jvmArg>-DtargetUsersPerSecond=${targetUsersPerSecond}</jvmArg>
+                        <jvmArg>-DrampupTimeInSeconds=${rampupTimeInSeconds}</jvmArg>
+                        <jvmArg>-DconstantLoadTimeInSeconds=${constantLoadTimeInSeconds}</jvmArg>
+                        <jvmArg>-DelasticPassword=${elasticPassword}</jvmArg>
+                        <jvmArg>-DemployeeDbPassword=${employeeDbPassword}</jvmArg>
+                        <jvmArg>-Ddebug=${debug}</jvmArg>
+                        <jvmArg>-DuseProxy=${useProxy}</jvmArg>
+                        <jvmArg>-Dgatling.data.graphite.rootPathPrefix=gatling2.${systemUnderTest}.${testEnvironment}</jvmArg>
+                        <jvmArg>-Dgatling.data.graphite.host=${influxDbHost}</jvmArg>
+                        <jvmArg>-Xms1g</jvmArg>
+                        <jvmArg>-Xmx4g</jvmArg>
+                    </jvmArgs>
+                    <propagateSystemProperties>false</propagateSystemProperties>
+
                     <eventSchedulerConfig>
                         <debugEnabled>true</debugEnabled>
                         <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
@@ -193,7 +242,8 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*star-scream.*</perfana-containers>
+                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                 </variables>
                                 <testConfig>
                                     <systemUnderTest>${systemUnderTest}</systemUnderTest>
@@ -219,6 +269,10 @@
                                 <tags>${sut-config}-be</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>CommandRunnerGatlingPush</name>
+                                <command>sh -c "g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</command>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
@@ -272,6 +326,11 @@
                     </dependency>
                     <dependency>
                         <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
                         <artifactId>test-events-test-run-config-command</artifactId>
                         <version>${test-events-test-run-config-command.version}</version>
                     </dependency>
@@ -321,9 +380,8 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <server_name>optimus-prime-fe</server_name>
-                <port>8080</port>
-                <testEnvironment>acme</testEnvironment>
+                <targetBaseUrl>http://afterburner:8080</targetBaseUrl>
+                <testEnvironment>acc</testEnvironment>
             </properties>
         </profile>
 
@@ -360,13 +418,12 @@
             <properties>
                 <workload>stressTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>30</targetConcurrency>
-                <!-- these actually are minutes when injected into jmeter bmz-Concurrent Thread Group plugin! -->
-                <rampupTimeInSeconds>30</rampupTimeInSeconds>
+                <targetUsersPerSecond>30</targetUsersPerSecond>
+                <rampupTimeInSeconds>1800</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>1</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <tags>stress-test,micro-service</tags>
+                <tags>gatling,stress-test,springboot-monitoring</tags>
             </properties>
         </profile>
 
@@ -378,16 +435,35 @@
             <properties>
                 <workload>loadTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>10</targetConcurrency>
-                <rampupTimeInSeconds>60</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+                <targetUsersPerSecond>2</targetUsersPerSecond>
+                <rampupTimeInSeconds>120</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>load-test,springboot-monitoring,jmeter</tags>
+                <tags>gatling,springboot-monitoring</tags>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-type-cpu</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <scenario>cpu</scenario>
+                <workload>loadTestCpu</workload>
+                <initialUsersPerSecond>1</initialUsersPerSecond>
+                <targetUsersPerSecond>10</targetUsersPerSecond>
+                <rampupTimeInSeconds>30</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+                <perfanaEnabled>true</perfanaEnabled>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+                <eventsEnabled>true</eventsEnabled>
+                <tags>load-test,micro-service</tags>
             </properties>
         </profile>
 
@@ -400,7 +476,7 @@
                 <scenario>slowbackend</scenario>
                 <workload>slowBackendTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>2</targetConcurrency>
+                <targetUsersPerSecond>2</targetUsersPerSecond>
                 <rampupTimeInSeconds>60</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
@@ -428,7 +504,7 @@
             <properties>
                 <workload>enduranceTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>60</targetConcurrency>
+                <targetUsersPerSecond>60</targetUsersPerSecond>
                 <rampupTimeInSeconds>900</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>172800</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
@@ -445,7 +521,7 @@
             <properties>
                 <workload>nightlyLoadTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>40</targetConcurrency>
+                <targetUsersPerSecond>40</targetUsersPerSecond>
                 <rampupTimeInSeconds>600</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>3600</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
