@@ -7,6 +7,7 @@ on:
 jobs:
 
   performance-test-gatling:
+    needs: build
     runs-on: self-hosted
     steps:
       - name: Install kubectl
@@ -22,16 +23,15 @@ jobs:
         with:
           name: version
       - name: Get version from file
-        working-directory: main
         run: |
           ls -all
-          cat /runner/_work/perfana-fe/perfana-fe/version/version.txt
-          echo "TAG_NAME=$(cat /runner/_work/perfana-fe/perfana-fe/version/version.txt)" >> $GITHUB_ENV
+          cat /runner/_work/afterburner/afterburner/version/version.txt
+          echo "TAG_NAME=$(cat /runner/_work/afterburner/afterburner/version/version.txt)" >> $GITHUB_ENV
       - name: Get commit message
         working-directory: main
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - uses: actions/checkout@v3
-      - name: Set up JDK 13
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17.0.4+101'
@@ -43,23 +43,32 @@ jobs:
           java-version: 17.0.4+101
           maven-version: 3.6.3
       - name: get KUBECONFIG from secrets
-        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/perfana-fe/perfana-fe/config
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG}}
+          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Check deployed version
         env:
-          KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config
-          IMAGE: perfana/perfana-fe-test:${{ env.TAG_NAME }}
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+          IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
           while true; do
-             echo "Waiting for deployment ..."
-             if [[ $(kubectl get deployment perfana-fe -n perfana -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ready, waiting 120s to make sure pod has started"
-                sleep 60
+             echo "Waiting for deployment optimus-prime-fe-afterburner ..."
+             if [[ $(kubectl get deployment optimus-prime-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment optimus-prime-fe-afterburner ready"
                 break
              fi
              sleep 10
           done
+          while true; do
+             echo "Waiting for deployment optimus-prime-be-afterburner ..."
+             if [[ $(kubectl get deployment optimus-prime-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment optimus-prime-be-afterburner ready"
+                break
+             fi
+             sleep 10
+          done
+          echo "Deployment ready, waiting 120s to make sure pods have started"
+          sleep 120
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config
