@@ -70,7 +70,7 @@ jobs:
           sleep 60
       - name: Build with Maven
         env:
-          KUBECONFIG: /runner/_work/perfana-fe/perfana-fe/config
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
           mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-load,assert-results \
