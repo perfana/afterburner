@@ -454,7 +454,7 @@
             <properties>
                 <workload>loadTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetUsersPerSecond>2</targetUsersPerSecond>
+                <targetUsersPerSecond>10</targetUsersPerSecond>
                 <rampupTimeInSeconds>120</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
