@@ -263,13 +263,31 @@
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>afterburner.remote.call.httpclient.connection.request.timeout.millis,afterburner.remote.call.httpclient.connection.request.timeout.millis,afterburner.remote.call.httpclient.socket.timeout.millis,afterburner.remote.call.httpclient.connect.timeout.millis,afterburner.remote.call.base_url,java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.socket.timeout.millis,
+                                    afterburner.remote.call.httpclient.connect.timeout.millis,
+                                    afterburner.remote.call.base_url,
+                                    server.tomcat.threads.max,
+                                    afterburner.async_max_pool_size,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.async_queue_size,
+                                    featureToggleIdentityMatrix
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.datasource.employee.maximum-pool-size
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingPush</name>
