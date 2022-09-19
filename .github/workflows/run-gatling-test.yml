@@ -42,12 +42,6 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
-      - name: Set annotations
-        if: inputs.annotations != ''
-        run: |
-          COMMIT_MESSAGE="COMMIT_MESSAGE="
-          COMMIT_MESSAGE+="${inputs.annotations}"
-          echo $COMMIT_MESSAGE >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
