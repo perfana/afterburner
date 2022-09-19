@@ -82,4 +82,12 @@ jobs:
           git commit -m "Bumped afterburner OptimusPrimes to ${{ env.TAG_NAME }} in demo environment" -a
           git push
           
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+      - name: Checkout code from code branch
+        uses: actions/checkout@v2
+        with:
+          path: main
+          fetch-depth: 0
 
