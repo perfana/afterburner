@@ -23,17 +23,13 @@ jobs:
   performance-test-gatling:
     runs-on: self-hosted
     steps:
-      - name: Set imGE version from input
-        if: inputs.version
-        run: |
-          echo "TAG_NAME=${{ inputs.version }}" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
-        if: !inputs.version
+        if: !env.TAG_NAME
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Get deployed version
-        if: !inputs.version
+        if: !env.TAG_NAME
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
