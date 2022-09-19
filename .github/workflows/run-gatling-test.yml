@@ -43,7 +43,7 @@ jobs:
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
       - name: Set annotations
-        if: input.annotations != ''
+        if: inputs.annotations != ''
         run: |
           ANNOTATIONS = $(echo "${input.annotations}") 
           echo "COMMIT_MESSAGE=$ANNOTATIONS" >> $GITHUB_ENV
