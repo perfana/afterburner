@@ -23,6 +23,9 @@ jobs:
   performance-test-gatling:
     runs-on: self-hosted
     steps:
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
         uses: actions/checkout@v2
