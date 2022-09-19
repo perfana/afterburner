@@ -23,6 +23,11 @@ jobs:
   performance-test-gatling:
     runs-on: self-hosted
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: get KUBECONFIG from secrets
         if: env.TAG_NAME != ''
         env:
