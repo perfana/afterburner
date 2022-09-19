@@ -26,9 +26,6 @@ jobs:
           ls -all
           cat /runner/_work/afterburner/afterburner/version/version.txt
           echo "TAG_NAME=$(cat /runner/_work/afterburner/afterburner/version/version.txt)" >> $GITHUB_ENV
-      - name: Get commit message
-        working-directory: main
-        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: get KUBECONFIG from secrets
         env:
