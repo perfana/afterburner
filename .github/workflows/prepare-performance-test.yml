@@ -3,7 +3,6 @@ name: Prepare for performance test
 
 on:
   workflow_call:
-    inputs:
 
 jobs:
 
