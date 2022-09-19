@@ -42,6 +42,11 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
+      - name: Set annotations
+        if: input.annotations != ''
+        run: |
+          ANNOTATIONS = $(echo "${input.annotations}") 
+          echo "COMMIT_MESSAGE=$ANNOTATIONS" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -67,7 +72,7 @@ jobs:
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
-          -Dannotations="${{ env.COMMIT_MESSAGE }} || ${{ inputs.annotations }}" \
+          -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxUrl=https://influxdb.demo.perfana.cloud \
