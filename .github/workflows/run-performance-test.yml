@@ -1,0 +1,50 @@
+---
+
+name: Run performance test
+
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      systemUnderTest:
+        description: 'System Under Test'
+        required: true
+        default: 'OptimusPrime'
+        type: choice
+        options:
+          - OptimusPrime
+          - JetFire
+      workload:
+        description: 'Workload'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - load
+          - stress
+      service:
+        description: 'Service name'
+        required: true
+        default: 'optimus-prime'
+        type: choice
+        options:
+          - optimus-prime
+          - jet-fire
+      annotations:
+        description: 'Test run annotation'
+        type: string
+        required: false
+
+
+jobs:
+
+
+  performance-test-gatling:
+    uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      annotations: ${{ inputs.annotations }}
+
