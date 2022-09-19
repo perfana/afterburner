@@ -24,12 +24,12 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: get KUBECONFIG from secrets
-        if: !env.TAG_NAME
+        if: env.TAG_NAME != ''
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Get deployed version
-        if: !env.TAG_NAME
+        if: env.TAG_NAME != ''
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
