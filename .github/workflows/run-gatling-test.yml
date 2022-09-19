@@ -45,7 +45,9 @@ jobs:
       - name: Set annotations
         if: inputs.annotations != ''
         run: |
-          echo "COMMIT_MESSAGE=${inputs.annotations}" >> $GITHUB_ENV
+          COMMIT_MESSAGE="COMMIT_MESSAGE="
+          COMMIT_MESSAGE+="${inputs.annotations}"
+          echo $COMMIT_MESSAGE >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
