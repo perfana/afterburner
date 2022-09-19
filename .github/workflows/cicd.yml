@@ -26,3 +26,7 @@ jobs:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
+    with:
+      systemUnderTest: "OptimusPrime"
+      workload: "load"
+      service: "optimus-prime"
