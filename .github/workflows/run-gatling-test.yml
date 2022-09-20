@@ -33,7 +33,6 @@ jobs:
           fetch-depth: 0
       - name: Get commit message
         if: inputs.annotations == ''
-        working-directory: main
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
