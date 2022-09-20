@@ -57,6 +57,10 @@ jobs:
         with:
           java-version: 17.0.4+101
           maven-version: 3.6.3
+      - name: get KUBECONFIG from secrets
+        env:
+          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
