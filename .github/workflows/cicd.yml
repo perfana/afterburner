@@ -56,5 +56,5 @@ jobs:
       service: "optimus-prime"
 
   deploy-to-production:
-    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@main
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
     needs: performance-test-gatling
