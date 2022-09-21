@@ -61,7 +61,7 @@ jobs:
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
-      - name: Build with Maven
+      - name: Start Gatling test
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
