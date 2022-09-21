@@ -54,3 +54,7 @@ jobs:
       systemUnderTest: "OptimusPrime"
       workload: "load"
       service: "optimus-prime"
+
+  deploy-to-production:
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@main
+    needs: performance-test-gatling

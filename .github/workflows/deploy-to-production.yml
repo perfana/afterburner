@@ -1,0 +1,12 @@
+---
+name: Deploy to production
+
+on:
+  workflow_call:
+
+jobs:
+
+  deploy-to-production:
+    steps:
+      - name: Deploy to production
+        run: echo "Deployed to production!"
