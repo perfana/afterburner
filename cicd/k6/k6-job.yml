@@ -91,4 +91,4 @@ spec:
             - "TEST_ENVIRONMENT=$(TEST_ENVIRONMENT)"
             - "-e"
             - "TEST_RUN_ID=$(TEST_RUN_ID)"
-            - "/opt/script.js"
+            - "/home/k6/script.js"
