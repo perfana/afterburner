@@ -158,8 +158,8 @@
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId}  \
-                                    && kubectl create -f k6-job.yml
+                                    --from-literal=TEST_RUN_ID=${testRunId};  \
+                                    kubectl create -f k6-job.yml
                                 </command>
 <!--                                <pollingCommand></pollingCommand>-->
 <!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
