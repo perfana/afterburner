@@ -66,10 +66,10 @@ spec:
                 secretKeyRef:
                   name: k6-args
                   key: TEST_RUN_ID
-          command: ["sleep 3600"]
+
           args:
             - "run"
-            - "/home/k6/script.js"
+            - "/opt/script.js"
             - "-out"
             - "influxdb=$(K6_INFLUXDB_URL)"
             - "-e"
