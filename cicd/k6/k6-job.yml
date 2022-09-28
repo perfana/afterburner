@@ -70,9 +70,9 @@ spec:
           args:
             - "run"
             - "script.js"
-            - "-out influxdb=$(K6_INFLUXDB_URL)"
-            - "-e K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
-            - "-e K6_INFLUXDB_PASSWORD=$(K6_INFLUXDB_PASSWORD)"
+#            - "-out influxdb=$(K6_INFLUXDB_URL)"
+#            - "-e K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
+#            - "-e K6_INFLUXDB_PASSWORD=$(K6_INFLUXDB_PASSWORD)"
             - "-e CONSTANT_LOAD_TIME=$(CONSTANT_LOAD_TIME)"
             - "-e RAMPUP_TIME=$(RAMPUP_TIME)"
             - "-e START_RATE=$(START_RATE)"
