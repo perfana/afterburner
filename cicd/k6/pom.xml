@@ -167,7 +167,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Start k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command> kubectl create -f k6-job.yml  -n acme</command>
+                                <command>kubectl create -f k6-job.yml  -n acme</command>
 <!--                                <pollingCommand></pollingCommand>-->
 <!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
                             </eventConfig>
