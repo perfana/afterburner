@@ -9,7 +9,7 @@ spec:
       containers:
         - name: k6
           image: "perfana/k6-afterburner:1.0.0"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: K6_INFLUXDB_URL
               valueFrom:
