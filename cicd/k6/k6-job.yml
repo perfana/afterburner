@@ -67,8 +67,9 @@ spec:
                   name: k6-args
                   key: TEST_RUN_ID
 
-          command: ["run script.js"]
           args:
+            - "run"
+            - "script.js"
             - "-out influxdb=$(K6_INFLUXDB_URL)"
             - "-e K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
             - "-e K6_INFLUXDB_PASSWORD=$(K6_INFLUXDB_PASSWORD)"
