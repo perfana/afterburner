@@ -69,7 +69,6 @@ spec:
 
           args:
             - "run"
-            - "/opt/script.js"
             - "-out"
             - "influxdb=$(K6_INFLUXDB_URL)"
             - "-e"
@@ -92,3 +91,4 @@ spec:
             - "TEST_ENVIRONMENT=$(TEST_ENVIRONMENT)"
             - "-e"
             - "TEST_RUN_ID=$(TEST_RUN_ID)"
+            - "/opt/script.js"
