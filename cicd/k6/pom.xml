@@ -148,7 +148,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Create k6 secret</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>kubectl create secret generic k6-args -n acme \
+                                <command>kubectl create secret generic k6-args --namespace="acme" \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
                                     --from-literal=K6_INFLUXDB_USER=${influxUser} \
