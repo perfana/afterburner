@@ -1,10 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: K6
+  name: k6
 spec:
   template:
     spec:
+      restartPolicy: Never
       containers:
         - name: k6
           image: "perfana/k6-afterburner:1.0.0"
