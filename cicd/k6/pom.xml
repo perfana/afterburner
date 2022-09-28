@@ -146,7 +146,7 @@
 
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>K6Runner</name>
+                                <name>Create k6 secret</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
                                 <command>kubectl create secret generic k6-args -n acme \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
@@ -156,11 +156,18 @@
                                     --from-literal=START_RATE=${startRate} \
                                     --from-literal=TARGET_RATE=${targetRate} \
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
+                                    --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId};  \
-                                    kubectl create -f k6-job.yml  -n acme
+                                    --from-literal=TEST_RUN_ID=${testRunId};
                                 </command>
+<!--                                <pollingCommand></pollingCommand>-->
+<!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Start k6 job</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <command> kubectl create -f k6-job.yml  -n acme</command>
 <!--                                <pollingCommand></pollingCommand>-->
 <!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
                             </eventConfig>
