@@ -69,8 +69,8 @@ spec:
 
           args:
             - "run"
-#            - "-out"
-#            - "influxdb=$(K6_INFLUXDB_URL)"
+            - "--out"
+            - "influxdb=$(K6_INFLUXDB_URL)"
             - "-e"
             - "K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
             - "-e"
