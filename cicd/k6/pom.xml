@@ -148,7 +148,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Create k6 secret</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>kubectl delete secret k6-args --ignore-not-found && kubectl create secret generic k6-args -n acme\
+                                <command>kubectl delete secret k6-args --ignore-not-found &amp;&amp; kubectl create secret generic k6-args -n acme\
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
                                     --from-literal=K6_INFLUXDB_USER=${influxUser} \
@@ -160,7 +160,7 @@
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
                                     --from-literal=TEST_RUN_ID=${testRunId} \
-                                    && kubectl delete jobs k6  -n acme && kubectl create -f k6-job.yml -n acme
+                                    &amp;&amp; kubectl delete jobs k6  -n acme &amp;&amp; kubectl create -f k6-job.yml -n acme
                                 </command>
 <!--                                <pollingCommand></pollingCommand>-->
 <!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
