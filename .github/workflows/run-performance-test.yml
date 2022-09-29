@@ -14,6 +14,7 @@ on:
         options:
           - OptimusPrime
           - JetFire
+          - BumbleBee
       workload:
         description: 'Workload'
         required: true
@@ -30,6 +31,7 @@ on:
         options:
           - optimus-prime
           - jet-fire
+          - bumble-bee
       tool:
         description: 'Load test tool'
         required: true
