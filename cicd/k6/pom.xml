@@ -137,7 +137,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>sh -c "kubectl delete secret k6-args --ignore-not-found; \
+                                <command>kubectl delete secret k6-args --ignore-not-found; \
                                     kubectl create secret generic k6-args -n acme \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
@@ -151,10 +151,10 @@
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
                                     --from-literal=TEST_RUN_ID=${testRunId}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
-                                    kubectl create -f k6-job.yml -n acme"
+                                    kubectl create -f k6-job.yml -n acme
                                 </command>
-                                <pollingCommand>sh -c "kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1"</pollingCommand>
-                                <abortCommand>sh -c "kubectl delete jobs k6 -n acme --ignore-not-found"</abortCommand>
+                                <pollingCommand>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</pollingCommand>
+                                <abortCommand>kubectl delete jobs k6 -n acme --ignore-not-found</abortCommand>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
