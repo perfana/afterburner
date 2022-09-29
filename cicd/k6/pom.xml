@@ -150,7 +150,8 @@
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
                                     --from-literal=TEST_RUN_ID=${testRunId}; \
-                                    kubectl delete jobs k6 -n acme --ignore-not-found; kubectl create -f k6-job.yml -n acme"
+                                    kubectl delete jobs k6 -n acme --ignore-not-found; \
+                                    kubectl create -f k6-job.yml -n acme"
                                 </command>
                                 <pollingCommand>sh -c "kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1"</pollingCommand>
                                 <abortCommand>sh -c "kubectl delete jobs k6 -n acme --ignore-not-found"</abortCommand>
