@@ -281,7 +281,7 @@
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
