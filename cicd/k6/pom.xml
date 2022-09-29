@@ -57,12 +57,6 @@
         <eventsEnabled>false</eventsEnabled>
         <eventScheduleScript></eventScheduleScript>
 
-        <!-- Default load settings -->
-        <initialUsersPerSecond>1</initialUsersPerSecond>
-        <targetUsersPerSecond>1</targetUsersPerSecond>
-        <rampupTimeInSeconds>60</rampupTimeInSeconds>
-        <constantLoadTimeInSeconds>900</constantLoadTimeInSeconds>
-
         <!-- Settings for the Perfana Dashboard -->
         <systemUnderTest>BumbleBee</systemUnderTest>
         <version>1.0</version>
@@ -124,8 +118,8 @@
                             <testEnvironment>${testEnvironment}</testEnvironment>
                             <testRunId>${testRunId}</testRunId>
                             <buildResultsUrl>${CIBuildResultsUrl}</buildResultsUrl>
-                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
-                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <rampupTimeInSeconds>${rampUpTime}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${duration}</constantLoadTimeInSeconds>
                             <annotations>${annotations}</annotations>
                             <tags>${tags}</tags>
                         </testConfig>
@@ -146,7 +140,7 @@
 
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Create k6 secret</name>
+                                <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
                                 <command>sh -c "kubectl delete secret k6-args --ignore-not-found; \
                                     kubectl create secret generic k6-args -n acme \
@@ -166,13 +160,6 @@
                                 <pollingCommand>sh -c "kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1"</pollingCommand>
                                 <abortCommand>sh -c "kubectl delete jobs k6 -n acme --ignore-not-found"</abortCommand>
                             </eventConfig>
-<!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
-<!--                                <name>Start k6 job</name>-->
-<!--                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>-->
-<!--                                <command>kubectl create -f k6-job.yml  -n acme</command>-->
-<!--                                <pollingCommand></pollingCommand>-->
-<!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
-<!--                            </eventConfig>-->
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
