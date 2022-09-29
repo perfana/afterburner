@@ -145,32 +145,33 @@
                                 </variables>
 
                             </eventConfig>
-<!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
-<!--                                <name>Create k6 secret</name>-->
-<!--                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>-->
-<!--                                <command>kubectl create secret generic k6-args -n acme\-->
-<!--                                    &#45;&#45;from-literal=K6_INFLUXDB_URL=${influxUrl} \-->
-<!--                                    &#45;&#45;from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \-->
-<!--                                    &#45;&#45;from-literal=K6_INFLUXDB_USER=${influxUser} \-->
-<!--                                    &#45;&#45;from-literal=CONSTANT_LOAD_TIME=${duration}s \-->
-<!--                                    &#45;&#45;from-literal=RAMPUP_TIME=${rampUpTime}s \-->
-<!--                                    &#45;&#45;from-literal=START_RATE=${startRate} \-->
-<!--                                    &#45;&#45;from-literal=TARGET_RATE=${targetRate} \-->
-<!--                                    &#45;&#45;from-literal=TARGET_BASE_URL=${targetBaseUrl} \-->
-<!--                                    &#45;&#45;from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \-->
-<!--                                    &#45;&#45;from-literal=TEST_ENVIRONMENT=${testEnvironment} \-->
-<!--                                    &#45;&#45;from-literal=TEST_RUN_ID=${testRunId}-->
-<!--                                </command>-->
-<!--&lt;!&ndash;                                <pollingCommand></pollingCommand>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>&ndash;&gt;-->
-<!--                            </eventConfig>-->
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Start k6 job</name>
+                                <name>Create k6 secret</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>kubectl create -f k6-job.yml  -n acme</command>
+                                <command>kubectl delete secret k6-args --ignore-not-found && kubectl create secret generic k6-args -n acme\
+                                    --from-literal=K6_INFLUXDB_URL=${influxUrl} \
+                                    --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
+                                    --from-literal=K6_INFLUXDB_USER=${influxUser} \
+                                    --from-literal=CONSTANT_LOAD_TIME=${duration}s \
+                                    --from-literal=RAMPUP_TIME=${rampUpTime}s \
+                                    --from-literal=START_RATE=${startRate} \
+                                    --from-literal=TARGET_RATE=${targetRate} \
+                                    --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
+                                    --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
+                                    --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
+                                    --from-literal=TEST_RUN_ID=${testRunId} \
+                                    && kubectl delete jobs k6  -n acme && kubectl create -f k6-job.yml -n acme
+                                </command>
 <!--                                <pollingCommand></pollingCommand>-->
 <!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
                             </eventConfig>
+<!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
+<!--                                <name>Start k6 job</name>-->
+<!--                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>-->
+<!--                                <command>kubectl create -f k6-job.yml  -n acme</command>-->
+<!--                                <pollingCommand></pollingCommand>-->
+<!--                                <abortCommand>sh -c "rm /tmp/this-is-bla; echo abort K6 runner 1"</abortCommand>-->
+<!--                            </eventConfig>-->
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
