@@ -164,7 +164,7 @@
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
