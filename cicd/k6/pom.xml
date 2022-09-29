@@ -163,7 +163,7 @@
                                     --from-literal=TEST_RUN_ID=${testRunId}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; kubectl create -f k6-job.yml -n acme"
                                 </command>
-                                <pollingCommand>if [[ $(kubectl get job k6 -o jsonpath={.status.active} -n acme') != 1 ]]; then exit 1; fi</pollingCommand>
+                                <pollingCommand>sh -c "kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1"</pollingCommand>
                                 <abortCommand>sh -c "kubectl delete jobs k6 -n acme --ignore-not-found"</abortCommand>
                             </eventConfig>
 <!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
