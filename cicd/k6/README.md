@@ -1,7 +1,6 @@
 # afterburner k6 test running in container
 
-Simple self-running test jar to use in load test environments to tune and explore monitor and analysis tools.
-
+Example of how to run a k6 script in a container, using a kubernetes job, orchestrated by the events-scheduler plugin combine with the CommandRunner plugin 
 # Build script container
 
 ```docker build -t perfana/k6-afterburner:1.0.0 .```
