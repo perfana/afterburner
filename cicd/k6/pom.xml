@@ -117,7 +117,7 @@
                             <workload>${workload}</workload>
                             <testEnvironment>${testEnvironment}</testEnvironment>
                             <testRunId>${testRunId}</testRunId>
-                            <buildResultsUrl>${CIBuildResultsUrl}</buildResultsUrl>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
                             <rampupTimeInSeconds>${rampUpTime}</rampupTimeInSeconds>
                             <constantLoadTimeInSeconds>${duration}</constantLoadTimeInSeconds>
                             <annotations>${annotations}</annotations>
