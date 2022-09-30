@@ -21,11 +21,6 @@ spec:
                 secretKeyRef:
                   name: gatling-args
                   key: SCENARIO
-            - name: INFLUX_DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: gatling-args
-                  key: INFLUX_DB_HOST
             - name: INFLUX_DB_URL
               valueFrom:
                 secretKeyRef:
