@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gatling
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: gatling
+          image: "perfana/gatling-afterburner:1.0.0"
+          imagePullPolicy: Always
+          env:
+            - name: SIMULATION
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: SIMULATION
+            - name: SCENARIO
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: SCENARIO
+            - name: INFLUX_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: INFLUX_DB_HOST
+            - name: INFLUX_DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: INFLUX_DB_URL
+            - name: INFLUX_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: INFLUX_DB_USER
+            - name: INFLUX_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: INFLUX_DB_PASSWORD
+            - name: CONSTANT_LOAD_TIME_IN_SECONDS
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: CONSTANT_LOAD_TIME_IN_SECONDS
+            - name: RAMPUP_TIME_IN_SECONDS
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: RAMPUP_TIME_IN_SECONDS
+            - name: INITIAL_USERS_PER_SECOND
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: INITIAL_USERS_PER_SECOND
+            - name: TARGET_USERS_PER_SECOND
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: TARGET_USERS_PER_SECOND
+            - name: TARGET_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: TARGET_BASE_URL
+            - name: SYSTEM_UNDER_TEST
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: SYSTEM_UNDER_TEST
+            - name: TEST_ENVIRONMENT
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: TEST_ENVIRONMENT
+            - name: TEST_RUN_ID
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: TEST_RUN_ID
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: ELASTIC_PASSWORD
+            - name: EMPLOYEE_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: EMPLOYEE_DB_PASSWORD
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: DEBUG
+            - name: USE_PROXY
+              valueFrom:
+                secretKeyRef:
+                  name: gatling-args
+                  key: USE_PROXY
+
