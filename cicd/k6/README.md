@@ -105,14 +105,16 @@ spec:
 
 # CommandRunner plugin configuration
 
-* command: create secret to pass arguments to kubernetes job and create the kubernetes job based on the manifest
-* pollingCommand: command to check if job is still active, exitcode = 0 when active
-* abortCommand: delete job in case of abort event
+* onBeforeTest: create secret to pass arguments to kubernetes job and create the kubernetes job based on the manifest
+* onKeepAlive: command to check if job is still active, exitcode = 0 when active
+* onAbort:  delete job and secret in case of abort event
+* onAfterTest: : delete job and secret after test
 
-``` <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+```
+   <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
         <name>Run k6 job</name>
         <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-        <command>kubectl delete secret k6-args --ignore-not-found; \
+        <onBeforeTest>kubectl delete secret k6-args --ignore-not-found; \
             kubectl create secret generic k6-args -n acme \
             --from-literal=K6_INFLUXDB_URL=${influxUrl} \
             --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
@@ -127,7 +129,13 @@ spec:
             --from-literal=TEST_RUN_ID=${testRunId}; \
             kubectl delete jobs k6 -n acme --ignore-not-found; \
             kubectl create -f k6-job.yml -n acme
-        </command>
-        <pollingCommand>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</pollingCommand>
-        <abortCommand>kubectl delete jobs k6 -n acme --ignore-not-found</abortCommand>
-    </eventConfig>```
+        </onBeforeTest>
+        <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+        <onAbort>kubectl delete secret k6-args --ignore-not-found; \
+                 kubectl delete jobs k6 -n acme --ignore-not-found
+        </onAbort>
+        <onAfterTest>kubectl delete secret k6-args --ignore-not-found; \
+                     kubectl delete jobs k6 -n acme --ignore-not-found
+        </onAfterTest>
+    </eventConfig>
+```

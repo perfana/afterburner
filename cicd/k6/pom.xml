@@ -137,7 +137,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>kubectl delete secret k6-args --ignore-not-found; \
+                                <onBeforeTest>kubectl delete secret k6-args --ignore-not-found; \
                                     kubectl create secret generic k6-args -n acme \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
@@ -152,20 +152,25 @@
                                     --from-literal=TEST_RUN_ID=${testRunId}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
                                     kubectl create -f k6-job.yml -n acme
-                                </command>
-                                <pollingCommand>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</pollingCommand>
-                                <abortCommand>kubectl delete jobs k6 -n acme --ignore-not-found</abortCommand>
+                                </onBeforeTest>
+                                <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete secret k6-args --ignore-not-found; \
+                                    kubectl delete jobs k6 -n acme --ignore-not-found
+                                </onAbort>
+                                <onAfterTest>kubectl delete secret k6-args --ignore-not-found; \
+                                    kubectl delete jobs k6 -n acme --ignore-not-found
+                                </onAfterTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-be-afterburner:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
