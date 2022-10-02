@@ -171,12 +171,11 @@
                                     --from-literal=ELASTIC_PASSWORD=${elasticPassword} \
                                     --from-literal=EMPLOYEE_DB_PASSWORD=foo \
                                     --from-literal=DEBUG=${debug} \
-                                    --from-literal=USE_PROXY=${useProxy};
-                                </onBeforeTest>
-                                <onStartTest>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
+                                    --from-literal=USE_PROXY=${useProxy}; \
+                                    kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
                                     kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
                                     kubectl create -f gatling-job.yml -n acme
-                                </onStartTest>
+                                </onBeforeTest>
                                 <onAfterTest>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
                                     kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
                                 </onAfterTest>
