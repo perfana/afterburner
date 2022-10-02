@@ -151,9 +151,9 @@
                                 </variables>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Run gatling job 1</name>
+                                <name>Start Gatling performance test jobs</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <command>kubectl delete secret gatling-args --ignore-not-found; \
+                                <onBeforeTest>kubectl delete secret gatling-args --ignore-not-found; \
                                     kubectl create secret generic gatling-args -n acme \
                                     --from-literal=SIMULATION=${systemUnderTestSimulation} \
                                     --from-literal=SCENARIO=${scenario} \
@@ -175,25 +175,30 @@
                                     kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
                                     kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
                                     kubectl create -f gatling-job.yml -n acme
-                                </command>
-                                <pollingCommand>kubectl get jobs gatling-lg-1 -o jsonpath={$.status.active} | grep -q 1</pollingCommand>
-                                <abortCommand>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found</abortCommand>
-                            </eventConfig><eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Run gatling job 2</name>
+                                </onBeforeTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Handle gatling-lg-1</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <pollingCommand>kubectl get jobs gatling-lg-2 -o jsonpath={$.status.active} | grep -q 1</pollingCommand>
-                                <abortCommand>kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found</abortCommand>
+                                <onKeepAlive>kubectl get jobs gatling-lg-1 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found</onAbort>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Handle gatling-lg-2</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <onKeepAlive>kubectl get jobs gatling-lg-2 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found</onAbort>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-be-afterburner:8080.acme/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
@@ -343,7 +348,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>gatling,springboot-monitoring</tags>
+                <tags>gatling-distributed,gatling,springboot-monitoring</tags>
             </properties>
         </profile>
 
