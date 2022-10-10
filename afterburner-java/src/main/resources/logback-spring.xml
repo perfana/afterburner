@@ -6,8 +6,25 @@
             <pattern>%d{dd-MM-yyyy'T'HH:mm:ss.SSS} %highlight(%-5level) %green([%20.20thread]) %yellow([%40.40logger{40}]) - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="splunk-hec-appender" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+        <url>http://localhost:8088</url>
+        <token>abc123</token>
+        <index>afterburner</index>
+        <disableCertificateValidation>true</disableCertificateValidation>
+        <send_mode>parallel</send_mode>
+        <batch_size_bytes>102400</batch_size_bytes>
+        <batch_size_count>10</batch_size_count>
+        <source>afterburner:log</source>
+        <sourcetype>eafterburner:test:env</sourcetype>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[__time=%d][%d{"yyyy-MM-dd'T'HH:mm:ss,SSSXXX", UTC}] [%thread] [%-5level] [%logger{36}] %msg%n</Pattern>
+        </layout>
+    </appender>
+
     <root level="info">
         <appender-ref ref="Console" />
+        <appender-ref ref="splunk-hec-appender" />
     </root>
 
     <springProfile name="logstash">
