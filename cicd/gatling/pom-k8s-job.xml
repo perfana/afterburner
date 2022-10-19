@@ -32,10 +32,10 @@
 
         <!-- dependency versioning -->
         <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
-        <test-events-command-runner.version>1.1.0</test-events-command-runner.version>
         <perfana-java-client.version>2.0.6-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>1.2.0</test-events-wiremock.version>
+        <test-events-wiremock.version>2.0.0</test-events-wiremock.version>
         <test-events-springboot.version>1.1.0</test-events-springboot.version>
+        <test-events-command-runner.version>1.1.0</test-events-command-runner.version>
         <test-events-test-run-config-command.version>1.0.1</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
