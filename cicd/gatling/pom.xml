@@ -455,8 +455,8 @@
                 <workload>loadTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
                 <targetUsersPerSecond>2</targetUsersPerSecond>
-                <rampupTimeInSeconds>120</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
+                <rampupTimeInSeconds>60</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
