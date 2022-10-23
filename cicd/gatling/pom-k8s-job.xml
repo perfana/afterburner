@@ -321,7 +321,7 @@
         <!-- Test type profiles -->
 
         <profile>
-            <id>stress</id>
+            <id>test-type-stress</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -338,7 +338,7 @@
         </profile>
 
         <profile>
-            <id>load</id>
+            <id>test-type-load</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
