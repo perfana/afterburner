@@ -54,7 +54,7 @@ jobs:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
-          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results -f pom-k8s-job.xml \
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results -f pom-k8s-job.xml \
           -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
