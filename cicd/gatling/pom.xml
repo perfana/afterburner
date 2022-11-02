@@ -30,12 +30,12 @@
 
         <!-- dependency versioning -->
         <gatling.version>3.7.3</gatling.version>
-        <events-gatling-maven-plugin.version>4.1.0-events-4-SNAPSHOT</events-gatling-maven-plugin.version>
+        <events-gatling-maven-plugin.version>4.1.0-events-3</events-gatling-maven-plugin.version>
         <scala-maven-plugin.version>4.5.6</scala-maven-plugin.version>
         <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[2.0.0,2.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
-        <test-events-command-runner.version>[1.0.0,1.1.0)</test-events-command-runner.version>
+        <test-events-command-runner.version>1.0.2</test-events-command-runner.version>
         <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
@@ -281,7 +281,7 @@
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
@@ -291,7 +291,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingPush</name>
-                                <onBeforeTest>sh -c "./g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onBeforeTest>
+                                <command>sh -c "./g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</command>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
@@ -455,8 +455,8 @@
                 <workload>loadTest</workload>
                 <initialUsersPerSecond>1</initialUsersPerSecond>
                 <targetUsersPerSecond>2</targetUsersPerSecond>
-                <rampupTimeInSeconds>60</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+                <rampupTimeInSeconds>120</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
