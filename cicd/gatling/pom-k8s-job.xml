@@ -31,12 +31,12 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <events-scheduler-maven-plugin.version>2.2.0-SNAPSHOT</events-scheduler-maven-plugin.version>
-        <test-events-command-runner.version>1.1.0-SNAPSHOT</test-events-command-runner.version>
-        <perfana-java-client.version>2.0.5-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>1.1.1</test-events-wiremock.version>
-        <test-events-springboot.version>1.0.1-SNAPSHOT</test-events-springboot.version>
-        <test-events-test-run-config-command.version>1.0.0-SNAPSHOT</test-events-test-run-config-command.version>
+        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>2.0.6-SNAPSHOT</perfana-java-client.version>
+        <test-events-wiremock.version>2.0.0</test-events-wiremock.version>
+        <test-events-springboot.version>1.1.0</test-events-springboot.version>
+        <test-events-command-runner.version>1.1.0</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>1.0.1</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
@@ -93,7 +93,7 @@
                 <plugin>
                     <groupId>io.perfana</groupId>
                     <artifactId>event-scheduler-maven-plugin</artifactId>
-                    <version>${events-scheduler-maven-plugin.version}</version>
+                    <version>${event-scheduler-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -144,6 +144,7 @@
                                 <enabled>${perfanaEnabled}</enabled>
                                 <perfanaUrl>${perfanaUrl}</perfanaUrl>
                                 <apiKey>${apiKey}</apiKey>
+                                <retryCount>60</retryCount>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
                                     <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
@@ -153,7 +154,8 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Start Gatling performance test jobs</name>
                                 <continueOnKeepAliveParticipant>false</continueOnKeepAliveParticipant>
-                                <onBeforeTest>kubectl delete secret gatling-args --ignore-not-found; \
+                                <onBeforeTest>
+                                    kubectl delete secret gatling-args --ignore-not-found; \
                                     kubectl create secret generic gatling-args -n acme \
                                     --from-literal=SIMULATION=${systemUnderTestSimulation} \
                                     --from-literal=SCENARIO=${scenario} \
@@ -176,8 +178,9 @@
                                     kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
                                     kubectl create -f gatling-job.yml -n acme
                                 </onBeforeTest>
-                                <onAfterTest>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
-                                    kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
+                                <onAfterTest>
+                                    kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
+                                    kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found
                                 </onAfterTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">

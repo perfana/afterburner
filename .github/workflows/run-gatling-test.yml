@@ -67,7 +67,7 @@ jobs:
           cd cicd/gatling
           wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
           chmod +x g2i
-          mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-load,assert-results \
+          mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
