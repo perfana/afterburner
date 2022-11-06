@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Download and install MySql APT repository
         run: |
-          wget http://dev.mysql.com/get/mysql-apt-config_0.8.10-1_all.deb;
-          sudo dpkg -i mysql-apt-config_0.8.10-1_all.deb;
+          wget https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb;
+          sudo dpkg -i mysql-apt-config_0.8.22-1_all.deb;
           sudo apt-get update
       - name: Install mysql cli and msql-shell
         run: sudo apt-get install mysql-apt-config && sudo apt-get install -y mysql-shell mysql-client 
