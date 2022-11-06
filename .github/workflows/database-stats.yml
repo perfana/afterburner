@@ -17,16 +17,16 @@ jobs:
           sudo apt-get update
       - name: Install mysql cli and msql-shell
         run: sudo apt-get install mysql-apt-config && sudo apt-get install -y mysql-shell mysql-client 
-      - name: Install mysql cli and mysql-shell
+      - name: Checkout xdbtime repo
         uses: actions/checkout@v3
         with:
           repository: 'xdbtime/xdbtime'
       - name: Prepare database scripts
         run: |
           mkdir -p ~/.mysqlsh/init.d;
-          cd xdbtime/mysql/init.d;
+          cd ./xdbtime/mysql/init.d;
           cp xdbperformance-status.py ~/.mysqlsh/init.d;
-          cd xdbtime/mysql;
+          cd ..;
       - name: Create perfomance report
         run: |
           echo "report = shell.reports.performance(shell.getSession())" | root:${{ secrets.AFTERBURNER_DB_PASSWORD }}@afterburner-db-mysql-headless.acme.svc.cluster.local:3306 --js
