@@ -24,6 +24,8 @@ jobs:
       - name: Prepare database scripts
         run: |
           mkdir -p ~/.mysqlsh/init.d;
+          pwd;
+          ls-all;
           cd ./xdbtime/mysql/init.d;
           cp xdbperformance-status.py ~/.mysqlsh/init.d;
           cd ..;
