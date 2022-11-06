@@ -25,8 +25,8 @@ jobs:
         run: |
           mkdir -p ~/.mysqlsh/init.d;
           pwd;
-          ls-all;
-          cd ./xdbtime/mysql/init.d;
+          ls -all;
+          cd /runner/_work/afterburner/afterburner/xdbtime/mysql/init.d;
           cp xdbperformance-status.py ~/.mysqlsh/init.d;
           cd ..;
       - name: Create perfomance report
