@@ -2,7 +2,7 @@
 name: Get database stats
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
 
 jobs:
