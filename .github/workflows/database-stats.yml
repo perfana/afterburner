@@ -11,7 +11,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Install mysql cli and msql-shell
-        run: sudo apt-get install -y mysql-shell mysql-client 
+        run: sudo apt-get install mysql-apt-config && sudo apt-get install -y mysql-shell mysql-client 
       - name: Install mysql cli and mysql-shell
         uses: actions/checkout@v3
         with:
