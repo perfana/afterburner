@@ -20,7 +20,7 @@ jobs:
       - name: Install mysql cli and mysql-shell
         uses: actions/checkout@v3
         with:
-          repository: 'https://github.com/xdbtime/xdbtime.git'
+          repository: 'xdbtime/xdbtime'
       - name: Prepare database scripts
         run: |
           mkdir -p ~/.mysqlsh/init.d;
