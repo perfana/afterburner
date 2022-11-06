@@ -31,7 +31,7 @@ jobs:
           cd ..;
       - name: Create perfomance report
         run: |
-          echo "report = shell.reports.performance(shell.getSession())" | root:${{ secrets.AFTERBURNER_DB_PASSWORD }}@afterburner-db-mysql-headless.acme.svc.cluster.local:3306 --js
+          echo "report = shell.reports.performance(shell.getSession())" | mysqlsh root:${{ secrets.AFTERBURNER_DB_PASSWORD }}@afterburner-db-mysql-headless.acme.svc.cluster.local:3306 --js
       - name: Upload report
         uses: actions/upload-artifact@v3
         with:
