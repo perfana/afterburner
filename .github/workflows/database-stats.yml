@@ -36,4 +36,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: database performance report
-          path: /reports/*.html
+          path: /runner/_work/afterburner/afterburner/mysql/reports/*.html
