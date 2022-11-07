@@ -50,7 +50,7 @@ jobs:
     - name: Download report
       uses: actions/download-artifact@v3
       with:
-        path: ${{ inputs.system-under-test }}-${{ github.job }}-${{ github.run_number }}.html
+        path: ${{ inputs.system-under-test || 'test-sut' }}-${{ github.job }}-${{ github.run_number }}.html
 
     - name: Commit
       uses: stefanzweifel/git-auto-commit-action@v4        
