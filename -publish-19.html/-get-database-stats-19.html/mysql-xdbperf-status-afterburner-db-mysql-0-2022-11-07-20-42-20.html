@@ -1,0 +1,1862 @@
+<!-- 
+    Copyright 2016-2022 Taras Guliak XDBTIME 
+    All rights reserved.
+
+    ========================================
+    
+    D3
+    
+    Copyright 2010-2022 Mike Bostock
+
+    Permission to use, copy, modify, and/or distribute this software for any purpose
+    with or without fee is hereby granted, provided that the above copyright notice
+    and this permission notice appear in all copies.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+    REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+    INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+    OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+    TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+    THIS SOFTWARE.
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>xdbtime &mdash; MySQL</title>
+    <link rel="shortcut icon" href="https://www.xdbtime.com/images/favicon.png">
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+            }
+        }
+
+        body {
+            color: #333;
+            margin: 0;
+        }
+
+        .main-wrapper {
+            max-width: 100rem;
+            margin: auto;
+        }
+
+        main {
+            border-width: 1px 0;
+            border-style: solid;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        main>div+h2 {
+            border-top: 1px solid;
+        }
+
+        h2 button {
+            all: inherit;
+            border: 0;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0.5em 0;
+        }
+
+        h2 button:focus svg {
+            outline: 1px solid;
+        }
+
+        button svg {
+            height: 1em;
+            margin-left: 0.5em;
+        }
+
+        [aria-expanded="true"].vert {
+            display: none;
+        }
+
+        [aria-expanded] rect {
+            fill: currentColor;
+        }
+
+        html {
+            font-family: 'Lato', sans-serif;
+
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .chartColorDark {
+            fill: #444;
+        }
+
+        .chartColorLight {
+            fill: #999;
+        }
+
+        text {
+            fill: #999;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #999;
+        }
+
+        path.domain {
+            stroke: none;
+        }
+
+        .axis-grid line {
+            stroke: rgba(0, 0, 0, 0.103);
+        }
+
+        .y .tick line {
+            stroke: #ddd;
+        }
+
+        table {
+            font-size: 12px;
+        }
+
+        td {
+            border-bottom: 0.5px solid #ddd;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #999;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background: #65a1ac;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 12px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <a href="https://www.xdbtime.com">
+            <img src="https://www.xdbtime.com/images/logo-white.png" alt="" height="25" />
+        </a>
+    </header>
+    <div class="main-wrapper" id="main-wrapper">
+
+
+        <h1>Database Performance Report - MySQL</h1>
+        <div id="chart1"> </div>
+        <main>
+            <h2>
+                <button aria-expanded="false">
+                    Global Status
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartGlobalStatus" hidden>
+                <p>Global Status is based on global_status view. </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    File Summary
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartFileSummary" hidden>
+                <p>File Summary tables are based on file_summary_by_event_name view </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    Waits Summary
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartWaitsSummary" hidden>
+                <p>Waits Summary charts are based on events_waits_summary_global_by_event_name view </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    Stages Summary
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartStagesSummary" hidden>
+                <p>Stages Summary charts are based on events_stages_summary_global_by_event_name view </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    Statements Summary
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartStatementsSummary" hidden>
+                <p>Statements Summary charts are based on events_statements_summary_global_by_event_name view </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    SQL Statistics Charts
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chart5" hidden>
+                <p>SQL Statistics charts are based on events_statements_summary_by_digest. SQL statistics are grouped by DIGEST and SCHEMA_NAME. </p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    SQL Statistics Tables
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chart6" hidden>
+                <p>SQL Statistics charts are based on events_statements_summary_by_digest. SQL statistics are grouped by DIGEST and SCHEMA_NAME.</p>
+            </div>
+            <h2>
+                <button aria-expanded="false">
+                    SQL Text
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 10">
+                        <rect class="vert" height="8" width="2" y="1" x="4" />
+                        <rect height="2" width="8" y="4" x="1" />
+                    </svg>
+                </button>
+            </h2>
+            <div id="chartSqlText" hidden>
+                <p>SQL Text is extracted from events_statements_summary_by_digest. </p>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
+
+
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script type="text/javascript">
+
+    const getWrapperWidth = () => {
+        const wr = document.getElementById('main-wrapper');
+        return wr.getBoundingClientRect().width;
+    }
+
+    // Header
+    const header = document.querySelector('.header');
+    const headerHeight = header.getBoundingClientRect().height;
+    const preHeader = document.createElement('div');
+    preHeader.style.height = headerHeight + 'px';
+    document.body.prepend(preHeader);
+
+    window.addEventListener('resize', () => {
+        // TODO: renderAllComponents
+    });
+
+    const headings = document.querySelectorAll('h2');
+
+    headings.forEach(h => {
+        let btn = h.querySelector('button');
+        let target = h.nextElementSibling;
+
+        btn.onclick = () => {
+            let expanded = btn.getAttribute('aria-expanded') === 'true';
+
+            btn.setAttribute('aria-expanded', !expanded);
+            target.hidden = expanded;
+        }
+    });
+
+    var svgDbTimeDraw = function (svgWidth, svgHeight, inpArray, svgObjName, withLegend, chartTitle, chartSubTitle, minDate, maxDate, maxX, pKeys, pColors, pAxisName) {
+        var margin = { top: 100, right: 100, bottom: 30, left: 40 },
+            width = svgWidth - margin.left - margin.right,
+            height = svgHeight - margin.top - margin.bottom;
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = pColors;
+
+        var stack = d3.stack();
+
+        var area = d3.area()
+            .x(function (d, i) { return x(d.data.date); })
+            .y0(function (d) { return y(d[0]); })
+            .y1(function (d) { return y(d[1]); })
+            .curve(d3.curveMonotoneX);
+
+        y.domain([0, maxX]).nice();
+        z.domain(pKeys);
+        stack.keys(pKeys);
+
+        var svgDbTime = d3.select(svgObjName).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
+        var g = svgDbTime.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        x.domain([minDate, maxDate]);
+
+        g.append("g")
+            .attr("class", "axis-grid")
+            .call(d3.axisLeft(y).tickSize(-width).tickFormat('').ticks(10));
+
+        var layer = g.selectAll(".layer")
+            .data(stack(inpArray))
+            .enter().append("g")
+            .attr("class", "layer");
+        layer.append("path")
+            .attr("class", "area")
+            .style("fill", function (d) { return z(d.key); })
+            .attr("d", area);
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(x));
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(null, "s"));
+        g.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(null, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", y(y.ticks().pop()) + 0.5)
+            .attr("dy", "0.32em")
+            .attr("class", "chartColorLight")
+            .attr("text-anchor", "start")
+            .text(pAxisName);
+        g.append("text")
+            .attr("x", 0)
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "left")
+            .attr("class", "chartColorDark")
+            .style("font-size", "26px")
+            .text(chartTitle);
+
+        g.append("text")
+            .attr("x", 0)
+            .attr("y", 0 - (margin.top / 4))
+            .attr("text-anchor", "left")
+            .style("font-size", "12px")
+            .text(chartSubTitle);
+
+        if (withLegend == 1) {
+            var legend = g.append("g")
+                .attr("font-size", "10px")
+                .attr("text-anchor", "begin")
+                .selectAll("g")
+                .data(pKeys.slice().reverse())
+                .enter().append("g")
+                .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+            legend.append("rect")
+                .attr("x", width + 15)
+                .attr("width", 13)
+                .attr("height", 13)
+                .attr("fill", z);
+            legend.append("text")
+                .attr("x", width + 36)
+                .attr("y", 6.5)
+                .attr("dy", "0.32em")
+                .text(function (d) { return d; });
+
+        }
+        return svgDbTime;
+    }
+
+    var svgStackedAreaDraw = function (svgWidth, svgHeight, inpArray, svgObjName, withLegend, chartName, minDate, maxDate, maxX, pKeys, pColors) {
+        var margin = { top: 50, right: 150, bottom: 30, left: 40 },
+            width = svgWidth - margin.left - margin.right,
+            height = svgHeight - margin.top - margin.bottom;
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = pColors;
+
+        var stack = d3.stack();
+
+        var area = d3.area()
+            .x(function (d, i) { return x(d.data.date); })
+            .y0(function (d) { return y(d[0]); })
+            .y1(function (d) { return y(d[1]); });
+
+        y.domain([0, maxX]).nice();
+        z.domain(pKeys);
+        stack.keys(pKeys);
+
+        var svgStackedArea = d3.select(svgObjName).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
+        var g = svgStackedArea.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        x.domain([minDate, maxDate]);
+
+        var layer = g.selectAll(".layer")
+            .data(stack(inpArray))
+            .enter().append("g")
+            .attr("class", "layer");
+        layer.append("path")
+            .attr("class", "area")
+            .style("fill", function (d) { return z(d.key); })
+            .attr("d", area);
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(x));
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(null, "s"));
+        g.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(null, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", y(y.ticks().pop()) + 0.5)
+            .attr("dy", "0.32em")
+            .attr("fill", "#000")
+            .attr("text-anchor", "start")
+            .text('DB Sessions');
+        g.append("text")
+            .attr("x", 0)
+            .attr("y", 0 - (margin.top / 4))
+            .attr("text-anchor", "left")
+            .style("font-size", "16px")
+            .text(minDate.toLocaleString('en-us', date_output));
+        if (withLegend == 1) {
+            var legend = g.append("g")
+                .attr("font-size", "10px")
+                .attr("text-anchor", "begin")
+                .selectAll("g")
+                .data(pKeys.slice().reverse())
+                .enter().append("g")
+                .attr("transform", function (d, i) { return "translate(0," + i * 16 + ")"; });
+            legend.append("rect")
+                .attr("x", width + 20)
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("fill", z);
+            legend.append("text")
+                .attr("x", width + 36)
+                .attr("y", 5.5)
+                .attr("dy", "0.32em")
+                .text(function (d) { return d; });
+
+        }
+        return svgStackedArea;
+    }
+
+
+
+    var svgBarChartDraw = function (svgWidth, svgHeight, statName, svgObjName, pColors, chartName, axisName) {
+        var margin = { top: 100, right: 20, bottom: 30, left: 40 },
+            width = svgWidth - margin.left - margin.right,
+            height = svgHeight - margin.top - margin.bottom;
+
+        var x = d3.scaleBand()
+            .rangeRound([40, width - 215])
+            .paddingInner(0.05)
+            .align(0.1);
+        var y = d3.scaleLinear().rangeRound([height, 0]);
+        var z = pColors;
+
+        var barChartData = statName;
+        var keys = barChartData.columns;
+
+
+        var stack = d3.stack();
+
+        var area = d3.area()
+            .x(function (d, i) { return x(d.data.date); })
+            .y0(function (d) { return y(d[0]); })
+            .y1(function (d) { return y(d[1]); })
+            .curve(d3.curveMonotoneX)
+            ;
+
+        x.domain(barChartData.map(function (d) { return d.series; }));
+        y.domain([0, 1.05 * d3.max(barChartData, function (d) { return d.total; })]).nice();
+        z.domain(keys);
+
+
+        var svgBarChart = d3.select(svgObjName).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom);
+
+        var g = svgBarChart.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+        g.append("g")
+            .selectAll("g")
+            .data(d3.stack().keys(keys)(barChartData))
+            .enter().append("g")
+            .attr("fill", function (d) { return z(d.key); })
+            .selectAll("rect")
+            .data(function (d) { return d; })
+            .enter().append("rect")
+            .attr("x", function (d) { return x(d.data.series); })
+            .attr("y", function (d) { return y(d[1]); })
+            .attr("height", function (d) { return y(d[0]) - y(d[1]); })
+            .attr("width", x.bandwidth());
+
+        g.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0, " + height + ")")
+            .call(d3.axisBottom(x));
+
+
+        g.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(null, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", y(y.ticks().pop()) + 0.5)
+            .attr("dy", "0.32em")
+            .attr("fill", "#000")
+            .attr("text-anchor", "start")
+            .text(axisName);
+        g.append("text")
+            .attr("x", 0)
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "left")
+            .attr("class", "chartColorDark")
+            .style("font-size", "26px")
+            .text(chartName);
+        var legend = g.append("g")
+            .attr("font-size", "10px")
+            .attr("text-anchor", "begin")
+            .selectAll("g")
+            .data(keys.slice().reverse())
+            .enter().append("g")
+            .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+        legend.append("rect")
+            .attr("x", width - 180)
+            .attr("width", 13)
+            .attr("height", 13)
+            .attr("fill", z);
+        legend.append("text")
+            .attr("x", width - 160)
+            .attr("y", 6.5)
+            .attr("dy", "0.32em")
+            .text(function (d) { return d; });
+
+        return svgBarChart;
+    }
+
+    function getMaxDiffSqlStatMySQL(statName) {
+        var maxValue = d3.max(sqlStatsMySQL[statName], function (d) { return d3.max([0, d[sqlStatsTableDetailsMySQL[statName]["colDiff"]]]); });
+        if (maxValue == 0) { return 0.01 } else { return maxValue; }
+    }
+
+    function getMinDiffSqlStatMySQL(statName) {
+        var minValue = d3.min(sqlStatsMySQL[statName], function (d) { return d3.min([d[sqlStatsTableDetailsMySQL[statName]["colDiff"]], 0]); });
+        if (minValue == 0) { return 0.01 } else { return minValue }
+    }
+
+    function sqlTableSummaryTextMySQL(statName) {
+        var outputString = percentFormat(d3.sum(sqlStatsMySQL[statName], function (d) { return d[sqlStatsTableDetailsMySQL[statName]["colShare"]]; })) + " of " + sqlStatsTableDetailsMySQL[statName]["description"] + " is covered by TOP " +
+            timeFormat(d3.max(sqlStatsMySQL[statName], function (d) { return d["RANK"]; })) + " SQLs found in Performance Schema. ";
+
+        outputString = outputString + sqlStatsTableDetailsMySQL[statName]["description"] + " (TOP " + timeFormat(d3.max(sqlStatsMySQL[statName], function (d) { return d["RANK"]; })) + " SQLs) consumed "
+            + outputFormat(sqlStatsTableDetailsMySQL[statName]["colDiff"], d3.sum(sqlStatsMySQL[statName], function (d) { return d[sqlStatsTableDetailsMySQL[statName]["colTestrun"]]; })) + " units.";
+        
+        return outputString;
+        
+    }
+
+
+
+
+    function getColspan(pcolumn) {
+        if (sqlStatsHeaderColspan2MySQL.includes(pcolumn)) { return 2; };
+        if (sqlStatsHeaderColspan3MySQL.includes(pcolumn)) { return 3; };
+        if (sqlStatsHeaderColspan4MySQL.includes(pcolumn)) { return 4; };
+        if (sqlStatsHeaderColspan5MySQL.includes(pcolumn)) { return 5; };
+        if (sqlStatsHeaderColspan6MySQL.includes(pcolumn)) { return 6; };
+        if (sqlStatsHeaderColspan7MySQL.includes(pcolumn)) { return 7; };
+        return 1;
+    }
+
+    function drawTable(data, columns, header1, header2, tableName, svgName, summaryText, tableDescription) {
+
+
+        d3.select(svgName)
+            .append('svg')
+            .attr('width', 2100)
+            .attr('height', 50)
+            .append('g')
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .append('text')
+            .attr('x', 20)
+            .attr('y', 40)
+            .attr("text-anchor", "mid")
+            .attr("font-size", "18px")
+            .attr("font-weight", "bold")
+            .attr("class", "chartColorDark")
+            .text(tableName);
+        d3.select(svgName)
+            .append('svg')
+            .attr('width', 2100)
+            .attr('height', 10)
+            .append('g')
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .append('text')
+            .attr('x', 10)
+            .attr('y', 8)
+            .attr("text-anchor", "mid")
+            .attr("font-size", "10px")
+            .attr("font-weight", "bold")
+            .attr("class", "chartColorGrey")
+            .text(tableDescription);
+        var table = d3.select(svgName).append("table"),
+            thead = table.append("thead"),
+            tbody = table.append("tbody");
+        thead.append("tr")
+            .selectAll("th")
+            .data(header1)
+            .enter()
+            .append("th")
+            .attr("colspan", function (column) { return getColspan(column); })
+            .attr("rowspan", function (column) { return getColspan(column) === 1 ? 2 : 1; })
+            .text(function (column) { return column; });
+        thead.append("tr")
+            .selectAll("th")
+            .data(header2)
+            .enter()
+            .append("th")
+            .text(function (column) { return column; });
+
+
+
+        var rows = tbody.selectAll("tr")
+            .data(data)
+            .enter()
+            .append("tr");
+        var cells = rows.selectAll("td")
+            .data(function (row) {
+                return columns.map(function (column) {
+                    return {
+                        column: column,
+                        value: row[column]
+                    };
+                });
+            })
+            .enter()
+            .append("td")
+            .text(function (d) { return outputFormat(d.column, d.value); });
+        table.selectAll("tbody tr")
+            .sort(function (a, b) { return d3.ascending(a.RANK, b.RANK); });
+
+        d3.select(svgName)
+            .append('svg')
+            .attr('width', 2100)
+            .attr('height', 40)
+            .append('g')
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .append('text')
+            .attr('x', 20)
+            .attr('y', 20)
+            .attr("text-anchor", "mid")
+            .attr("font-size", "12px")
+            .attr("class", "chartColorDark")
+            .text(summaryText);
+        return table;
+    }
+
+    function outputFormat(pcolumn, pvalue) {
+        if (timeFormatArrayMySQL.includes(pcolumn)) { if (Math.abs(pvalue) > 999) { return execFormat(+pvalue); } else { return timeFormat(+pvalue); } };
+        if (execFormatArrayMySQL.includes(pcolumn)) { if (Math.abs(pvalue) < 10) { return timeFormat(+pvalue); } else { return execFormat(+pvalue); } };
+        if (percentFormatArrayMySQL.includes(pcolumn)) { return percentFormat(+pvalue); };
+        if (intervalFormatArrayMySQL.includes(pcolumn)) { return intervalFormat(+pvalue); };
+        return pvalue;
+    }
+
+    function drawAllObjects(pScreenWidth) {
+        if (statementsSummaryGroupsMySQL["Wait Classes"][0]["total"]>0) svgBarChartDraw(400, 450, statementsSummaryGroupsMySQL["Wait Classes"], "#chart1", waitClassColors, "Statements Summary", "Seconds");
+        if (waitsSummaryGroupsMySQL["Wait Classes"][0]["total"]>0) svgBarChartDraw(400, 450, waitsSummaryGroupsMySQL["Wait Classes"], "#chart1", waitClassColors, "Waits Summary", "Seconds");
+        if (stagesSummaryGroupsMySQL["Wait Classes"][0]["total"]>0) svgBarChartDraw(400, 450, stagesSummaryGroupsMySQL["Wait Classes"], "#chart1", waitClassColors, "Stages Summary", "Seconds");
+        
+
+        ["io/file", "io/socket", "io/table", "io/aurora_redo_log_flus", "lock/metadata", "lock/table", "synch/cond", "synch/mutex", "synch/rwlock", "synch/sxlock"].forEach(function (d) {
+            if (waitsSummaryGroupsMySQL[d].columns) svgBarChartDraw(400, 450, waitsSummaryGroupsMySQL[d], "#chartWaitsSummary", cat20Colors, d, "Seconds");
+
+        });
+
+        ["sql", "innodb"].forEach(function (d) {
+            if (stagesSummaryGroupsMySQL[d].columns) svgBarChartDraw(400, 450, stagesSummaryGroupsMySQL[d], "#chartStagesSummary", cat20Colors, d, "Seconds");
+
+        });
+
+        ["sql", "com", "sp", "scheduler"].forEach(function (d) {
+            if (statementsSummaryGroupsMySQL[d].columns) svgBarChartDraw(400, 450, statementsSummaryGroupsMySQL[d], "#chartStatementsSummary", cat20Colors, d, "Seconds");
+
+        });
+
+
+        sqlStatsChartDetailsMySQL.forEach(function (d) {
+            svgBarChartDraw(400, 450, sqlStatsGroupsMySQL[d.chartId], "#chart5", cat20Colors, d.chartName, d.axisName);
+        });
+
+
+        sqlStatsTablesMySQL.forEach(function (d) {
+            if (sqlStatsMySQL[d].length > 0) {
+                var tempTable = drawTable(sqlStatsMySQL[d], sqlStatsColsMySQL[d], sqlStatsColsHeader1MySQL[d], sqlStatsColsHeader2MySQL[d], sqlStatsTableDetailsMySQL[d]["name"], "#chart6", sqlTableSummaryTextMySQL(d), tableDescriptionText);
+                sqlStatsTablesMySQL[d] = tempTable;
+            }
+        });
+        
+
+
+        var dbSummaryTable = drawTable(sqlStatsMySQL["DB_SUMMARY"], sqlStatsColsMySQL["DB_SUMMARY"], sqlStatsColsHeader1MySQL["DB_SUMMARY"], sqlStatsColsHeader2MySQL["DB_SUMMARY"], sqlStatsTableDetailsMySQL["DB_SUMMARY"]["name"], "#chart1", "", "");
+        
+        var globalStatusTable = drawTable(sqlStatsMySQL["GLOBAL_STATUS"], sqlStatsColsMySQL["GLOBAL_STATUS"], sqlStatsColsHeader1MySQL["GLOBAL_STATUS"], sqlStatsColsHeader2MySQL["GLOBAL_STATUS"], sqlStatsTableDetailsMySQL["GLOBAL_STATUS"]["name"], "#chartGlobalStatus", "", "");
+
+        var sqlTextTable = drawTable(sqlStatsMySQL["SQL_TEXT"], sqlStatsColsMySQL["SQL_TEXT"], sqlStatsColsHeader1MySQL["SQL_TEXT"], sqlStatsColsHeader2MySQL["SQL_TEXT"], sqlStatsTableDetailsMySQL["SQL_TEXT"]["name"], "#chartSqlText", "", "");
+
+        var fileSummaryByEventTableMySQL = drawTable(sqlStatsMySQL["FILE_SUMMARY_EVENT"], sqlStatsColsMySQL["FILE_SUMMARY_EVENT"], sqlStatsColsHeader1MySQL["FILE_SUMMARY_EVENT"], sqlStatsColsHeader2MySQL["FILE_SUMMARY_EVENT"], sqlStatsTableDetailsMySQL["FILE_SUMMARY_EVENT"]["name"], "#chartFileSummary", "", tableDescriptionText);
+
+
+    }
+
+    var csvWaitsSummaryMySQL = "wait_class,wait_event,tst_before,tst_after\n";
+
+    var csvStagesSummaryMySQL = "wait_class,wait_event,tst_before,tst_after\n";
+
+    var csvStatementsSummaryMySQL = "wait_class,wait_event,tst_before,tst_after\n";
+
+    var csvSqlStatsChartMySQL = "stat_name,sql_type,value_b,value_t\n";
+
+    var csvSqlStatsTableMySQL = "STATISTIC,SCHEMA_NAME,DIGEST,COUNT_STAR,SUM_TIMER_WAIT,MIN_TIMER_WAIT,AVG_TIMER_WAIT,MAX_TIMER_WAIT,SUM_LOCK_TIME,SUM_ERRORS,SUM_WARNINGS,SUM_ROWS_AFFECTED,SUM_ROWS_SENT,SUM_ROWS_EXAMINED,SUM_CREATED_TMP_DISK_TABLES,SUM_CREATED_TMP_TABLES,SUM_SELECT_FULL_JOIN,SUM_SELECT_FULL_RANGE_JOIN,SUM_SELECT_RANGE,SUM_SELECT_RANGE_CHECK,SUM_SELECT_SCAN,SUM_SORT_MERGE_PASSES,SUM_SORT_RANGE,SUM_SORT_ROWS,SUM_SORT_SCAN,SUM_NO_INDEX_USED,SUM_NO_GOOD_INDEX_USED\n";
+
+    var csvFileSummaryByEventMySQL = "EVENT_NAME,COUNT_STAR,SUM_TIMER_WAIT,MIN_TIMER_WAIT,AVG_TIMER_WAIT,MAX_TIMER_WAIT,COUNT_READ,SUM_TIMER_READ,MIN_TIMER_READ,AVG_TIMER_READ,MAX_TIMER_READ,SUM_NUMBER_OF_BYTES_READ,COUNT_WRITE,SUM_TIMER_WRITE,MIN_TIMER_WRITE,AVG_TIMER_WRITE,MAX_TIMER_WRITE,SUM_NUMBER_OF_BYTES_WRITE,COUNT_MISC,SUM_TIMER_MISC,MIN_TIMER_MISC,AVG_TIMER_MISC,MAX_TIMER_MISC\n";
+
+    var csvDbSummary = "HOSTNAME,INNODBBUFFERPOOLSIZE,VERSION,VERSION_COMMENT,VERSION_OS,VERSION_MACHINE,UPTIME,REPORT_TIME\n";
+
+    var csvGlobalStatus = "VARIABLE_NAME,VARIABLE_VALUE\n";
+    
+    var csvSQLText = "SCHEMA!@#!DIGEST!@#!DIGEST_TEXT\n";
+
+    csvStatementsSummaryMySQL = csvStatementsSummaryMySQL
++ "sql,select,27780,27780\n"
++ "sql,show_variables,1069,1069\n"
++ "sql,show_status,314,314\n"
++ "sql,set_option,238,238\n"
++ "sql,error,85,85\n"
++ "com,Statistics,33,33\n"
++ "sql,show_slave_status,26,26\n"
++ "com,Quit,22,22\n"
++ "com,Ping,12,12\n"
++ "sql,show_tables,0,0\n"
++ "sql,show_charsets,0,0\n"
++ "sql,show_collations,0,0\n"
++ "sql,show_plugins,0,0\n"
++ "sql,show_databases,0,0\n"
++ "sql,show_storage_engines,0,0\n"
+;
+csvWaitsSummaryMySQL = csvWaitsSummaryMySQL
++ "io/table,sql/handler,25936,25936\n"
++ "io/file,innodb/innodb_log_file,5,5\n"
++ "io/file,innodb/innodb_data_file,4,4\n"
++ "io/file,innodb/innodb_dblwr_file,3,3\n"
+;
+csvStagesSummaryMySQL = csvStagesSummaryMySQL
+;
+csvSqlStatsChartMySQL = csvSqlStatsChartMySQL
++ "SQL_TYPE,employees,18,18\n"
++ "SQL_TYPE,null,44,44\n"
++ "ERRORS,employees,0,0\n"
++ "ERRORS,null,1,1\n"
++ "WARNINGS,employees,110279,110279\n"
++ "WARNINGS,null,1,1\n"
++ "ROWS_AFFECTED,employees,0,0\n"
++ "ROWS_AFFECTED,null,0,0\n"
++ "ROWS_SENT,employees,166789306,166789306\n"
++ "ROWS_SENT,null,3290,3290\n"
++ "ROWS_EXAMINED,employees,25882923945,25882923945\n"
++ "ROWS_EXAMINED,null,317127,317127\n"
++ "EXECUTIONS,employees,3977008,3977008\n"
++ "EXECUTIONS,null,138,138\n"
++ "CREATED_TMP_DISK_TABLES,employees,0,0\n"
++ "CREATED_TMP_DISK_TABLES,null,1,1\n"
++ "CREATED_TMP_TABLES,employees,661674,661674\n"
++ "CREATED_TMP_TABLES,null,420,420\n"
++ "SELECT_FULL_JOIN,employees,110279,110279\n"
++ "SELECT_FULL_JOIN,null,31,31\n"
++ "SELECT_FULL_RANGE_JOIN,employees,0,0\n"
++ "SELECT_FULL_RANGE_JOIN,null,0,0\n"
++ "SELECT_RANGE,employees,110279,110279\n"
++ "SELECT_RANGE,null,0,0\n"
++ "SELECT_RANGE_CHECK,employees,0,0\n"
++ "SELECT_RANGE_CHECK,null,0,0\n"
++ "SELECT_SCAN,employees,1409022,1409022\n"
++ "SELECT_SCAN,null,445,445\n"
++ "SORT_MERGE_PASSES,employees,0,0\n"
++ "SORT_MERGE_PASSES,null,0,0\n"
++ "SORT_RANGE,employees,0,0\n"
++ "SORT_RANGE,null,0,0\n"
++ "SORT_ROWS,employees,0,0\n"
++ "SORT_ROWS,null,1922,1922\n"
++ "SORT_SCAN,employees,0,0\n"
++ "SORT_SCAN,null,221,221\n"
++ "NO_INDEX_USED,employees,857626,857626\n"
++ "NO_INDEX_USED,null,65,65\n"
++ "NO_GOOD_INDEX_USED,employees,0,0\n"
++ "NO_GOOD_INDEX_USED,null,0,0\n"
++ "TIMER_WAIT,employees,29426,29426\n"
++ "TIMER_WAIT,null,1,1\n"
++ "LOCK_TIME,employees,6,6\n"
++ "LOCK_TIME,null,0,0\n"
+;
+csvSqlStatsTableMySQL = csvSqlStatsTableMySQL
++ "SUM_LOCK_TIME,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "SUM_LOCK_TIME,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "SUM_LOCK_TIME,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_LOCK_TIME,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_LOCK_TIME,null,babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b,4,0,0.0029,0.0093,0.0206,0,0,0,0,5,42,0,4,0,0,0,0,4,0,0,5,4,0,0\n"
++ "SUM_LOCK_TIME,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_LOCK_TIME,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_LOCK_TIME,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_LOCK_TIME,null,3bd70b5052ba69b3a48ebfd882cc2c08755dd11003437f930ac907f20752499c,1,0,0.0549,0.0549,0.0549,0,0,0,0,42,42,0,0,0,0,0,0,1,0,0,0,0,1,0\n"
++ "SUM_LOCK_TIME,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_LOCK_TIME,null,5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba,4,0,0.0027,0.0033,0.0039,0,0,0,0,49,210,0,4,0,0,0,0,4,0,0,49,4,0,0\n"
++ "SUM_LOCK_TIME,null,5ae46c271737a6b43746f8fd2be6297c798ece98178e83f3e83f5c2217d6d28c,4,0,0.0010,0.0038,0.0110,0,0,0,0,48,252,0,0,0,0,0,0,4,0,0,48,4,4,0\n"
++ "SUM_LOCK_TIME,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_LOCK_TIME,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_ERRORS,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_WARNINGS,employees,aeea8d14c430e6eaaf2ffc1c542f366c21a261cbe130323702b18c3c36cf92ae,110279,26,0.0001,0.0002,0.0196,0,0,110279,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_WARNINGS,null,63516f646c2eee1be679b055e150d0284b55345d93659ca8f8b922d6b18a4be8,1,0,0.0023,0.0023,0.0023,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0\n"
++ "SUM_ROWS_SENT,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_ROWS_SENT,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "SUM_ROWS_SENT,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,c16f24f908846019a741db580f6545a5933e9435a7cf1579c50794a6ca287739,614423,122,0.0000,0.0002,0.0585,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_SENT,employees,c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff,614423,322,0.0001,0.0005,0.0622,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_SENT,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_SENT,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "SUM_ROWS_SENT,employees,d210015a0c276d85b92323714234cff1ce4a2a740ac094a87abf8f25e21f1e3d,110279,27,0.0001,0.0002,0.0157,0,0,0,0,110279,110279,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_SENT,null,30206a476ac13c395eccf17398e4dc3f5af775f8111950a7c81bfb16ed17c6ad,4,0,0.0023,0.0047,0.0116,0,0,0,0,1128,1280,0,0,0,0,0,0,4,0,0,0,0,4,0\n"
++ "SUM_ROWS_SENT,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_ROWS_SENT,null,f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a,1,0,0.0100,0.0100,0.0100,0,0,0,0,286,613,0,1,0,0,0,0,2,0,0,286,1,1,0\n"
++ "SUM_ROWS_SENT,null,d472a238ee22927b4b0203a4908252dc52b7acc7a9fbcb37aeef2a3faa4dfe8f,4,0,0.0026,0.0027,0.0028,0,0,0,0,242,242,0,0,0,0,0,0,4,0,0,0,0,4,0\n"
++ "SUM_ROWS_SENT,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_ROWS_SENT,null,1824c01e624ba744de63fc0cf24077bf9dd28f28a4d76761ad824617878469cf,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_ROWS_SENT,null,c9d768b3113445f3bca2bb6f40efee9bd37dc33b4ef897c4fabd556dc92f115e,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_ROWS_SENT,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_ROWS_EXAMINED,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_ROWS_EXAMINED,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "SUM_ROWS_EXAMINED,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "SUM_ROWS_EXAMINED,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,employees,c16f24f908846019a741db580f6545a5933e9435a7cf1579c50794a6ca287739,614423,122,0.0000,0.0002,0.0585,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_EXAMINED,employees,c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff,614423,322,0.0001,0.0005,0.0622,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_EXAMINED,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_ROWS_EXAMINED,null,13c8185194c350b84975ac1e88524b4685f33722247557abcdc7465f5446db87,1,0,0.1427,0.1427,0.1427,0,0,0,0,0,300024,0,0,0,0,0,0,1,0,0,0,0,1,0\n"
++ "SUM_ROWS_EXAMINED,employees,d210015a0c276d85b92323714234cff1ce4a2a740ac094a87abf8f25e21f1e3d,110279,27,0.0001,0.0002,0.0157,0,0,0,0,110279,110279,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_ROWS_EXAMINED,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_ROWS_EXAMINED,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_ROWS_EXAMINED,null,30206a476ac13c395eccf17398e4dc3f5af775f8111950a7c81bfb16ed17c6ad,4,0,0.0023,0.0047,0.0116,0,0,0,0,1128,1280,0,0,0,0,0,0,4,0,0,0,0,4,0\n"
++ "SUM_ROWS_EXAMINED,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_ROWS_EXAMINED,null,f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a,1,0,0.0100,0.0100,0.0100,0,0,0,0,286,613,0,1,0,0,0,0,2,0,0,286,1,1,0\n"
++ "SUM_ROWS_EXAMINED,null,1824c01e624ba744de63fc0cf24077bf9dd28f28a4d76761ad824617878469cf,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_ROWS_EXAMINED,null,c9d768b3113445f3bca2bb6f40efee9bd37dc33b4ef897c4fabd556dc92f115e,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "COUNT_STAR,employees,ee697e4b4152b6204eb23d2a055339cc8262297cf42467b78c1e241ddfcfbce3,614423,115,0.0000,0.0002,0.0464,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,158bfe3d4b4b0a372a4acdb38affe2cb4f6b3cb21a9af0ea9fad9a9a083ac18a,614423,94,0.0000,0.0002,0.0176,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,c16f24f908846019a741db580f6545a5933e9435a7cf1579c50794a6ca287739,614423,122,0.0000,0.0002,0.0585,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff,614423,322,0.0001,0.0005,0.0622,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,aeea8d14c430e6eaaf2ffc1c542f366c21a261cbe130323702b18c3c36cf92ae,110279,26,0.0001,0.0002,0.0196,0,0,110279,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "COUNT_STAR,employees,d210015a0c276d85b92323714234cff1ce4a2a740ac094a87abf8f25e21f1e3d,110279,27,0.0001,0.0002,0.0157,0,0,0,0,110279,110279,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,3ff8c8daed309ed2e1bb8c4743803fab5f9aac41552db00bb1b4c3ce932b2e9c,110279,29,0.0001,0.0003,0.0121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "COUNT_STAR,null,ce04eda080d3f5605113e1d0d47c2f20e23b091e2487ba586f07b32cda423942,15,0,0.0002,0.0003,0.0005,0,0,0,0,15,15,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,employees,a724a21545b602d4ae826ae58bbf526427a94f1e68ebec539ec3c53bfaa88281,12,0,0.0001,0.0003,0.0004,0,0,0,0,12,12,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "COUNT_STAR,null,6c0e91b80089f7231089ae9d92a7beb675c4fcd1a319b91365291fd84e262f6a,7,0,0.0002,0.0005,0.0007,0,0,0,0,7,7,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_CREATED_TMP_DISK_TABLES,null,8181054918915fc138d84fa7a6901fadcd699767bc70fb4090001619a68dd04b,1,0,0.0080,0.0080,0.0080,0,0,0,0,48,48,1,1,0,0,0,0,1,0,0,0,0,1,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_CREATED_TMP_TABLES,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_CREATED_TMP_TABLES,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_CREATED_TMP_TABLES,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_CREATED_TMP_TABLES,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_CREATED_TMP_TABLES,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_CREATED_TMP_TABLES,null,230e50b71157a47e34c64f86d958d304e42cc8bad0d5a345f7f60672da38222c,4,0,0.0058,0.0093,0.0136,0,0,0,0,4,4,0,4,0,0,0,0,8,0,0,0,0,4,0\n"
++ "SUM_CREATED_TMP_TABLES,null,5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba,4,0,0.0027,0.0033,0.0039,0,0,0,0,49,210,0,4,0,0,0,0,4,0,0,49,4,0,0\n"
++ "SUM_CREATED_TMP_TABLES,null,babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b,4,0,0.0029,0.0093,0.0206,0,0,0,0,5,42,0,4,0,0,0,0,4,0,0,5,4,0,0\n"
++ "SUM_CREATED_TMP_TABLES,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_CREATED_TMP_TABLES,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_CREATED_TMP_TABLES,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_CREATED_TMP_TABLES,null,8181054918915fc138d84fa7a6901fadcd699767bc70fb4090001619a68dd04b,1,0,0.0080,0.0080,0.0080,0,0,0,0,48,48,1,1,0,0,0,0,1,0,0,0,0,1,0\n"
++ "SUM_CREATED_TMP_TABLES,null,f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a,1,0,0.0100,0.0100,0.0100,0,0,0,0,286,613,0,1,0,0,0,0,2,0,0,286,1,1,0\n"
++ "SUM_CREATED_TMP_TABLES,null,1fe7aba925a48c9ab55b7b197d166da67a92d13a24185cf5d8e659052fc893d1,1,0,0.0033,0.0033,0.0033,0,0,0,0,1,1,0,1,0,0,0,0,2,0,0,0,0,1,0\n"
++ "SUM_SELECT_FULL_JOIN,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_FULL_JOIN,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_SELECT_FULL_JOIN,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_SELECT_FULL_JOIN,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_SELECT_FULL_JOIN,null,00d0ba4e970cc939197d362d6bfb899e0e6a8f2117b5208b3f17793815a8eaad,2,0,0.0018,0.0021,0.0025,0,0,0,0,10,32,0,0,2,0,0,0,2,0,0,0,0,2,0\n"
++ "SUM_SELECT_FULL_JOIN,null,dbea8921b559b8cdd4976d57d70304daa8a242fbbfe6df94427006b54ead6b0f,1,0,0.0023,0.0023,0.0023,0,0,0,0,5,21,0,0,1,0,0,0,1,0,0,5,1,1,0\n"
++ "SUM_TIMER_WAIT,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_TIMER_WAIT,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff,614423,322,0.0001,0.0005,0.0622,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,c16f24f908846019a741db580f6545a5933e9435a7cf1579c50794a6ca287739,614423,122,0.0000,0.0002,0.0585,0,0,0,0,614423,614423,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,ee697e4b4152b6204eb23d2a055339cc8262297cf42467b78c1e241ddfcfbce3,614423,115,0.0000,0.0002,0.0464,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,158bfe3d4b4b0a372a4acdb38affe2cb4f6b3cb21a9af0ea9fad9a9a083ac18a,614423,94,0.0000,0.0002,0.0176,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_TIMER_WAIT,employees,3ff8c8daed309ed2e1bb8c4743803fab5f9aac41552db00bb1b4c3ce932b2e9c,110279,29,0.0001,0.0003,0.0121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,d210015a0c276d85b92323714234cff1ce4a2a740ac094a87abf8f25e21f1e3d,110279,27,0.0001,0.0002,0.0157,0,0,0,0,110279,110279,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,employees,aeea8d14c430e6eaaf2ffc1c542f366c21a261cbe130323702b18c3c36cf92ae,110279,26,0.0001,0.0002,0.0196,0,0,110279,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n"
++ "SUM_TIMER_WAIT,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_TIMER_WAIT,null,13c8185194c350b84975ac1e88524b4685f33722247557abcdc7465f5446db87,1,0,0.1427,0.1427,0.1427,0,0,0,0,0,300024,0,0,0,0,0,0,1,0,0,0,0,1,0\n"
++ "SUM_TIMER_WAIT,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SELECT_RANGE,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5,220558,685,0.0008,0.0031,0.1534,2,0,0,0,12020411,14005433,0,0,0,0,0,0,220558,0,0,0,0,0,0\n"
++ "SUM_SELECT_SCAN,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851,110279,244,0.0007,0.0022,0.0629,1,0,0,0,110279,2867254,0,0,0,0,0,0,110279,0,0,0,0,0,0\n"
++ "SUM_SELECT_SCAN,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_SELECT_SCAN,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_SELECT_SCAN,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_SELECT_SCAN,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_SELECT_SCAN,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SELECT_SCAN,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SELECT_SCAN,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SELECT_SCAN,null,230e50b71157a47e34c64f86d958d304e42cc8bad0d5a345f7f60672da38222c,4,0,0.0058,0.0093,0.0136,0,0,0,0,4,4,0,4,0,0,0,0,8,0,0,0,0,4,0\n"
++ "SUM_SELECT_SCAN,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_SELECT_SCAN,null,5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba,4,0,0.0027,0.0033,0.0039,0,0,0,0,49,210,0,4,0,0,0,0,4,0,0,49,4,0,0\n"
++ "SUM_SELECT_SCAN,null,babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b,4,0,0.0029,0.0093,0.0206,0,0,0,0,5,42,0,4,0,0,0,0,4,0,0,5,4,0,0\n"
++ "SUM_SELECT_SCAN,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_SORT_ROWS,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_SORT_ROWS,null,f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a,1,0,0.0100,0.0100,0.0100,0,0,0,0,286,613,0,1,0,0,0,0,2,0,0,286,1,1,0\n"
++ "SUM_SORT_ROWS,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_SORT_ROWS,null,c9d768b3113445f3bca2bb6f40efee9bd37dc33b4ef897c4fabd556dc92f115e,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_SORT_ROWS,null,1824c01e624ba744de63fc0cf24077bf9dd28f28a4d76761ad824617878469cf,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_SORT_ROWS,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_ROWS,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_ROWS,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_ROWS,null,5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba,4,0,0.0027,0.0033,0.0039,0,0,0,0,49,210,0,4,0,0,0,0,4,0,0,49,4,0,0\n"
++ "SUM_SORT_ROWS,null,5ae46c271737a6b43746f8fd2be6297c798ece98178e83f3e83f5c2217d6d28c,4,0,0.0010,0.0038,0.0110,0,0,0,0,48,252,0,0,0,0,0,0,4,0,0,48,4,4,0\n"
++ "SUM_SORT_ROWS,null,1856574834be14252580820873d7125ede9315d91bf93a4a4525fac56ee51b6f,1,0,0.0114,0.0114,0.0114,0,0,0,0,41,123,0,0,0,0,0,0,1,0,0,41,1,1,0\n"
++ "SUM_SORT_ROWS,null,dbea8921b559b8cdd4976d57d70304daa8a242fbbfe6df94427006b54ead6b0f,1,0,0.0023,0.0023,0.0023,0,0,0,0,5,21,0,0,1,0,0,0,1,0,0,5,1,1,0\n"
++ "SUM_SORT_ROWS,null,babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b,4,0,0.0029,0.0093,0.0206,0,0,0,0,5,42,0,4,0,0,0,0,4,0,0,5,4,0,0\n"
++ "SUM_SORT_ROWS,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_SORT_ROWS,null,788d4c9461ba43ca204b381c394dec05a95c114e664e2c4d066eb0bc8be18d7a,1,0,0.0109,0.0109,0.0109,0,0,0,0,1,115,0,0,0,0,0,0,1,0,0,1,1,0,0\n"
++ "SUM_SORT_ROWS,null,0b0566ba3958050e531f2c172d73695998993136c914b7e0808d0a662a757dc1,1,0,0.0027,0.0027,0.0027,0,0,0,0,1,13,0,0,0,0,0,0,1,0,0,1,1,0,0\n"
++ "SUM_SORT_SCAN,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_SORT_SCAN,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_SORT_SCAN,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_SCAN,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_SCAN,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_SORT_SCAN,null,5ae46c271737a6b43746f8fd2be6297c798ece98178e83f3e83f5c2217d6d28c,4,0,0.0010,0.0038,0.0110,0,0,0,0,48,252,0,0,0,0,0,0,4,0,0,48,4,4,0\n"
++ "SUM_SORT_SCAN,null,5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba,4,0,0.0027,0.0033,0.0039,0,0,0,0,49,210,0,4,0,0,0,0,4,0,0,49,4,0,0\n"
++ "SUM_SORT_SCAN,null,babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b,4,0,0.0029,0.0093,0.0206,0,0,0,0,5,42,0,4,0,0,0,0,4,0,0,5,4,0,0\n"
++ "SUM_SORT_SCAN,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_SORT_SCAN,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_SORT_SCAN,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_SORT_SCAN,null,c9d768b3113445f3bca2bb6f40efee9bd37dc33b4ef897c4fabd556dc92f115e,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_SORT_SCAN,null,0b0566ba3958050e531f2c172d73695998993136c914b7e0808d0a662a757dc1,1,0,0.0027,0.0027,0.0027,0,0,0,0,1,13,0,0,0,0,0,0,1,0,0,1,1,0,0\n"
++ "SUM_SORT_SCAN,null,1824c01e624ba744de63fc0cf24077bf9dd28f28a4d76761ad824617878469cf,1,0,0.0061,0.0061,0.0061,0,0,0,0,111,335,0,0,0,0,0,0,1,0,0,111,1,0,0\n"
++ "SUM_SORT_SCAN,null,1856574834be14252580820873d7125ede9315d91bf93a4a4525fac56ee51b6f,1,0,0.0114,0.0114,0.0114,0,0,0,0,41,123,0,0,0,0,0,0,1,0,0,41,1,1,0\n"
++ "SUM_SORT_SCAN,null,788d4c9461ba43ca204b381c394dec05a95c114e664e2c4d066eb0bc8be18d7a,1,0,0.0109,0.0109,0.0109,0,0,0,0,1,115,0,0,0,0,0,0,1,0,0,1,1,0,0\n"
++ "SUM_SORT_SCAN,null,dbea8921b559b8cdd4976d57d70304daa8a242fbbfe6df94427006b54ead6b0f,1,0,0.0023,0.0023,0.0023,0,0,0,0,5,21,0,0,1,0,0,0,1,0,0,5,1,1,0\n"
++ "SUM_SORT_SCAN,null,f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a,1,0,0.0100,0.0100,0.0100,0,0,0,0,286,613,0,1,0,0,0,0,2,0,0,286,1,1,0\n"
++ "SUM_NO_INDEX_USED,employees,c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749,110279,596,0.0015,0.0054,0.0710,0,0,0,0,69475770,69475770,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9,110279,43,0.0001,0.0004,0.0154,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e,110279,43,0.0001,0.0004,0.0301,0,0,0,0,551395,551395,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2,110279,473,0.0015,0.0043,0.0705,0,0,0,0,0,0,0,110279,0,0,110279,0,110279,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6,110279,165,0.0005,0.0015,0.0199,0,0,0,0,8160646,34627606,0,110279,0,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871,110279,157,0.0004,0.0014,0.0307,1,0,0,0,220558,1102790,0,0,110279,0,0,0,110279,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317,110279,314,0.0009,0.0028,0.0497,0,0,0,0,54146989,54146989,0,110279,0,0,0,0,220558,0,0,0,0,110279,0\n"
++ "SUM_NO_INDEX_USED,employees,303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14,85677,25970,0.1208,0.3031,2.7270,1,0,0,0,20212726,25704256176,0,0,0,0,0,0,85674,0,0,0,0,85673,0\n"
++ "SUM_NO_INDEX_USED,null,b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8,6,0,0.0076,0.0208,0.0288,0,0,0,0,24,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_NO_INDEX_USED,null,aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1,6,0,0.0022,0.0077,0.0151,0,0,0,0,90,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_NO_INDEX_USED,null,0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0,6,0,0.0010,0.0021,0.0046,0,0,0,0,0,90,0,12,0,0,0,0,12,0,0,90,6,6,0\n"
++ "SUM_NO_INDEX_USED,null,13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627,6,0,0.0069,0.0547,0.0893,0,1,0,0,220,13464,0,335,0,0,0,0,225,0,0,220,110,5,0\n"
++ "SUM_NO_INDEX_USED,null,d472a238ee22927b4b0203a4908252dc52b7acc7a9fbcb37aeef2a3faa4dfe8f,4,0,0.0026,0.0027,0.0028,0,0,0,0,242,242,0,0,0,0,0,0,4,0,0,0,0,4,0\n"
++ "SUM_NO_INDEX_USED,null,230e50b71157a47e34c64f86d958d304e42cc8bad0d5a345f7f60672da38222c,4,0,0.0058,0.0093,0.0136,0,0,0,0,4,4,0,4,0,0,0,0,8,0,0,0,0,4,0\n"
++ "SUM_NO_INDEX_USED,null,d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74,4,0,0.0019,0.0029,0.0042,0,0,0,0,5,41,0,4,4,0,0,0,4,0,0,5,4,4,0\n"
++ "SUM_NO_INDEX_USED,null,12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f,4,0,0.0031,0.0043,0.0075,0,0,0,0,0,0,0,4,8,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_NO_INDEX_USED,null,3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce,4,0,0.0127,0.0147,0.0166,0,0,0,0,0,716,0,4,16,0,0,0,4,0,0,0,4,4,0\n"
++ "SUM_NO_INDEX_USED,null,30206a476ac13c395eccf17398e4dc3f5af775f8111950a7c81bfb16ed17c6ad,4,0,0.0023,0.0047,0.0116,0,0,0,0,1128,1280,0,0,0,0,0,0,4,0,0,0,0,4,0\n"
++ "SUM_NO_INDEX_USED,null,1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879,4,0,0.0181,0.0266,0.0309,0,0,0,0,813,1626,0,88,0,0,0,0,172,0,0,813,84,4,0\n"
++ "SUM_NO_INDEX_USED,null,5ae46c271737a6b43746f8fd2be6297c798ece98178e83f3e83f5c2217d6d28c,4,0,0.0010,0.0038,0.0110,0,0,0,0,48,252,0,0,0,0,0,0,4,0,0,48,4,4,0\n"
+;
+csvFileSummaryByEventMySQL = csvFileSummaryByEventMySQL
++ "wait/io/file/innodb/innodb_log_file,1202,5,0.0000,0.0039,0.0524,7,0,0.0000,0.0000,0.0001,68608,443,0,0.0000,0.0001,0.0049,363520,752,5,0.0000,0.0061,0.0524\n"
++ "wait/io/file/innodb/innodb_data_file,3433,4,0.0000,0.0012,0.0825,2215,0,0.0000,0.0001,0.0144,36487168,857,0,0.0000,0.0001,0.0049,26427392,361,4,0.0000,0.0107,0.0825\n"
++ "wait/io/file/innodb/innodb_dblwr_file,408,3,0.0000,0.0070,0.0322,2,0,0.0002,0.0062,0.0122,8781824,200,0,0.0000,0.0002,0.0027,11698176,206,3,0.0000,0.0136,0.0322\n"
++ "wait/io/file/innodb/innodb_temp_file,66,0,0.0000,0.0027,0.0264,0,0,0.0000,0.0000,0.0000,0,25,0,0.0000,0.0001,0.0002,475136,41,0,0.0000,0.0043,0.0264\n"
++ "wait/io/file/sql/binlog,20,0,0.0000,0.0012,0.0120,4,0,0.0000,0.0000,0.0000,2910,2,0,0.0000,0.0001,0.0001,157,14,0,0.0000,0.0016,0.0120\n"
++ "wait/io/file/sql/ERRMSG,5,0,0.0000,0.0008,0.0032,3,0,0.0000,0.0002,0.0005,371449,0,0,0.0000,0.0000,0.0000,0,2,0,0.0000,0.0016,0.0032\n"
++ "wait/io/file/sql/binlog_index,23,0,0.0000,0.0000,0.0003,5,0,0.0000,0.0000,0.0000,992,0,0,0.0000,0.0000,0.0000,0,18,0,0.0000,0.0000,0.0003\n"
++ "wait/io/file/sql/casetest,10,0,0.0000,0.0000,0.0001,0,0,0.0000,0.0000,0.0000,0,0,0,0.0000,0.0000,0.0000,0,10,0,0.0000,0.0000,0.0001\n"
++ "wait/io/file/sql/pid,3,0,0.0000,0.0000,0.0001,0,0,0.0000,0.0000,0.0000,0,1,0,0.0000,0.0000,0.0000,2,2,0,0.0000,0.0000,0.0001\n"
++ "wait/io/file/mysys/charset,3,0,0.0000,0.0000,0.0000,1,0,0.0000,0.0000,0.0000,19475,0,0,0.0000,0.0000,0.0000,0,2,0,0.0000,0.0000,0.0000\n"
++ "wait/io/file/sql/misc,5,0,0.0000,0.0000,0.0000,0,0,0.0000,0.0000,0.0000,0,0,0,0.0000,0.0000,0.0000,0,5,0,0.0000,0.0000,0.0000\n"
++ "wait/io/file/mysys/cnf,5,0,0.0000,0.0000,0.0000,3,0,0.0000,0.0000,0.0000,56,0,0,0.0000,0.0000,0.0000,0,2,0,0.0000,0.0000,0.0000\n"
+;
+csvDbSummary = csvDbSummary
++ "afterburner-db-mysql-0,134217728,8.0.31,Source distribution,Linux,x86_64,461h 45m 12s,07 Nov 2022 20:42:20\n"
+;
+csvSQLText = csvSQLText
++ "employees!@#!c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff!@#!SELECT @@SESSION . `auto_increment_increment` AS `auto_increment_increment` , @@`character_set_client` AS `character_set_client` , @@`character_set_connection` AS `character_set_connection` , @@`character_set_results` AS `character_set_results` , @@`character_set_server` AS `character_set_server` , @@`collation_server` AS `collation_server` , @@`collation_connection` AS `collation_connection` , @@`init_connect` AS `init_connect` , @@`interactive_timeout` AS `interactive_timeout` , @@`license` AS `license` , @@`lower_case_table_names` AS `lower_case_table_names` , @@`max_allowed_packet` AS `max_allowed_packet` , @@`net_write_timeout` AS `net_write_timeout` , @@`performance_schema` AS `performance_schema` , @@`sql_mode` AS `sql_mode` , @@`system_time_zone` AS `system_time_zone` , @@`time_zone` AS `time_zone` , @@`transaction_isolation` AS `transaction_isolation` , @@`wait_timeout` AS `wait_timeout`\n"
++ "employees!@#!ee697e4b4152b6204eb23d2a055339cc8262297cf42467b78c1e241ddfcfbce3!@#!SET `character_set_results` = ?\n"
++ "employees!@#!158bfe3d4b4b0a372a4acdb38affe2cb4f6b3cb21a9af0ea9fad9a9a083ac18a!@#!SET `autocommit` = ?\n"
++ "employees!@#!c16f24f908846019a741db580f6545a5933e9435a7cf1579c50794a6ca287739!@#!SELECT @@SESSION . `transaction_read_only`\n"
++ "employees!@#!3ff8c8daed309ed2e1bb8c4743803fab5f9aac41552db00bb1b4c3ce932b2e9c!@#!SET `lock_wait_timeout` = ?\n"
++ "employees!@#!d210015a0c276d85b92323714234cff1ce4a2a740ac094a87abf8f25e21f1e3d!@#!SELECT @@`version`\n"
++ "employees!@#!070e38632eb4444e50cdcbf0b17474ba801e203add89783a24584951442a2317!@#!SHOW GLOBAL STATUS\n"
++ "employees!@#!c0066ea11affd8cfdecf6e133173291d0456413df0e3c1d722cf87551260c749!@#!SHOW GLOBAL VARIABLES\n"
++ "employees!@#!261d1aef896bd551369d871098adf259b001b9c8b358502f42f58d3967504851!@#!SELECT COLUMN_NAME FROM `information_schema` . `columns` WHERE TABLE_NAME = ? AND COLUMN_NAME IN (...)\n"
++ "employees!@#!739c845cdc8f54c3ebcf2abe9fd8ba13474f3415fd6cd0b61cee9b51663face9!@#!SELECT `page_size` , `compress_ops` , `compress_ops_ok` , `compress_time` , `uncompress_ops` , `uncompress_time` FROM `information_schema` . `innodb_cmp`\n"
++ "employees!@#!284ed8f763d9220df7bbbca74c4e4d54bd9a883884953e278ad64c89d4a6435e!@#!SELECT `page_size` , `buffer_pool_instance` , `pages_used` , `pages_free` , `relocation_ops` , `relocation_time` FROM `information_schema` . `innodb_cmpmem`\n"
++ "employees!@#!2b33b294f226bb4ccbffea205b0fe1cd72117cefeca13fafba4fde0057e2d6f2!@#!SHOW GLOBAL VARIABLES WHERE `Variable_Name` = ? OR `Variable_Name` = ?\n"
++ "employees!@#!bcf6e713de01dcd39204e71874044a80a2886e20b925b442edc8b04a286a11c6!@#!SELECT NAME , `subsystem` , TYPE , COMMENT , `count` FROM `information_schema` . `innodb_metrics` WHERE `status` = ?\n"
++ "employees!@#!dbeb9488ba471a9039941c34d61c179df0f159b992b1d07fa303b2e78ed60871!@#!SELECT SCHEMA_NAME FROM `information_schema` . `schemata` WHERE SCHEMA_NAME NOT IN (...)\n"
++ "employees!@#!d878e3005775daaa0064fcc5f54e9669d246eabe67e37b5a6ae8fe8fc2a281f5!@#!SELECT `TABLE_SCHEMA` , TABLE_NAME , `TABLE_TYPE` , `ifnull` ( ENGINE , ? ) AS ENGINE , `ifnull` ( `VERSION` , ? ) AS `VERSION` , `ifnull` ( ROW_FORMAT , ? ) AS ROW_FORMAT , `ifnull` ( `TABLE_ROWS` , ? ) AS `TABLE_ROWS` , `ifnull` ( `DATA_LENGTH` , ? ) AS `DATA_LENGTH` , `ifnull` ( `INDEX_LENGTH` , ? ) AS `INDEX_LENGTH` , `ifnull` ( `DATA_FREE` , ? ) AS `DATA_FREE` , `ifnull` ( `CREATE_OPTIONS` , ? ) AS `CREATE_OPTIONS` FROM `information_schema` . `tables` WHERE `TABLE_SCHEMA` = ?\n"
++ "employees!@#!aeea8d14c430e6eaaf2ffc1c542f366c21a261cbe130323702b18c3c36cf92ae!@#!SHOW SLAVE STATUS\n"
++ "employees!@#!303616cc6c2e11ab80d830c115f4279723ca5fcdcc197cce8b811f0262dc2d14!@#!SELECT * FROM `employees` . `employees` WHERE `first_name` = ?\n"
++ "employees!@#!a724a21545b602d4ae826ae58bbf526427a94f1e68ebec539ec3c53bfaa88281!@#!SELECT @@SESSION . `transaction_isolation`\n"
++ " !@#!c20fcea11911be36651b7ca7bd3712d4ed9ac1134cee9c6620039e1fb13b5eff!@#!SELECT @@SESSION . `auto_increment_increment` AS `auto_increment_increment` , @@`character_set_client` AS `character_set_client` , @@`character_set_connection` AS `character_set_connection` , @@`character_set_results` AS `character_set_results` , @@`character_set_server` AS `character_set_server` , @@`collation_server` AS `collation_server` , @@`collation_connection` AS `collation_connection` , @@`init_connect` AS `init_connect` , @@`interactive_timeout` AS `interactive_timeout` , @@`license` AS `license` , @@`lower_case_table_names` AS `lower_case_table_names` , @@`max_allowed_packet` AS `max_allowed_packet` , @@`net_write_timeout` AS `net_write_timeout` , @@`performance_schema` AS `performance_schema` , @@`sql_mode` AS `sql_mode` , @@`system_time_zone` AS `system_time_zone` , @@`time_zone` AS `time_zone` , @@`transaction_isolation` AS `transaction_isolation` , @@`wait_timeout` AS `wait_timeout`\n"
++ " !@#!ee697e4b4152b6204eb23d2a055339cc8262297cf42467b78c1e241ddfcfbce3!@#!SET `character_set_results` = ?\n"
++ " !@#!158bfe3d4b4b0a372a4acdb38affe2cb4f6b3cb21a9af0ea9fad9a9a083ac18a!@#!SET `autocommit` = ?\n"
++ " !@#!ce04eda080d3f5605113e1d0d47c2f20e23b091e2487ba586f07b32cda423942!@#!SELECT SCHEMA ( )\n"
++ " !@#!694ce669f6158c6e62190a80036873cd7a95b81566f32b7f979f9624b10f564a!@#!SHOW ENGINES\n"
++ " !@#!1856574834be14252580820873d7125ede9315d91bf93a4a4525fac56ee51b6f!@#!SHOW CHARSET\n"
++ " !@#!f547ffac4814e362ef0421e4a45a6137d4be89fbb5ba419e1813d13647bcb53a!@#!SHOW COLLATION\n"
++ " !@#!42793ae5a2f38fe0c24360cf3f945195c67efe4955511d184c53c275af1674bc!@#!SELECT @@GLOBAL . `character_set_server` , @@GLOBAL . `collation_server`\n"
++ " !@#!8181054918915fc138d84fa7a6901fadcd699767bc70fb4090001619a68dd04b!@#!SHOW PLUGINS\n"
++ " !@#!230e50b71157a47e34c64f86d958d304e42cc8bad0d5a345f7f60672da38222c!@#!SHOW VARIABLES LIKE ?\n"
++ " !@#!dbea8921b559b8cdd4976d57d70304daa8a242fbbfe6df94427006b54ead6b0f!@#!SHOW SCHEMAS\n"
++ " !@#!7699d87f9f20a7984fb57ecc57470859c0b58516e5a12b077e4fe2879e632c63!@#!SELECT * FROM `information_schema` . `TABLES` `t` WHERE `t` . `TABLE_SCHEMA` = ? AND `t` . `TABLE_NAME` = ?\n"
++ " !@#!44e35cee979ba420eb49a8471f852bbe15b403c89742704817dfbaace0d99dbb!@#!SELECT @@`version_comment` LIMIT ?\n"
++ " !@#!a724a21545b602d4ae826ae58bbf526427a94f1e68ebec539ec3c53bfaa88281!@#!SELECT @@SESSION . `transaction_isolation`\n"
++ " !@#!4afc27c8a906bab8df4a1d831a8e67e410d7eaf297809b287f06002c8e5ba59c!@#!SET `SQL_SELECT_LIMIT` = ?\n"
++ " !@#!788d4c9461ba43ca204b381c394dec05a95c114e664e2c4d066eb0bc8be18d7a!@#!SHOW FULL TABLES FROM `performance_schema` WHERE `Tables_in_performance_schema` LIKE ?\n"
++ " !@#!5f180d9749efc219fa8235003d359878fb3cd6f0f672cfd1badcbf062152fbba!@#!SELECT * FROM `information_schema` . `COLUMNS` WHERE `TABLE_SCHEMA` = ? AND TABLE_NAME = ? ORDER BY `ORDINAL_POSITION`\n"
++ " !@#!babab01b51d54ade8a9bc57123f3fe62e966cf24b2a743097b8afaf266372b3b!@#!SELECT * FROM `information_schema` . `STATISTICS` WHERE `TABLE_SCHEMA` = ? AND TABLE_NAME = ? ORDER BY TABLE_NAME , `INDEX_NAME` , `SEQ_IN_INDEX`\n"
++ " !@#!d19caed75d692a17f84ecb30458fc8e996f7f0ea773520d0f561e9fba0a95c74!@#!SELECT `kc` . `CONSTRAINT_NAME` , `kc` . `TABLE_NAME` , `kc` . `COLUMN_NAME` , `kc` . `ORDINAL_POSITION` FROM `INFORMATION_SCHEMA` . `KEY_COLUMN_USAGE` `kc` WHERE `kc` . `TABLE_SCHEMA` = ? AND `kc` . `REFERENCED_TABLE_NAME` IS NULL AND `kc` . `TABLE_NAME` = ? ORDER BY `kc` . `CONSTRAINT_NAME` , `kc` . `ORDINAL_POSITION`\n"
++ " !@#!12ba6262e915babbff2c1c623060008086b28927b1a3fd9e23f3dda74682e41f!@#!SELECT `cc` . `CONSTRAINT_NAME` , `cc` . `CHECK_CLAUSE` , `tc` . `TABLE_NAME` FROM ( SELECT CONSTRAINT_NAME , `CHECK_CLAUSE` FROM `INFORMATION_SCHEMA` . `CHECK_CONSTRAINTS` WHERE CONSTRAINT_SCHEMA = ? ORDER BY CONSTRAINT_NAME ) `cc` , ( SELECT TABLE_NAME , CONSTRAINT_NAME FROM `INFORMATION_SCHEMA` . `TABLE_CONSTRAINTS` WHERE `TABLE_SCHEMA` = ? AND TABLE_NAME = ? ) `tc` WHERE `cc` . `CONSTRAINT_NAME` = `tc` . `CONSTRAINT_NAME` ORDER BY `cc` . `CONSTRAINT_NAME`\n"
++ " !@#!3969c362c48af8a109d542d4c31787570bf0c74c025f5729fb85761ba9a4f4ce!@#!SELECT DISTINCTROW `A` . `REFERENCED_TABLE_SCHEMA` AS `PKTABLE_CAT` , ? AS `PKTABLE_SCHEM` , `A` . `REFERENCED_TABLE_NAME` AS `PKTABLE_NAME` , `A` . `REFERENCED_COLUMN_NAME` AS `PKCOLUMN_NAME` , `A` . `TABLE_SCHEMA` AS `FKTABLE_CAT` , ? AS `FKTABLE_SCHEM` , `A` . `TABLE_NAME` AS `FKTABLE_NAME` , `A` . `COLUMN_NAME` AS `FKCOLUMN_NAME` , `A` . `ORDINAL_POSITION` AS `KEY_SEQ` , CASE WHEN `R` . `UPDATE_RULE` = ? THEN ? WHEN `R` . `UPDATE_RULE` = ? THEN ? WHEN `R` . `UPDATE_RULE` = ? THEN ? WHEN `R` . `UPDATE_RULE` = ? THEN ? WHEN `R` . `UPDATE_RULE` = ? THEN ? ELSE ? END AS `UPDATE_RULE` , CASE WHEN `R` . `DELETE_RULE` = ? THEN ? WHEN `R` . `DELETE_RULE` = ? THEN ? WHEN `R` . `DELETE_RULE` = ? THEN ? WHEN `R` . `DELETE_RULE` = ? THEN ? WHEN `R` . `DELETE_RULE` = ? THEN ? ELSE ? END AS `DELETE_RULE` , `A` . `CONSTRAINT_NAME` AS `FK_NAME` , `R` . `UNIQUE_CONSTRAINT_NAME` AS `PK_NAME` , ? AS `DEFERRABILITY` FROM `INFORMATION_SCHEMA` . `KEY_COLUMN_USAGE` `A` JOIN `INFORMATION_SCHEMA` . `TABLE_CONSTRAINTS` `B` USING ( CONSTRAINT_NAME , TABLE_NAME ) JOIN `INFORMATION_SCHEMA` .\n"
++ " !@#!cada86b38df143105ddb127907acf3bc872774365e2933b9ba04302163a211b6!@#!SET `SQL_SELECT_LIMIT` = DEFAULT\n"
++ " !@#!c9d768b3113445f3bca2bb6f40efee9bd37dc33b4ef897c4fabd556dc92f115e!@#!SHOW TABLES FROM `performance_schema`\n"
++ " !@#!1824c01e624ba744de63fc0cf24077bf9dd28f28a4d76761ad824617878469cf!@#!SHOW FULL TABLES FROM `performance_schema`\n"
++ " !@#!3bd70b5052ba69b3a48ebfd882cc2c08755dd11003437f930ac907f20752499c!@#!SELECT * FROM `performance_schema` . `events_statements_summary_by_digest` LIMIT ?, ...\n"
++ " !@#!d41392b6408bf37c8c00d5bd4e604f3a3970a4d3ccd89060135a9d5dd85b3a4d!@#!SELECT @@`sql_mode`\n"
++ " !@#!00d0ba4e970cc939197d362d6bfb899e0e6a8f2117b5208b3f17793815a8eaad!@#!SELECT SCHEMA_NAME FROM `INFORMATION_SCHEMA` . `SCHEMATA`\n"
++ " !@#!d69f70d04c18461fe3d490f3e809405980e07e3d63666cceb01732b08648d792!@#!SELECT `concat` ( @@`version` , ? , @@`version_comment` )\n"
++ " !@#!6c0e91b80089f7231089ae9d92a7beb675c4fcd1a319b91365291fd84e262f6a!@#!SELECT `CONCAT` ( ? , @@`hostname` , ? , `DATE_FORMAT` ( SYSDATE ( ) , ? ) , ? )\n"
++ " !@#!aca55d69bcb7e2264d7fd3c5685777d8927f68ac8ab262abc7969f1597b9d6f1!@#!SELECT `CONCAT` ( ? , `wait_class` , ? , `wait_event` , ? , `tr_wait_time_seconds` , ? , `tr_wait_time_seconds` , ? ) AS `x` FROM ( SELECT SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) - `LOCATE` ( ? , `s` . `event_name` , ? ) - ? ) `wait_class` , SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? , `LENGTH` ( `s` . `event_name` ) - `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) ) `wait_event` , `ROUND` ( `tr_timer_wait` / ?, ... ) `tr_wait_time_seconds` FROM ( SELECT `event_name` , ( MAX ( `sum_timer_wait` ) ) `tr_timer_wait` FROM `performance_schema` . `events_statements_summary_global_by_event_name` WHERE `event_name` != ? GROUP BY `event_name` ORDER BY `sum_timer_wait` DESC LIMIT ? ) `s` WHERE ( `ROUND` ( `tr_timer_wait` / ?, ... ) ) > ? ) `b`\n"
++ " !@#!b310c3d89e48a802836ce9c835fb46fff322dad2341b5ddeac5cb60eea392da8!@#!SELECT `CONCAT` ( ? , `wait_class` , ? , `wait_event` , ? , `tr_wait_time_seconds` , ? , `tr_wait_time_seconds` , ? ) AS `x` FROM ( SELECT SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? , IF ( `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? ) = ? , `LENGTH` ( `s` . `event_name` ) , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? ) ) - `LOCATE` ( ? , `s` . `event_name` , ? ) - ? ) `wait_class` , SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? ) + ? , `LENGTH` ( `s` . `event_name` ) - `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? ) ) `wait_event` , `ROUND` ( `tr_timer_wait` / ?, ... ) `tr_wait_time_seconds` FROM ( SELECT `event_name` ,\n"
++ " !@#!0767e00b8150136977e0f48709c2702c912d303835381a5f9a9c8e5d2a42c8d0!@#!SELECT `CONCAT` ( ? , `wait_class` , ? , `wait_event` , ? , `tr_wait_time_seconds` , ? , `tr_wait_time_seconds` , ? ) AS `x` FROM ( SELECT SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) - `LOCATE` ( ? , `s` . `event_name` , ? ) - ? ) `wait_class` , SUBSTRING ( `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) + ? , `LENGTH` ( `s` . `event_name` ) - `LOCATE` ( ? , `s` . `event_name` , `LOCATE` ( ? , `s` . `event_name` , ? ) + ? ) ) `wait_event` , `ROUND` ( `tr_timer_wait` / ?, ... ) `tr_wait_time_seconds` FROM ( SELECT `event_name` , ( MAX ( `sum_timer_wait` ) ) `tr_timer_wait` FROM `performance_schema` . `events_stages_summary_global_by_event_name` WHERE `event_name` != ? GROUP BY `event_name` ORDER BY `sum_timer_wait` DESC LIMIT ? ) `s` WHERE ( `ROUND` ( `tr_timer_wait` / ?, ... ) ) > ? ) `b`\n"
++ " !@#!13b34d2f6f97294a479285f0ada82391bd8688d01220d8e4caf45ce666307627!@#!SELECT `CONCAT` ( ?, ... , `IFNULL` ( `b` . `SCHEMA_NAME` , ? ) , ? , COUNT (?) , ? , COUNT (?) , ? ) AS `x` FROM `performance_schema` . `events_statements_summary_by_digest` `a` LEFT JOIN ( SELECT `IFNULL` ( SCHEMA_NAME , ? ) SCHEMA_NAME , SUM ( `sum_timer_wait` ) FROM `performance_schema` . `events_statements_summary_by_digest` GROUP BY `IFNULL` ( SCHEMA_NAME , ? ) ORDER BY ? DESC LIMIT ? ) `b` ON `IFNULL` ( `a` . `SCHEMA_NAME` , ? ) = `b` . `schema_name` GROUP BY `IFNULL` ( `b` . `SCHEMA_NAME` , ? ) UNION SELECT `CONCAT` ( ?, ... , `IFNULL` ( `b` . `SCHEMA_NAME` , ? ) , ? , SUM ( `IFNULL` ( `SUM_ERRORS` , ? ) ) , ? , SUM ( `IFNULL` ( `SUM_ERRORS` , ? ) ) , ? ) AS `x` FROM `performance_schema` . `events_statements_summary_by_digest` `a` LEFT JOIN ( SELECT `IFNULL` ( SCHEMA_NAME , ? ) SCHEMA_NAME , SUM ( `sum_timer_wait` ) FROM `performance_schema` . `events_statements_summary_by_digest` GROUP BY `IFNULL` ( SCHEMA_NAME , ? ) ORDER BY ? DESC LIMIT ? ) `b` ON `IFNULL` ( `a` . `SCHEMA_NAME` , ? ) = `b` . `schema_name` GROUP BY `IFNULL` ( `b` . `SCHEMA_NAME` , ? ) UNION SELECT `CONCAT` ( ?, ... , `IFNULL` ( `b` . `SCHEMA_NAME` , ? ) , ? , SUM ( `IFNULL` (\n"
++ " !@#!77d2427f1e61ae3829a9c921f387338afbdb7206415b3abc272fbb8335fbbf52!@#!SET GLOBAL `sql_mode` = ( SELECT REPLACE ( @@`sql_mode` , ?, ... ) )\n"
++ " !@#!1fe7aba925a48c9ab55b7b197d166da67a92d13a24185cf5d8e659052fc893d1!@#!SHOW GLOBAL VARIABLES LIKE ?\n"
++ " !@#!1deca3a4486f914287939f2eee0fef7d7da9ffd706ce3851b87041c24bc93879!@#!SELECT `a` . `col` AS `x` FROM ( SELECT `CONCAT` ( ?, ... , `IFNULL` ( SCHEMA_NAME , ? ) , ? , `DIGEST` , ? , `COUNT_STAR` , ? , `ROUND` ( `SUM_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `MIN_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `AVG_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `MAX_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `SUM_LOCK_TIME` / ?, ... ) , ? , `SUM_ERRORS` , ? , `SUM_WARNINGS` , ? , `SUM_ROWS_AFFECTED` , ? , `SUM_ROWS_SENT` , ? , `SUM_ROWS_EXAMINED` , ? , `SUM_CREATED_TMP_DISK_TABLES` , ? , `SUM_CREATED_TMP_TABLES` , ? , `SUM_SELECT_FULL_JOIN` , ? , `SUM_SELECT_FULL_RANGE_JOIN` , ? , `SUM_SELECT_RANGE` , ? , `SUM_SELECT_RANGE_CHECK` , ? , `SUM_SELECT_SCAN` , ? , `SUM_SORT_MERGE_PASSES` , ? , `SUM_SORT_RANGE` , ? , `SUM_SORT_ROWS` , ? , `SUM_SORT_SCAN` , ? , `SUM_NO_INDEX_USED` , ? , `SUM_NO_GOOD_INDEX_USED` , ? ) AS `col` FROM `performance_schema` . `events_statements_summary_by_digest` `x` WHERE `SUM_LOCK_TIME` > ? ORDER BY `SUM_LOCK_TIME` DESC LIMIT ? ) `a` UNION SELECT `a` . `col` AS `x` FROM ( SELECT `CONCAT` ( ?, ... , `IFNULL` ( SCHEMA_NAME , ? ) , ? ,\n"
++ " !@#!5ae46c271737a6b43746f8fd2be6297c798ece98178e83f3e83f5c2217d6d28c!@#!SELECT `CONCAT` ( ? , `EVENT_NAME` , ? , `COUNT_STAR` , ? , `ROUND` ( `SUM_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `MIN_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `AVG_TIMER_WAIT` / ?, ... ) , ? , `ROUND` ( `MAX_TIMER_WAIT` / ?, ... ) , ? , `COUNT_READ` , ? , `ROUND` ( `SUM_TIMER_READ` / ?, ... ) , ? , `ROUND` ( `MIN_TIMER_READ` / ?, ... ) , ? , `ROUND` ( `AVG_TIMER_READ` / ?, ... ) , ? , `ROUND` ( `MAX_TIMER_READ` / ?, ... ) , ? , `SUM_NUMBER_OF_BYTES_READ` , ? , `COUNT_WRITE` , ? , `ROUND` ( `SUM_TIMER_WRITE` / ?, ... ) , ? , `ROUND` ( `MIN_TIMER_WRITE` / ?, ... ) , ? , `ROUND` ( `AVG_TIMER_WRITE` / ?, ... ) , ? , `ROUND` ( `MAX_TIMER_WRITE` / ?, ... ) , ? , `SUM_NUMBER_OF_BYTES_WRITE` , ? , `COUNT_MISC` , ? , `ROUND` ( `SUM_TIMER_MISC` / ?, ... ) , ? , `ROUND` ( `MIN_TIMER_MISC` / ?, ... ) , ? , `ROUND` ( `AVG_TIMER_MISC` / ?, ... ) , ? , `ROUND` ( `MAX_TIMER_MISC` / ?, ... ) , ? ) AS `x` FROM `performance_schema` . `file_summary_by_event_name` WHERE `SUM_TIMER_WAIT` > ? ORDER BY `SUM_TIMER_WAIT` DESC LIMIT ?\n"
++ " !@#!a1e50ff50aaef5d912eaf52bc155c5715b0a615b14bf8fda7a01a4e8746a8b3d!@#!SELECT `CONCAT` ( ? , @@`hostname` , ? , @@`innodb_buffer_pool_size` , ? , @@`version` , ? , @@`version_comment` , ? , @@`version_compile_os` , ? , @@`version_compile_machine` , ? , `TIME_FORMAT` ( `SEC_TO_TIME` ( `VARIABLE_VALUE` ) , ? ) , ? , `DATE_FORMAT` ( SYSDATE ( ) , ? ) , ? ) FROM `performance_schema` . `global_status` WHERE `VARIABLE_NAME` = ?\n"
++ " !@#!d472a238ee22927b4b0203a4908252dc52b7acc7a9fbcb37aeef2a3faa4dfe8f!@#!SELECT `CONCAT` ( ? , COALESCE ( SCHEMA_NAME , ? ) , ? , `digest` , ? , SUBSTRING ( `DIGEST_TEXT` , ?, ... ) , ? ) FROM `performance_schema` . `events_statements_summary_by_digest`\n"
++ " !@#!30206a476ac13c395eccf17398e4dc3f5af775f8111950a7c81bfb16ed17c6ad!@#!SELECT `CONCAT` ( ? , `VARIABLE_NAME` , ? , `VARIABLE_VALUE` , ? ) FROM `performance_schema` . `global_status` WHERE `variable_value` RLIKE ?\n"
++ " !@#!0b0566ba3958050e531f2c172d73695998993136c914b7e0808d0a662a757dc1!@#!SHOW FULL TABLES FROM `employees` WHERE `Tables_in_employees` LIKE ?\n"
++ " !@#!13c8185194c350b84975ac1e88524b4685f33722247557abcdc7465f5446db87!@#!SELECT * FROM `employees` . `employees` WHERE `first_name` = ? LIMIT ?, ...\n"
++ " !@#!63516f646c2eee1be679b055e150d0284b55345d93659ca8f8b922d6b18a4be8!@#!EXPLAIN SELECT * FROM `employees` . `employees` WHERE `first_name` = ?\n"
++ " !@#!118d653c380580e38366e6c2f770958c117ff4937f4a30ea3b324cc43674dc3e!@#!SHOW WARNINGS\n"
+;
+csvGlobalStatus = csvGlobalStatus
++ "Aborted_clients,14\n"
++ "Aborted_connects,54674\n"
++ "Acl_cache_items_count,0\n"
++ "Binlog_cache_disk_use,0\n"
++ "Binlog_cache_use,0\n"
++ "Binlog_stmt_cache_disk_use,0\n"
++ "Binlog_stmt_cache_use,0\n"
++ "Bytes_received,1130014679\n"
++ "Bytes_sent,8436700368\n"
++ "Com_stmt_reprepare,0\n"
++ "Connection_errors_accept,0\n"
++ "Connection_errors_internal,0\n"
++ "Connection_errors_max_connections,0\n"
++ "Connection_errors_peer_address,0\n"
++ "Connection_errors_select,0\n"
++ "Connection_errors_tcpwrap,0\n"
++ "Connections,1111856\n"
++ "Created_tmp_disk_tables,1\n"
++ "Created_tmp_files,5\n"
++ "Created_tmp_tables,662183\n"
++ "Delayed_errors,0\n"
++ "Delayed_insert_threads,0\n"
++ "Delayed_writes,0\n"
++ "Error_log_buffered_bytes,1568\n"
++ "Error_log_buffered_events,9\n"
++ "Error_log_expired_events,0\n"
++ "Error_log_latest_write,1667659518963168\n"
++ "Flush_commands,3\n"
++ "Global_connection_memory,0\n"
++ "Handler_commit,527848\n"
++ "Handler_delete,8\n"
++ "Handler_discover,0\n"
++ "Handler_external_lock,5694209\n"
++ "Handler_mrr_init,0\n"
++ "Handler_prepare,0\n"
++ "Handler_read_first,637160\n"
++ "Handler_read_key,15111955\n"
++ "Handler_read_last,0\n"
++ "Handler_read_next,14899564\n"
++ "Handler_read_prev,0\n"
++ "Handler_read_rnd,54\n"
++ "Handler_read_rnd_next,25990099901\n"
++ "Handler_rollback,0\n"
++ "Handler_savepoint,0\n"
++ "Handler_savepoint_rollback,0\n"
++ "Handler_update,13268\n"
++ "Handler_write,159361158\n"
++ "Innodb_buffer_pool_resize_status_code,0\n"
++ "Innodb_buffer_pool_resize_status_progress,0\n"
++ "Innodb_buffer_pool_pages_data,2371\n"
++ "Innodb_buffer_pool_bytes_data,38846464\n"
++ "Innodb_buffer_pool_pages_dirty,0\n"
++ "Innodb_buffer_pool_bytes_dirty,0\n"
++ "Innodb_buffer_pool_pages_flushed,859\n"
++ "Innodb_buffer_pool_pages_free,5813\n"
++ "Innodb_buffer_pool_pages_misc,8\n"
++ "Innodb_buffer_pool_pages_total,8192\n"
++ "Innodb_buffer_pool_read_ahead_rnd,0\n"
++ "Innodb_buffer_pool_read_ahead,832\n"
++ "Innodb_buffer_pool_read_ahead_evicted,0\n"
++ "Innodb_buffer_pool_read_requests,412043517\n"
++ "Innodb_buffer_pool_reads,1377\n"
++ "Innodb_buffer_pool_wait_free,0\n"
++ "Innodb_buffer_pool_write_requests,3248\n"
++ "Innodb_data_fsyncs,1011\n"
++ "Innodb_data_pending_fsyncs,0\n"
++ "Innodb_data_pending_reads,0\n"
++ "Innodb_data_pending_writes,0\n"
++ "Innodb_data_read,36277248\n"
++ "Innodb_data_reads,2233\n"
++ "Innodb_data_writes,1525\n"
++ "Innodb_data_written,14437376\n"
++ "Innodb_dblwr_pages_written,714\n"
++ "Innodb_dblwr_writes,200\n"
++ "Innodb_redo_log_uuid,1075899837\n"
++ "Innodb_redo_log_checkpoint_lsn,255938623\n"
++ "Innodb_redo_log_current_lsn,255938623\n"
++ "Innodb_redo_log_flushed_to_disk_lsn,255938623\n"
++ "Innodb_redo_log_logical_size,512\n"
++ "Innodb_redo_log_physical_size,3276800\n"
++ "Innodb_redo_log_capacity_resized,104857600\n"
++ "Innodb_log_waits,0\n"
++ "Innodb_log_write_requests,1566\n"
++ "Innodb_log_writes,361\n"
++ "Innodb_os_log_fsyncs,449\n"
++ "Innodb_os_log_pending_fsyncs,0\n"
++ "Innodb_os_log_pending_writes,0\n"
++ "Innodb_os_log_written,236544\n"
++ "Innodb_page_size,16384\n"
++ "Innodb_pages_created,163\n"
++ "Innodb_pages_read,2209\n"
++ "Innodb_pages_written,859\n"
++ "Innodb_row_lock_current_waits,0\n"
++ "Innodb_row_lock_time,0\n"
++ "Innodb_row_lock_time_avg,0\n"
++ "Innodb_row_lock_time_max,0\n"
++ "Innodb_row_lock_waits,0\n"
++ "Innodb_rows_deleted,0\n"
++ "Innodb_rows_inserted,48\n"
++ "Innodb_rows_read,25705456320\n"
++ "Innodb_rows_updated,0\n"
++ "Innodb_system_rows_deleted,8\n"
++ "Innodb_system_rows_inserted,9\n"
++ "Innodb_system_rows_read,17541089\n"
++ "Innodb_system_rows_updated,464\n"
++ "Innodb_sampled_pages_read,0\n"
++ "Innodb_sampled_pages_skipped,0\n"
++ "Innodb_num_open_files,16\n"
++ "Innodb_truncated_status_writes,0\n"
++ "Innodb_undo_tablespaces_total,2\n"
++ "Innodb_undo_tablespaces_implicit,2\n"
++ "Innodb_undo_tablespaces_explicit,0\n"
++ "Innodb_undo_tablespaces_active,2\n"
++ "Key_blocks_not_flushed,0\n"
++ "Key_blocks_unused,6698\n"
++ "Key_blocks_used,0\n"
++ "Key_read_requests,0\n"
++ "Key_reads,0\n"
++ "Key_write_requests,0\n"
++ "Key_writes,0\n"
++ "Locked_connects,0\n"
++ "Max_execution_time_exceeded,0\n"
++ "Max_execution_time_set,0\n"
++ "Max_execution_time_set_failed,0\n"
++ "Max_used_connections,33\n"
++ "Mysqlx_aborted_clients,0\n"
++ "Mysqlx_bytes_received,0\n"
++ "Mysqlx_bytes_received_compressed_payload,0\n"
++ "Mysqlx_bytes_received_uncompressed_frame,0\n"
++ "Mysqlx_bytes_sent,0\n"
++ "Mysqlx_bytes_sent_compressed_payload,0\n"
++ "Mysqlx_bytes_sent_uncompressed_frame,0\n"
++ "Mysqlx_connection_accept_errors,0\n"
++ "Mysqlx_connection_errors,0\n"
++ "Mysqlx_connections_accepted,0\n"
++ "Mysqlx_connections_closed,0\n"
++ "Mysqlx_connections_rejected,0\n"
++ "Mysqlx_crud_create_view,0\n"
++ "Mysqlx_crud_delete,0\n"
++ "Mysqlx_crud_drop_view,0\n"
++ "Mysqlx_crud_find,0\n"
++ "Mysqlx_crud_insert,0\n"
++ "Mysqlx_crud_modify_view,0\n"
++ "Mysqlx_crud_update,0\n"
++ "Mysqlx_cursor_close,0\n"
++ "Mysqlx_cursor_fetch,0\n"
++ "Mysqlx_cursor_open,0\n"
++ "Mysqlx_errors_sent,0\n"
++ "Mysqlx_errors_unknown_message_type,0\n"
++ "Mysqlx_expect_close,0\n"
++ "Mysqlx_expect_open,0\n"
++ "Mysqlx_init_error,0\n"
++ "Mysqlx_messages_sent,0\n"
++ "Mysqlx_notice_global_sent,0\n"
++ "Mysqlx_notice_other_sent,0\n"
++ "Mysqlx_notice_warning_sent,0\n"
++ "Mysqlx_notified_by_group_replication,0\n"
++ "Mysqlx_port,33060\n"
++ "Mysqlx_prep_deallocate,0\n"
++ "Mysqlx_prep_execute,0\n"
++ "Mysqlx_prep_prepare,0\n"
++ "Mysqlx_rows_sent,0\n"
++ "Mysqlx_sessions,0\n"
++ "Mysqlx_sessions_accepted,0\n"
++ "Mysqlx_sessions_closed,0\n"
++ "Mysqlx_sessions_fatal_error,0\n"
++ "Mysqlx_sessions_killed,0\n"
++ "Mysqlx_sessions_rejected,0\n"
++ "Mysqlx_ssl_accepts,0\n"
++ "Mysqlx_ssl_ctx_verify_depth,18446744073709551615\n"
++ "Mysqlx_ssl_ctx_verify_mode,5\n"
++ "Mysqlx_ssl_finished_accepts,0\n"
++ "Mysqlx_stmt_create_collection,0\n"
++ "Mysqlx_stmt_create_collection_index,0\n"
++ "Mysqlx_stmt_disable_notices,0\n"
++ "Mysqlx_stmt_drop_collection,0\n"
++ "Mysqlx_stmt_drop_collection_index,0\n"
++ "Mysqlx_stmt_enable_notices,0\n"
++ "Mysqlx_stmt_ensure_collection,0\n"
++ "Mysqlx_stmt_execute_mysqlx,0\n"
++ "Mysqlx_stmt_execute_sql,0\n"
++ "Mysqlx_stmt_execute_xplugin,0\n"
++ "Mysqlx_stmt_get_collection_options,0\n"
++ "Mysqlx_stmt_kill_client,0\n"
++ "Mysqlx_stmt_list_clients,0\n"
++ "Mysqlx_stmt_list_notices,0\n"
++ "Mysqlx_stmt_list_objects,0\n"
++ "Mysqlx_stmt_modify_collection_options,0\n"
++ "Mysqlx_stmt_ping,0\n"
++ "Mysqlx_worker_threads,2\n"
++ "Mysqlx_worker_threads_active,0\n"
++ "Not_flushed_delayed_rows,0\n"
++ "Ongoing_anonymous_transaction_count,0\n"
++ "Open_files,2\n"
++ "Open_streams,0\n"
++ "Open_table_definitions,67\n"
++ "Open_tables,619\n"
++ "Opened_files,2\n"
++ "Opened_table_definitions,100\n"
++ "Opened_tables,700\n"
++ "Performance_schema_accounts_lost,0\n"
++ "Performance_schema_cond_classes_lost,0\n"
++ "Performance_schema_cond_instances_lost,0\n"
++ "Performance_schema_digest_lost,0\n"
++ "Performance_schema_file_classes_lost,0\n"
++ "Performance_schema_file_handles_lost,0\n"
++ "Performance_schema_file_instances_lost,0\n"
++ "Performance_schema_hosts_lost,0\n"
++ "Performance_schema_index_stat_lost,0\n"
++ "Performance_schema_locker_lost,0\n"
++ "Performance_schema_memory_classes_lost,0\n"
++ "Performance_schema_metadata_lock_lost,0\n"
++ "Performance_schema_mutex_classes_lost,0\n"
++ "Performance_schema_mutex_instances_lost,0\n"
++ "Performance_schema_nested_statement_lost,0\n"
++ "Performance_schema_prepared_statements_lost,0\n"
++ "Performance_schema_program_lost,0\n"
++ "Performance_schema_rwlock_classes_lost,0\n"
++ "Performance_schema_rwlock_instances_lost,0\n"
++ "Performance_schema_session_connect_attrs_longest_seen,127\n"
++ "Performance_schema_session_connect_attrs_lost,0\n"
++ "Performance_schema_socket_classes_lost,0\n"
++ "Performance_schema_socket_instances_lost,0\n"
++ "Performance_schema_stage_classes_lost,0\n"
++ "Performance_schema_statement_classes_lost,0\n"
++ "Performance_schema_table_handles_lost,0\n"
++ "Performance_schema_table_instances_lost,0\n"
++ "Performance_schema_table_lock_stat_lost,0\n"
++ "Performance_schema_thread_classes_lost,0\n"
++ "Performance_schema_thread_instances_lost,0\n"
++ "Performance_schema_users_lost,0\n"
++ "Prepared_stmt_count,0\n"
++ "Queries,6052345\n"
++ "Questions,5585686\n"
++ "Replica_open_temp_tables,0\n"
++ "Secondary_engine_execution_count,0\n"
++ "Select_full_join,110310\n"
++ "Select_full_range_join,0\n"
++ "Select_range,110279\n"
++ "Select_range_check,0\n"
++ "Select_scan,1409561\n"
++ "Slave_open_temp_tables,0\n"
++ "Slow_launch_threads,0\n"
++ "Slow_queries,85682\n"
++ "Sort_merge_passes,0\n"
++ "Sort_range,0\n"
++ "Sort_rows,2183\n"
++ "Sort_scan,265\n"
++ "Ssl_accept_renegotiates,0\n"
++ "Ssl_accepts,668542\n"
++ "Ssl_callback_cache_hits,0\n"
++ "Ssl_client_connects,0\n"
++ "Ssl_connect_renegotiates,0\n"
++ "Ssl_ctx_verify_depth,18446744073709551615\n"
++ "Ssl_ctx_verify_mode,5\n"
++ "Ssl_default_timeout,7200\n"
++ "Ssl_finished_accepts,668542\n"
++ "Ssl_finished_connects,0\n"
++ "Ssl_session_cache_hits,0\n"
++ "Ssl_session_cache_misses,0\n"
++ "Ssl_session_cache_overflows,0\n"
++ "Ssl_session_cache_size,128\n"
++ "Ssl_session_cache_timeout,300\n"
++ "Ssl_session_cache_timeouts,0\n"
++ "Ssl_sessions_reused,0\n"
++ "Ssl_used_session_cache_entries,0\n"
++ "Ssl_verify_depth,18446744073709551615\n"
++ "Ssl_verify_mode,5\n"
++ "Table_locks_immediate,331206\n"
++ "Table_locks_waited,0\n"
++ "Table_open_cache_hits,2846453\n"
++ "Table_open_cache_misses,700\n"
++ "Table_open_cache_overflows,0\n"
++ "Tc_log_max_pages_used,0\n"
++ "Tc_log_page_size,0\n"
++ "Tc_log_page_waits,0\n"
++ "Threads_cached,5\n"
++ "Threads_connected,23\n"
++ "Threads_created,72\n"
++ "Threads_running,2\n"
++ "Uptime,1662312\n"
++ "Uptime_since_flush_status,1662312\n"
+;
+// Copyright 2016-2022 Taras Guliak XDBTIME 
+// All rights reserved.
+
+var timeFormatDMY = d3.timeParse("%d/%m/%Y");
+var timeFormatDMY_HM = d3.timeParse("%d/%m/%Y %H:%M");
+var timeFormatDMY_HMS = d3.timeParse("%d/%m/%Y %H:%M:%S");
+var tableDescriptionText = "Time in Seconds";
+
+var execFormat = d3.format(".2s");
+var timeFormat = d3.format(".3");
+var percentFormat = d3.format(".0%");
+var intervalFormat = d3.timeFormat(".%L");
+
+var date_output = {
+weekday: 'long',
+year: 'numeric',
+month: 'long',
+day: 'numeric'
+};
+
+var waitClassColors = d3.scaleOrdinal().range(["#9DE0AD", "#65a1ac", "#5FB2D5", "#C14755", "#EE3E38", "#F0C080", "#FF9190", "#96B6C5", "#ADC4CE", "#EEE0C9", "#F1F0E8", "#E4DECB"]);
+
+var cat20Colors = d3.scaleOrdinal(d3.schemeCategory20);
+
+var pointA = "Baseline";
+
+var waitsSummaryDataMySQL = d3.csvParse(csvWaitsSummaryMySQL);
+
+var waitsSummaryGroupsMySQL = {
+"io/file": [{ series: pointA, total: 0 }]
+, "io/socket": [{ series: pointA, total: 0 }]
+, "io/table": [{ series: pointA, total: 0 }]
+, "io/aurora_redo_log_flus": [{ series: pointA, total: 0 }]
+, "lock/metadata": [{ series: pointA, total: 0 }]
+, "lock/table": [{ series: pointA, total: 0 }]
+, "synch/cond": [{ series: pointA, total: 0 }]
+, "synch/mutex": [{ series: pointA, total: 0 }]
+, "synch/rwlock": [{ series: pointA, total: 0 }]
+, "synch/sxlock": [{ series: pointA, total: 0 }]
+, "Wait Classes": [{ series: pointA, total: 0 }]
+};
+
+waitsSummaryDataMySQL.forEach(function (d) {
+d.tst_before = +d.tst_before;
+d.tst_after = +d.tst_after;
+});
+
+for (i = 0, t = 0; i < waitsSummaryDataMySQL.length; ++i) {
+waitsSummaryGroupsMySQL[waitsSummaryDataMySQL[i].wait_class][0][waitsSummaryDataMySQL[i].wait_event] = waitsSummaryDataMySQL[i].tst_before;
+waitsSummaryGroupsMySQL[waitsSummaryDataMySQL[i].wait_class][0]["total"] += waitsSummaryDataMySQL[i].tst_before;
+
+if (!waitsSummaryGroupsMySQL[waitsSummaryDataMySQL[i].wait_class].columns) waitsSummaryGroupsMySQL[waitsSummaryDataMySQL[i].wait_class].columns = [];
+waitsSummaryGroupsMySQL[waitsSummaryDataMySQL[i].wait_class].columns.push(waitsSummaryDataMySQL[i].wait_event);
+}
+
+
+waitsSummaryGroupsMySQL["Wait Classes"].columns = [];
+
+["io/file", "io/socket", "io/table", "io/aurora_redo_log_flus", "lock/metadata", "lock/table", "synch/cond", "synch/mutex", "synch/rwlock", "synch/sxlock"].forEach(function (d) {
+
+waitsSummaryGroupsMySQL["Wait Classes"][0][d] = waitsSummaryGroupsMySQL[d][0]["total"];
+waitsSummaryGroupsMySQL["Wait Classes"][0]["total"] += waitsSummaryGroupsMySQL[d][0]["total"];
+
+waitsSummaryGroupsMySQL["Wait Classes"].columns.push(d);
+
+});
+
+// Stages Summary
+
+var stagesSummaryDataMySQL = d3.csvParse(csvStagesSummaryMySQL);
+
+var stagesSummaryGroupsMySQL = {
+"sql": [{ series: pointA, total: 0 }]
+, "innodb": [{ series: pointA, total: 0 }]
+, "Wait Classes": [{ series: pointA, total: 0 }]
+};
+
+
+stagesSummaryDataMySQL.forEach(function (d) {
+d.tst_before = +d.tst_before;
+d.tst_after = +d.tst_after;
+});
+
+for (i = 0, t = 0; i < stagesSummaryDataMySQL.length; ++i) {
+stagesSummaryGroupsMySQL[stagesSummaryDataMySQL[i].wait_class][0][stagesSummaryDataMySQL[i].wait_event] = stagesSummaryDataMySQL[i].tst_before;
+stagesSummaryGroupsMySQL[stagesSummaryDataMySQL[i].wait_class][0]["total"] += stagesSummaryDataMySQL[i].tst_before;
+
+
+if (!stagesSummaryGroupsMySQL[stagesSummaryDataMySQL[i].wait_class].columns) stagesSummaryGroupsMySQL[stagesSummaryDataMySQL[i].wait_class].columns = [];
+stagesSummaryGroupsMySQL[stagesSummaryDataMySQL[i].wait_class].columns.push(stagesSummaryDataMySQL[i].wait_event);
+}
+
+
+stagesSummaryGroupsMySQL["Wait Classes"].columns = [];
+
+["sql", "innodb"].forEach(function (d) {
+
+stagesSummaryGroupsMySQL["Wait Classes"][0][d] = stagesSummaryGroupsMySQL[d][0]["total"];
+stagesSummaryGroupsMySQL["Wait Classes"][0]["total"] += stagesSummaryGroupsMySQL[d][0]["total"];
+
+stagesSummaryGroupsMySQL["Wait Classes"].columns.push(d);
+
+});
+
+// Statements Summary
+
+var statementsSummaryDataMySQL = d3.csvParse(csvStatementsSummaryMySQL);
+
+var statementsSummaryGroupsMySQL = {
+"sql": [{ series: pointA, total: 0 }]
+, "sp": [{ series: pointA, total: 0 }]
+, "com": [{ series: pointA, total: 0 }]
+, "scheduler": [{ series: pointA, total: 0 }]
+, "Wait Classes": [{ series: pointA, total: 0 }]
+};
+
+
+statementsSummaryDataMySQL.forEach(function (d) {
+d.tst_before = +d.tst_before;
+d.tst_after = +d.tst_after;
+});
+
+for (i = 0, t = 0; i < statementsSummaryDataMySQL.length; ++i) {
+statementsSummaryGroupsMySQL[statementsSummaryDataMySQL[i].wait_class][0][statementsSummaryDataMySQL[i].wait_event] = statementsSummaryDataMySQL[i].tst_before;
+statementsSummaryGroupsMySQL[statementsSummaryDataMySQL[i].wait_class][0]["total"] += statementsSummaryDataMySQL[i].tst_before;
+
+
+if (!statementsSummaryGroupsMySQL[statementsSummaryDataMySQL[i].wait_class].columns) statementsSummaryGroupsMySQL[statementsSummaryDataMySQL[i].wait_class].columns = [];
+statementsSummaryGroupsMySQL[statementsSummaryDataMySQL[i].wait_class].columns.push(statementsSummaryDataMySQL[i].wait_event);
+}
+
+
+statementsSummaryGroupsMySQL["Wait Classes"].columns = [];
+
+["sql", "sp", "com", "scheduler"].forEach(function (d) {
+
+statementsSummaryGroupsMySQL["Wait Classes"][0][d] = statementsSummaryGroupsMySQL[d][0]["total"];
+statementsSummaryGroupsMySQL["Wait Classes"][0]["total"] += statementsSummaryGroupsMySQL[d][0]["total"];
+
+statementsSummaryGroupsMySQL["Wait Classes"].columns.push(d);
+
+});
+
+// MySQL SQL stats charts
+
+// SQL Stats Charts
+var dataSqlStatsChartMySQL = d3.csvParse(csvSqlStatsChartMySQL);
+dataSqlStatsChartMySQL.forEach(function (d) {
+d.value_b = +d.value_b;
+d.value_t = +d.value_t;
+});
+
+var sqlStatsGroupsMySQL = {
+"SQL_TYPE": [{ series: pointA, total: 0 }]
+, "LOCK_TIME": [{ series: pointA, total: 0 }]
+, "ERRORS": [{ series: pointA, total: 0 }]
+, "WARNINGS": [{ series: pointA, total: 0 }]
+, "ROWS_AFFECTED": [{ series: pointA, total: 0 }]
+, "ROWS_SENT": [{ series: pointA, total: 0 }]
+, "ROWS_EXAMINED": [{ series: pointA, total: 0 }]
+, "EXECUTIONS": [{ series: pointA, total: 0 }]
+, "CREATED_TMP_DISK_TABLES": [{ series: pointA, total: 0 }]
+, "CREATED_TMP_TABLES": [{ series: pointA, total: 0 }]
+, "SELECT_FULL_JOIN": [{ series: pointA, total: 0 }]
+, "TIMER_WAIT": [{ series: pointA, total: 0 }]
+, "SELECT_FULL_RANGE_JOIN": [{ series: pointA, total: 0 }]
+, "SELECT_RANGE": [{ series: pointA, total: 0 }]
+, "SELECT_RANGE_CHECK": [{ series: pointA, total: 0 }]
+, "SELECT_SCAN": [{ series: pointA, total: 0 }]
+, "SORT_MERGE_PASSES": [{ series: pointA, total: 0 }]
+, "SORT_RANGE": [{ series: pointA, total: 0 }]
+, "SORT_ROWS": [{ series: pointA, total: 0 }]
+, "SORT_SCAN": [{ series: pointA, total: 0 }]
+, "NO_INDEX_USED": [{ series: pointA, total: 0 }]
+, "NO_GOOD_INDEX_USED": [{ series: pointA, total: 0 }]
+};
+
+var sqlStatsChartDetailsMySQL = [
+{ chartId: "SQL_TYPE", chartName: "SQL TYPE", axisName: "Count" }
+, { chartId: "EXECUTIONS", chartName: "EXECUTIONS", axisName: "Count" }
+, { chartId: "TIMER_WAIT", chartName: "TIMER WAIT", axisName: "Seconds" }
+, { chartId: "LOCK_TIME", chartName: "LOCK TIME", axisName: "Seconds" }
+, { chartId: "ROWS_AFFECTED", chartName: "ROWS AFFECTED", axisName: "Count" }
+, { chartId: "ROWS_SENT", chartName: "ROWS SENT", axisName: "Count" }
+, { chartId: "ROWS_EXAMINED", chartName: "ROWS EXAMINED", axisName: "Count" }
+, { chartId: "CREATED_TMP_DISK_TABLES", chartName: "TMP DISK TABLES", axisName: "Count" }
+, { chartId: "CREATED_TMP_TABLES", chartName: "TMP TABLES", axisName: "Count" }
+, { chartId: "SELECT_FULL_JOIN", chartName: "SEL FULL JOIN", axisName: "Count" }
+, { chartId: "SELECT_FULL_RANGE_JOIN", chartName: "SEL FULL RANGE JOIN", axisName: "Count" }
+, { chartId: "SELECT_RANGE", chartName: "SEL RANGE", axisName: "Count" }
+, { chartId: "SELECT_RANGE_CHECK", chartName: "SEL RANGE CHECK", axisName: "Count" }
+, { chartId: "SELECT_SCAN", chartName: "SEL SCAN", axisName: "Count" }
+, { chartId: "SORT_MERGE_PASSES", chartName: "SORT MERGE PASSES", axisName: "Count" }
+, { chartId: "SORT_RANGE", chartName: "SORT RANGE", axisName: "Count" }
+, { chartId: "SORT_ROWS", chartName: "SORT ROWS", axisName: "Count" }
+, { chartId: "SORT_SCAN", chartName: "SORT SCAN", axisName: "Count" }
+, { chartId: "NO_INDEX_USED", chartName: "NO INDEX USED", axisName: "Count" }
+, { chartId: "NO_GOOD_INDEX_USED", chartName: "NO GOOD INDEX USED", axisName: "Count" }
+, { chartId: "ERRORS", chartName: "ERRORS", axisName: "Count" }
+, { chartId: "WARNINGS", chartName: "WARNINGS", axisName: "Count" }
+];
+
+for (i = 0, t = 0; i < dataSqlStatsChartMySQL.length; ++i) {
+sqlStatsGroupsMySQL[dataSqlStatsChartMySQL[i].stat_name][0][dataSqlStatsChartMySQL[i].sql_type] = dataSqlStatsChartMySQL[i].value_b;
+sqlStatsGroupsMySQL[dataSqlStatsChartMySQL[i].stat_name][0]["total"] += dataSqlStatsChartMySQL[i].value_b;
+
+if (!sqlStatsGroupsMySQL[dataSqlStatsChartMySQL[i].stat_name].columns) sqlStatsGroupsMySQL[dataSqlStatsChartMySQL[i].stat_name].columns = [];
+sqlStatsGroupsMySQL[dataSqlStatsChartMySQL[i].stat_name].columns.push(dataSqlStatsChartMySQL[i].sql_type);
+}
+
+// SQL Stats MySQL
+
+var timeFormatArrayMySQL = ["SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_TIMER_WAIT_B", "SUM_LOCK_TIME_B", "SUM_TIMER_WAIT_D", "SUM_LOCK_TIME_D", "SUM_TIMER_WAIT_TA", "SUM_LOCK_TIME_B", "MIN_TIMER_WAIT", "AVG_TIMER_WAIT", "MAX_TIMER_WAIT"];
+var execFormatArrayMySQL = ["COUNT_STAR", "COUNT_STAR_B", "COUNT_STAR_D", "SUM_ERRORS_B", "SUM_WARNINGS_B", "SUM_ROWS_AFFECTED_B", "SUM_ROWS_SENT_B", "SUM_ROWS_EXAMINED_B", "SUM_CREATED_TMP_DISK_TABLES_B", "SUM_CREATED_TMP_TABLES_B", "SUM_SELECT_FULL_JOIN_B", "SUM_SELECT_FULL_RANGE_JOIN_B", "SUM_SELECT_RANGE_B", "SUM_SELECT_RANGE_CHECK_B", "SUM_SELECT_SCAN_B", "SUM_SORT_MERGE_PASSES_B", "SUM_SORT_RANGE_B", "SUM_SORT_ROWS_B", "SUM_SORT_SCAN_B", "SUM_NO_INDEX_USED_B", "SUM_NO_GOOD_INDEX_USED_B", "SUM_ERRORS", "SUM_WARNINGS", "SUM_ROWS_AFFECTED", "SUM_ROWS_SENT", "SUM_ROWS_EXAMINED", "SUM_CREATED_TMP_DISK_TABLES", "SUM_CREATED_TMP_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED", "SUM_ERRORS_D", "SUM_WARNINGS_D", "SUM_ROWS_AFFECTED_D", "SUM_ROWS_SENT_D", "SUM_ROWS_EXAMINED_D", "SUM_CREATED_TMP_DISK_TABLES_D", "SUM_CREATED_TMP_TABLES_D", "SUM_SELECT_FULL_JOIN_D", "SUM_SELECT_FULL_RANGE_JOIN_D", "SUM_SELECT_RANGE_D", "SUM_SELECT_RANGE_CHECK_D", "SUM_SELECT_SCAN_D", "SUM_SORT_MERGE_PASSES_D", "SUM_SORT_RANGE_D", "SUM_SORT_ROWS_D", "SUM_SORT_SCAN_D", "SUM_NO_INDEX_USED_D", "SUM_NO_GOOD_INDEX_USED_D", "COUNT_STAR", "COUNT_READ", "COUNT_WRITE", "COUNT_MISC", "SUM_NUMBER_OF_BYTES_READ", "SUM_NUMBER_OF_BYTES_WRITE", "INNODBBUFFERPOOLSIZE", "VARIABLE_VALUE"];
+var percentFormatArrayMySQL = ["SUM_TIMER_WAIT_S", "COUNT_STAR_S", "SUM_LOCK_TIME_S", "SUM_ROWS_EXAMINED_S", "SUM_ROWS_AFFECTED_S", "SUM_ROWS_SENT_S", "SUM_CREATED_TMP_TABLES_S", "SUM_CREATED_TMP_DISK_TABLES_S", "SUM_SELECT_FULL_JOIN_S", "SUM_SELECT_FULL_RANGE_JOIN_S", "SUM_SELECT_RANGE_S", "SUM_SELECT_RANGE_CHECK_S", "SUM_SELECT_SCAN_S", "SUM_SORT_MERGE_PASSES_S", "SUM_SORT_RANGE_S", "SUM_SORT_ROWS_S", "SUM_SORT_SCAN_S", "SUM_NO_INDEX_USED_S", "SUM_NO_GOOD_INDEX_USED_S", "SUM_ERRORS_S", "SUM_WARNINGS_S"];
+var intervalFormatArrayMySQL = ["MIN_TIMER_WAIT", "AVG_TIMER_WAIT", "MAX_TIMER_WAIT"];
+
+var dataSqlStatsTableMySQL = d3.csvParse(csvSqlStatsTableMySQL);
+
+var currentStatistic = "dummy";
+var currentRank = 1;
+dataSqlStatsTableMySQL.forEach(function (d) {
+if (currentStatistic === d.STATISTIC) { d.RANK = +currentRank; currentRank = currentRank + 1; } else { currentStatistic = d.STATISTIC; d.RANK = 1; currentRank = 2; }
+});
+
+
+var sqlStatsMySQL = { "COUNT_STAR": [], "SUM_TIMER_WAIT": [], "SUM_LOCK_TIME": [], "SUM_ERRORS": [], "SUM_WARNINGS": [], "SUM_ROWS_AFFECTED": [], "SUM_ROWS_SENT": [], "SUM_ROWS_EXAMINED": [], "SUM_CREATED_TMP_DISK_TABLES": [], "SUM_CREATED_TMP_TABLES": [], "SUM_SELECT_FULL_JOIN": [], "SUM_SELECT_FULL_RANGE_JOIN": [], "SUM_SELECT_RANGE": [], "SUM_SELECT_RANGE_CHECK": [], "SUM_SELECT_SCAN": [], "SUM_SORT_MERGE_PASSES": [], "SUM_SORT_RANGE": [], "SUM_SORT_ROWS": [], "SUM_SORT_SCAN": [], "SUM_NO_INDEX_USED": [], "SUM_NO_GOOD_INDEX_USED": [], "FILE_SUMMARY_EVENT": [], "DB_SUMMARY": [], "SQL_TEXT": [], "GLOBAL_STATUS": []};
+
+var sqlStatsColsMySQL = {
+"COUNT_STAR": ["RANK", "DIGEST", "SCHEMA_NAME", "COUNT_STAR_S", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_TIMER_WAIT": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_TIMER_WAIT_S", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "COUNT_STAR", "SUM_WARNINGS", "SUM_ERRORS", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED", "MIN_TIMER_WAIT", "AVG_TIMER_WAIT", "MAX_TIMER_WAIT"]
+, "SUM_LOCK_TIME": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_LOCK_TIME_S", "SUM_LOCK_TIME", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_ROWS_EXAMINED": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_ROWS_EXAMINED_S", "SUM_ROWS_EXAMINED", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_ROWS_AFFECTED": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_ROWS_AFFECTED_S", "SUM_ROWS_AFFECTED", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_ROWS_SENT": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_ROWS_SENT_S", "SUM_ROWS_SENT", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_CREATED_TMP_TABLES": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_CREATED_TMP_TABLES_S", "SUM_CREATED_TMP_TABLES", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_CREATED_TMP_DISK_TABLES": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_CREATED_TMP_DISK_TABLES_S", "SUM_CREATED_TMP_DISK_TABLES", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SELECT_FULL_JOIN": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SELECT_FULL_JOIN_S", "SUM_SELECT_FULL_JOIN", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SELECT_FULL_RANGE_JOIN": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SELECT_FULL_RANGE_JOIN_S", "SUM_SELECT_FULL_RANGE_JOIN", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SELECT_RANGE": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SELECT_RANGE_S", "SUM_SELECT_RANGE", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SELECT_RANGE_CHECK": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SELECT_RANGE_CHECK_S", "SUM_SELECT_RANGE_CHECK", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SELECT_SCAN": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SELECT_SCAN_S", "SUM_SELECT_SCAN", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SORT_MERGE_PASSES": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SORT_MERGE_PASSES_S", "SUM_SORT_MERGE_PASSES", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SORT_RANGE": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SORT_RANGE_S", "SUM_SORT_RANGE", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SORT_ROWS": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SORT_ROWS_S", "SUM_SORT_ROWS", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_SORT_SCAN": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_SORT_SCAN_S", "SUM_SORT_SCAN", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_NO_INDEX_USED": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_NO_INDEX_USED_S", "SUM_NO_INDEX_USED", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_NO_GOOD_INDEX_USED": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_NO_GOOD_INDEX_USED_S", "SUM_NO_GOOD_INDEX_USED", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_ERRORS": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_ERRORS_S", "SUM_ERRORS", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "SUM_WARNINGS": ["RANK", "DIGEST", "SCHEMA_NAME", "SUM_WARNINGS_S", "SUM_WARNINGS", "COUNT_STAR", "SUM_TIMER_WAIT", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED"]
+, "FILE_SUMMARY_EVENT": ["EVENT_NAME", "COUNT_STAR", "SUM_TIMER_WAIT", "MIN_TIMER_WAIT", "AVG_TIMER_WAIT", "MAX_TIMER_WAIT", "COUNT_READ", "SUM_TIMER_READ", "MIN_TIMER_READ", "AVG_TIMER_READ", "MAX_TIMER_READ", "SUM_NUMBER_OF_BYTES_READ", "COUNT_WRITE", "SUM_TIMER_WRITE", "MIN_TIMER_WRITE", "AVG_TIMER_WRITE", "MAX_TIMER_WRITE", "SUM_NUMBER_OF_BYTES_WRITE", "COUNT_MISC", "SUM_TIMER_MISC", "MIN_TIMER_MISC", "AVG_TIMER_MISC", "MAX_TIMER_MISC"]
+, "DB_SUMMARY": ["HOSTNAME", "INNODBBUFFERPOOLSIZE", "VERSION", "VERSION_COMMENT", "VERSION_OS", "VERSION_MACHINE", "UPTIME", "REPORT_TIME"]
+, "SQL_TEXT": ["SCHEMA", "DIGEST", "DIGEST_TEXT"]
+, "GLOBAL_STATUS": ["VARIABLE_NAME", "VARIABLE_VALUE"]
+};
+
+var sqlStatsColsHeader1MySQL = {
+"COUNT_STAR": ["#", "DIGEST", "SCHEMA NAME", "%", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_TIMER_WAIT": ["#", "DIGEST", "SCHEMA NAME", "%", "TIME", "COUNT", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED", "WAIT TIME"]
+, "SUM_LOCK_TIME": ["#", "DIGEST", "SCHEMA NAME", "%", "LOCK TIME", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_ROWS_EXAMINED": ["#", "DIGEST", "SCHEMA NAME", "%", "ROWS EXAMINED", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_ROWS_AFFECTED": ["#", "DIGEST", "SCHEMA NAME", "%", "ROWS AFFECTED", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_ROWS_SENT": ["#", "DIGEST", "SCHEMA NAME", "%", "ROWS SENT", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_CREATED_TMP_TABLES": ["#", "DIGEST", "SCHEMA NAME", "%", "CREATED TEMP TABLES", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_CREATED_TMP_DISK_TABLES": ["#", "DIGEST", "SCHEMA NAME", "%", "CREATED TEMP DISK TABLES", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SELECT_FULL_JOIN": ["#", "DIGEST", "SCHEMA NAME", "%", "SELECT FULL JOIN", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SELECT_FULL_RANGE_JOIN": ["#", "DIGEST", "SCHEMA NAME", "%", "SELECT FULL RANGE JOIN", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SELECT_RANGE": ["#", "DIGEST", "SCHEMA NAME", "%", "SELECT RANGE", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SELECT_RANGE_CHECK": ["#", "DIGEST", "SCHEMA NAME", "%", "SELECT RANGE CHECK", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SELECT_SCAN": ["#", "DIGEST", "SCHEMA NAME", "%", "SELECT SCAN", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SORT_MERGE_PASSES": ["#", "DIGEST", "SCHEMA NAME", "%", "SORT MERGE PASSES", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SORT_RANGE": ["#", "DIGEST", "SCHEMA NAME", "%", "SORT RANGE", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SORT_ROWS": ["#", "DIGEST", "SCHEMA NAME", "%", "SORT ROWS", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_SORT_SCAN": ["#", "DIGEST", "SCHEMA NAME", "%", "SORT SCAN", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_NO_INDEX_USED": ["#", "DIGEST", "SCHEMA NAME", "%", "NO INDEX USED ", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_NO_GOOD_INDEX_USED": ["#", "DIGEST", "SCHEMA NAME", "%", "NO GOOD INDEX USED", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_ERRORS": ["#", "DIGEST", "SCHEMA NAME", "%", "ERRORS", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "SUM_WARNINGS": ["#", "DIGEST", "SCHEMA NAME", "%", "WARNINGS", "EXECUTIONS", "TIME", "ROWS", "TEMP TABLES", "SELECT", "SORT", "NO INDEX USED"]
+, "FILE_SUMMARY_EVENT": ["EVENT_NAME", "OVERALL LATENCY", "READ LATENCY", "WRITE LATENCY", "MISC LATENCY"]
+, "DB_SUMMARY": ["HOSTNAME", "INNODB BUFFERPOOL SIZE", "VERSION", "VERSION COMMENT", "VERSION OS", "VERSION MACHINE", "UPTIME", "REPORT TIME"]
+, "SQL_TEXT": ["SCHEMA NAME", "DIGEST", "DIGEST TEXT (first 2000 symbols)"]
+, "GLOBAL_STATUS": ["VARIABLE NAME", "VARIABLE VALUE"]
+};
+
+var sqlStatsColsHeader2MySQL = {
+"COUNT_STAR": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_TIMER_WAIT": ["WAIT", "LOCK", "Exec", "Warn", "Err", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD", "MIN", "AVG", "MAX"]
+, "SUM_LOCK_TIME": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_ROWS_EXAMINED": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_ROWS_AFFECTED": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_ROWS_SENT": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_CREATED_TMP_TABLES": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_CREATED_TMP_DISK_TABLES": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SELECT_FULL_JOIN": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SELECT_FULL_RANGE_JOIN": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SELECT_RANGE": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SELECT_RANGE_CHECK": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SELECT_SCAN": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SORT_MERGE_PASSES": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SORT_RANGE": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SORT_ROWS": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_SORT_SCAN": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_NO_INDEX_USED": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_NO_GOOD_INDEX_USED": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_ERRORS": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "SUM_WARNINGS": ["WAIT", "LOCK", "EXAMINED", "SENT", "AFFECTED", "TEMP", "DISK", "FJ", "FRJ", "R", "RC", "SCAN", "MERGE", "RANGE", "ROWS", "SCAN", "NO", "NO GOOD"]
+, "FILE_SUMMARY_EVENT": ["COUNT", "SUM", "MIN", "AVG", "MAX", "COUNT", "SUM", "MIN", "AVG", "MAX", "BYTES", "COUNT", "SUM", "MIN", "AVG", "MAX", "BYTES", "COUNT", "SUM", "MIN", "AVG", "MAX"]
+, "DB_SUMMARY": []
+, "SQL_TEXT": []
+, "GLOBAL_STATUS": []
+};
+
+var sqlStatsHeaderColspan2MySQL = ["TIME", "TEMP TABLES", "NO INDEX USED"];
+var sqlStatsHeaderColspan3MySQL = ["TIMER WAIT", "ROWS", "COUNT", "WAIT TIME"];
+var sqlStatsHeaderColspan4MySQL = ["COUNT STAR", "SORT"];
+var sqlStatsHeaderColspan5MySQL = ["SELECT", "OVERALL LATENCY"];
+var sqlStatsHeaderColspan6MySQL = ["READ LATENCY", "WRITE LATENCY", "MISC LATENCY"];
+var sqlStatsHeaderColspan7MySQL = ["TIME DISTRIBUTION"];
+
+
+var sqlStatsTableDetailsMySQL = {
+"COUNT_STAR": { name: "Top 20 SQLs by Executions", description: "Total Executions", colShare: "COUNT_STAR_S", colDiff: "COUNT_STAR_D", colBaseline: "COUNT_STAR_B", colTestrun: "COUNT_STAR" }
+, "SUM_TIMER_WAIT": { name: "Top 20 SQLs by Sum Timer Wait", description: "Total Timer Wait", colShare: "SUM_TIMER_WAIT_S", colDiff: "SUM_TIMER_WAIT_D", colBaseline: "SUM_TIMER_WAIT_B", colTestrun: "SUM_TIMER_WAIT" }
+, "SUM_LOCK_TIME": { name: "Top 20 SQLs by Sum Lock Time", description: "Total Lock Time", colShare: "SUM_LOCK_TIME_S", colDiff: "SUM_LOCK_TIME_D", colBaseline: "SUM_LOCK_TIME_B", colTestrun: "SUM_LOCK_TIME" }
+, "SUM_ROWS_EXAMINED": { name: "Top 20 SQLs by Sum Rows Examined", description: "Total Rows Examined", colShare: "SUM_ROWS_EXAMINED_S", colDiff: "SUM_ROWS_EXAMINED_D", colBaseline: "SUM_ROWS_EXAMINED_B", colTestrun: "SUM_ROWS_EXAMINED" }
+, "SUM_ROWS_AFFECTED": { name: "Top 20 SQLs by Sum Rows Affected", description: "Total Rows Affected", colShare: "SUM_ROWS_AFFECTED_S", colDiff: "SUM_ROWS_AFFECTED_D", colBaseline: "SUM_ROWS_AFFECTED_B", colTestrun: "SUM_ROWS_AFFECTED" }
+, "SUM_ROWS_SENT": { name: "Top 20 SQLs by Sum Rows Sent", description: "Total Rows Sent", colShare: "SUM_ROWS_SENT_S", colDiff: "SUM_ROWS_SENT_D", colBaseline: "SUM_ROWS_SENT_B", colTestrun: "SUM_ROWS_SENT" }
+, "SUM_CREATED_TMP_TABLES": { name: "Top 20 SQLs by Sum Created Temp Tables", description: "Total Created Temp Tables", colShare: "SUM_CREATED_TMP_TABLES_S", colDiff: "SUM_CREATED_TMP_TABLES_D", colBaseline: "SUM_CREATED_TMP_TABLES_B", colTestrun: "SUM_CREATED_TMP_TABLES" }
+, "SUM_CREATED_TMP_DISK_TABLES": { name: "Top 20 SQLs by Sum Created Temp Disk Tables", description: "Total Created Temp Disk Tables", colShare: "SUM_CREATED_TMP_DISK_TABLES_S", colDiff: "SUM_CREATED_TMP_DISK_TABLES_D", colBaseline: "SUM_CREATED_TMP_DISK_TABLES_B", colTestrun: "SUM_CREATED_TMP_DISK_TABLES" }
+, "SUM_SELECT_FULL_JOIN": { name: "Top 20 SQLs by Sum Select Full Join", description: "Total Select Full Join", colShare: "SUM_SELECT_FULL_JOIN_S", colDiff: "SUM_SELECT_FULL_JOIN_D", colBaseline: "SUM_SELECT_FULL_JOIN_B", colTestrun: "SUM_SELECT_FULL_JOIN" }
+, "SUM_SELECT_FULL_RANGE_JOIN": { name: "Top 20 SQLs by Sum Select Full Range Join", description: "Total Select Full Range Join", colShare: "SUM_SELECT_FULL_RANGE_JOIN_S", colDiff: "SUM_SELECT_FULL_RANGE_JOIN_D", colBaseline: "SUM_SELECT_FULL_RANGE_JOIN_B", colTestrun: "SUM_SELECT_FULL_RANGE_JOIN" }
+, "SUM_SELECT_RANGE": { name: "Top 20 SQLs by Sum Select Range", description: "Total Select Range", colShare: "SUM_SELECT_RANGE_S", colDiff: "SUM_SELECT_RANGE_D", colBaseline: "SUM_SELECT_RANGE_B", colTestrun: "SUM_SELECT_RANGE" }
+, "SUM_SELECT_RANGE_CHECK": { name: "Top 20 SQLs by Sum Select Range Check", description: "Total Select Range Check", colShare: "SUM_SELECT_RANGE_CHECK_S", colDiff: "SUM_SELECT_RANGE_CHECK_D", colBaseline: "SUM_SELECT_RANGE_CHECK_B", colTestrun: "SUM_SELECT_RANGE_CHECK" }
+, "SUM_SELECT_SCAN": { name: "Top 20 SQLs by Sum Select Scan", description: "Total Select Scan", colShare: "SUM_SELECT_SCAN_S", colDiff: "SUM_SELECT_SCAN_D", colBaseline: "SUM_SELECT_SCAN_B", colTestrun: "SUM_SELECT_SCAN" }
+, "SUM_SORT_MERGE_PASSES": { name: "Top 20 SQLs by Sum Sort Merge Passes", description: "Total Sort Merge Passes", colShare: "SORT MERGE PASSES_S", colDiff: "SORT MERGE PASSES_D", colBaseline: "SORT MERGE PASSES_B", colTestrun: "SORT MERGE PASSES" }
+, "SUM_SORT_RANGE": { name: "Top 20 SQLs by Sum Sort Range", description: "Total Sort Range", colShare: "SUM_SORT_RANGE_S", colDiff: "SUM_SORT_RANGE_D", colBaseline: "SUM_SORT_RANGE_B", colTestrun: "SUM_SORT_RANGE" }
+, "SUM_SORT_ROWS": { name: "Top 20 SQLs by Sum Sort Rows", description: "Total Sort Rows", colShare: "SUM_SORT_ROWS_S", colDiff: "SUM_SORT_ROWS_D", colBaseline: "SUM_SORT_ROWS_B", colTestrun: "SUM_SORT_ROWS" }
+, "SUM_SORT_SCAN": { name: "Top 20 SQLs by Sum Sort Scan", description: "Total Sort Scan", colShare: "SUM_SORT_SCAN_S", colDiff: "SUM_SORT_SCAN_D", colBaseline: "SUM_SORT_SCAN_B", colTestrun: "SUM_SORT_SCAN" }
+, "SUM_NO_INDEX_USED": { name: "Top 20 SQLs by Sum No Index Used", description: "Total No Index Used", colShare: "SUM_NO_INDEX_USED_S", colDiff: "SUM_NO_INDEX_USED_D", colBaseline: "SUM_NO_INDEX_USED_B", colTestrun: "SUM_NO_INDEX_USED" }
+, "SUM_NO_GOOD_INDEX_USED": { name: "Top 20 SQLs by Sum No Good Index Used", description: "Total No Good Index Used", colShare: "SUM_NO_GOOD_INDEX_USED_S", colDiff: "SUM_NO_GOOD_INDEX_USED_D", colBaseline: "SUM_NO_GOOD_INDEX_USED_B", colTestrun: "SUM_NO_GOOD_INDEX_USED" }
+, "SUM_ERRORS": { name: "Top 20 SQLs by Sum Errors", description: "Total Errors", colShare: "SUM_ERRORS_S", colDiff: "SUM_ERRORS_D", colBaseline: "SUM_ERRORS_B", colTestrun: "SUM_ERRORS" }
+, "SUM_WARNINGS": { name: "Top 20 SQLs by Sum Warnings", description: "Total Warnings", colShare: "SUM_WARNINGS_S", colDiff: "SUM_WARNINGS_D", colBaseline: "SUM_WARNINGS_B", colTestrun: "SUM_WARNINGS" }
+, "FILE_SUMMARY_EVENT": { name: "Top File Summary by Event", description: "", colShare: "", colDiff: "", colBaseline: "", colTestrun: "" }
+, "DB_SUMMARY": { name: "", description: "", colShare: "", colDiff: "", colBaseline: "", colTestrun: "" }
+, "SQL_TEXT": { name: "", description: "", colShare: "", colDiff: "", colBaseline: "", colTestrun: "" }
+, "GLOBAL_STATUS": { name: "", description: "", colShare: "", colDiff: "", colBaseline: "", colTestrun: "" }
+};
+
+for (i = 0, t = 0; i < dataSqlStatsTableMySQL.length; i++) {
+var myObj = {};
+
+sqlStatsColsMySQL[dataSqlStatsTableMySQL[i]["STATISTIC"]].forEach(function (d) {
+
+    switch (d) {
+        case "SUM_TIMER_WAIT_S": if ((+sqlStatsGroupsMySQL["TIMER_WAIT"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_TIMER_WAIT"]))/(+sqlStatsGroupsMySQL["TIMER_WAIT"][0]["total"]);} break;
+        case "COUNT_STAR_S": if ((+sqlStatsGroupsMySQL["EXECUTIONS"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["COUNT_STAR"]))/(+sqlStatsGroupsMySQL["EXECUTIONS"][0]["total"]);} break;
+        case "SUM_LOCK_TIME_S": if ((+sqlStatsGroupsMySQL["LOCK_TIME"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_LOCK_TIME"]))/(+sqlStatsGroupsMySQL["LOCK_TIME"][0]["total"]);} break;
+        case "SUM_ROWS_EXAMINED_S": if ((+sqlStatsGroupsMySQL["ROWS_EXAMINED"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_ROWS_EXAMINED"]))/(+sqlStatsGroupsMySQL["ROWS_EXAMINED"][0]["total"]);} break;
+        case "SUM_ROWS_AFFECTED_S": if ((+sqlStatsGroupsMySQL["ROWS_AFFECTED"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_ROWS_AFFECTED"]))/(+sqlStatsGroupsMySQL["ROWS_AFFECTED"][0]["total"]);} break;
+        case "SUM_ROWS_SENT_S": if ((+sqlStatsGroupsMySQL["ROWS_SENT"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_ROWS_SENT"]))/(+sqlStatsGroupsMySQL["ROWS_SENT"][0]["total"]);} break;
+        case "SUM_CREATED_TMP_TABLES_S": if ((+sqlStatsGroupsMySQL["CREATED_TMP_TABLES"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_CREATED_TMP_TABLES"]))/(+sqlStatsGroupsMySQL["CREATED_TMP_TABLES"][0]["total"]);} break;
+        case "SUM_CREATED_TMP_DISK_TABLES_S": if ((+sqlStatsGroupsMySQL["CREATED_TMP_DISK_TABLES"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_CREATED_TMP_DISK_TABLES"]))/(+sqlStatsGroupsMySQL["CREATED_TMP_DISK_TABLES"][0]["total"]);} break;
+        case "SUM_SELECT_FULL_JOIN_S": if ((+sqlStatsGroupsMySQL["SELECT_FULL_JOIN"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SELECT_FULL_JOIN"]))/(+sqlStatsGroupsMySQL["SELECT_FULL_JOIN"][0]["total"]);} break;
+        case "SUM_SELECT_FULL_RANGE_JOIN_S": if ((+sqlStatsGroupsMySQL["SELECT_FULL_RANGE_JOIN"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SELECT_FULL_RANGE_JOIN"]))/(+sqlStatsGroupsMySQL["SELECT_FULL_RANGE_JOIN"][0]["total"]);} break;
+        case "SUM_SELECT_RANGE_S": if ((+sqlStatsGroupsMySQL["SELECT_RANGE"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SELECT_RANGE"]))/(+sqlStatsGroupsMySQL["SELECT_RANGE"][0]["total"]);} break;
+        case "SUM_SELECT_RANGE_CHECK_S": if ((+sqlStatsGroupsMySQL["SELECT_RANGE_CHECK"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SELECT_RANGE_CHECK"]))/(+sqlStatsGroupsMySQL["SELECT_RANGE_CHECK"][0]["total"]);} break;
+        case "SUM_SELECT_SCAN_S": if ((+sqlStatsGroupsMySQL["SELECT_SCAN"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SELECT_SCAN"]))/(+sqlStatsGroupsMySQL["SELECT_SCAN"][0]["total"]);} break;
+        case "SUM_SORT_MERGE_PASSES_S": if ((+sqlStatsGroupsMySQL["SORT_MERGE_PASSES"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SORT_MERGE_PASSES"]))/(+sqlStatsGroupsMySQL["SORT_MERGE_PASSES"][0]["total"]);} break;
+        case "SUM_SORT_RANGE_S": if ((+sqlStatsGroupsMySQL["SORT_RANGE"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SORT_RANGE"]))/(+sqlStatsGroupsMySQL["SORT_RANGE"][0]["total"]);} break;
+        case "SUM_SORT_ROWS_S": if ((+sqlStatsGroupsMySQL["SORT_ROWS"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SORT_ROWS"]))/(+sqlStatsGroupsMySQL["SORT_ROWS"][0]["total"]);} break;
+        case "SUM_SORT_SCAN_S": if ((+sqlStatsGroupsMySQL["SORT_SCAN"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_SORT_SCAN"]))/(+sqlStatsGroupsMySQL["SORT_SCAN"][0]["total"]);} break;
+        case "SUM_NO_INDEX_USED_S": if ((+sqlStatsGroupsMySQL["NO_INDEX_USED"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_NO_INDEX_USED"]))/(+sqlStatsGroupsMySQL["NO_INDEX_USED"][0]["total"]);} break;
+        case "SUM_NO_GOOD_INDEX_USED_S": if ((+sqlStatsGroupsMySQL["NO_GOOD_INDEX_USED"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_NO_GOOD_INDEX_USED"]))/(+sqlStatsGroupsMySQL["NO_GOOD_INDEX_USED"][0]["total"]);} break;
+        case "SUM_ERRORS_S": if ((+sqlStatsGroupsMySQL["ERRORS"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_ERRORS"]))/(+sqlStatsGroupsMySQL["ERRORS"][0]["total"]);} break;
+        case "SUM_WARNINGS_S": if ((+sqlStatsGroupsMySQL["WARNINGS"][0]["total"]) == 0 ) {myObj[d] = 1} else {myObj[d] = ((+dataSqlStatsTableMySQL[i]["SUM_WARNINGS"]))/(+sqlStatsGroupsMySQL["WARNINGS"][0]["total"]);} break;
+
+
+
+        default: myObj[d] = dataSqlStatsTableMySQL[i][d];
+    }
+
+})
+sqlStatsMySQL[dataSqlStatsTableMySQL[i]["STATISTIC"]].push(myObj);
+};
+
+var sqlStatsTablesMySQL = ["SUM_TIMER_WAIT", "COUNT_STAR", "SUM_LOCK_TIME", "SUM_ROWS_EXAMINED", "SUM_ROWS_SENT", "SUM_ROWS_AFFECTED", "SUM_CREATED_TMP_TABLES", "SUM_CREATED_TMP_DISK_TABLES", "SUM_SELECT_FULL_JOIN", "SUM_SELECT_FULL_RANGE_JOIN", "SUM_SELECT_RANGE", "SUM_SELECT_RANGE_CHECK", "SUM_SELECT_SCAN", "SUM_SORT_MERGE_PASSES", "SUM_SORT_RANGE", "SUM_SORT_ROWS", "SUM_SORT_SCAN", "SUM_NO_INDEX_USED", "SUM_NO_GOOD_INDEX_USED", "SUM_ERRORS", "SUM_WARNINGS"];
+
+// csvFileSummaryByEventMySQL
+
+
+
+var dataFileSummaryByEventMySQL = d3.csvParse(csvFileSummaryByEventMySQL);
+
+for (i = 0, t = 0; i < dataFileSummaryByEventMySQL.length; i++) {
+var myObj = {};
+sqlStatsColsMySQL["FILE_SUMMARY_EVENT"].forEach(function (d) {
+    myObj[d] = dataFileSummaryByEventMySQL[i][d];
+})
+sqlStatsMySQL["FILE_SUMMARY_EVENT"].push(myObj);
+};
+
+// DB Summary
+var dataDbSummary = d3.csvParse(csvDbSummary);
+
+for (i = 0, t = 0; i < dataDbSummary.length; i++) {
+var myObj = {};
+sqlStatsColsMySQL["DB_SUMMARY"].forEach(function (d) {
+    myObj[d] = dataDbSummary[i][d];
+})
+sqlStatsMySQL["DB_SUMMARY"].push(myObj);
+};
+
+// Global Status
+var dataGlobalStatus = d3.csvParse(csvGlobalStatus);
+
+for (i = 0, t = 0; i < dataGlobalStatus.length; i++) {
+var myObj = {};
+sqlStatsColsMySQL["GLOBAL_STATUS"].forEach(function (d) {
+    myObj[d] = dataGlobalStatus[i][d];
+})
+sqlStatsMySQL["GLOBAL_STATUS"].push(myObj);
+};
+
+// SQL Text Table
+
+var psv = d3.dsvFormat("!@#!");
+var dataSqlText = psv.parse(csvSQLText);
+
+for (i = 0, t = 0; i < dataSqlText.length; i++) {
+var myObj = {};
+sqlStatsColsMySQL["SQL_TEXT"].forEach(function(d){
+    myObj[d] = dataSqlText[i][d];
+})
+sqlStatsMySQL["SQL_TEXT"].push(myObj);
+};
+
+
+
+
+drawAllObjects(getWrapperWidth());
+
+</script>
