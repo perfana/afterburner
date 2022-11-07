@@ -1,7 +1,0 @@
-RULE trace auto closeable close() calls
-INTERFACE java.lang.AutoCloseable
-METHOD void close()
-AT ENTRY
-IF true
-DO traceln("*** close() called")
-ENDRULE

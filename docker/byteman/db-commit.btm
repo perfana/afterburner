@@ -1,7 +1,0 @@
-RULE trace jdbc commit calls
-INTERFACE java.sql.Connection
-METHOD void commit()
-AT ENTRY
-IF true
-DO traceStack("*** commit ", 25)
-ENDRULE

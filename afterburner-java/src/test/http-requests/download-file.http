@@ -1,4 +1,0 @@
-GET http://localhost:8080/files/download/test.txt
-Accept: application/json
-
-###

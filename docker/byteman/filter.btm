@@ -1,6 +1,0 @@
-RULE filter doFilter
-INTERFACE ^javax.servlet.Filter
-METHOD doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
-IF true
-DO traceln("*** " + java.time.LocalDateTime.now() + " doFilter " + $0)
-ENDRULE
