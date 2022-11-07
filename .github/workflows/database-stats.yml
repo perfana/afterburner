@@ -35,5 +35,22 @@ jobs:
       - name: Upload report
         uses: actions/upload-artifact@v3
         with:
-          name: database performance report
+          name: ${{ inputs.system-under-test }}-${{ github.job }}-${{ github.run_number }}.html
           path: /runner/_work/afterburner/afterburner/mysql/reports/*.html
+
+  publish:
+    needs: get-database-stats
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: pages
+    - name: Download report
+      uses: actions/download-artifact@v3
+      with:
+        path: /runner/_work/afterburner/afterburner/mysql/reports/${{ inputs.system-under-test }}-${{ github.job }}-${{ github.run_number }}.html
+
+    - name: Commit
+      uses: stefanzweifel/git-auto-commit-action@v4        
