@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
-wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer' 
+
+curl https://dtdg.co/latest-java-tracer --location --output dd-java-agent.jar
 
 mv dd-java-agent.jar ../afterburner-java/src/main/jib/
 
