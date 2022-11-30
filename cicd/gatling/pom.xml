@@ -245,6 +245,7 @@
                                 <variables>
                                     <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
                                     <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
+                                    <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
                                 <testConfig>
                                     <systemUnderTest>${systemUnderTest}</systemUnderTest>
