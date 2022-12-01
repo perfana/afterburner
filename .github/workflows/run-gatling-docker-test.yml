@@ -1,5 +1,5 @@
 ---
-name: Run performance tests with Gatling
+name: Run performance tests with Gatling docker container
 
 on:
   workflow_call:
@@ -20,7 +20,7 @@ on:
 
 jobs:
 
-  performance-test-gatling:
+  performance-test-gatling-docker:
     runs-on: self-hosted
     steps:
       - name: Install kubectl
@@ -33,7 +33,6 @@ jobs:
           fetch-depth: 0
       - name: Get commit message
         if: inputs.annotations == ''
-        working-directory: main
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
@@ -46,29 +45,16 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17.0.4+101'
-          distribution: 'temurin'
-          cache: maven
-      - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.2.1
-        with:
-          java-version: 17.0.4+101
-          maven-version: 3.6.3
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
-      - name: Start Gatling test
+      - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
-          wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
-          chmod +x g2i
-          mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results -f pom-k8s-job.xml \
           -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \

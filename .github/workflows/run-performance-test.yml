@@ -14,6 +14,7 @@ on:
         options:
           - OptimusPrime
           - JetFire
+          - BumbleBee
       workload:
         description: 'Workload'
         required: true
@@ -30,6 +31,16 @@ on:
         options:
           - optimus-prime
           - jet-fire
+          - bumble-bee
+      tool:
+        description: 'Load test tool'
+        required: true
+        default: 'gatling'
+        type: choice
+        options:
+          - gatling
+          - k6
+          - gatling-docker
       annotations:
         description: 'Test run annotation'
         type: string
@@ -41,6 +52,27 @@ jobs:
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
+    if: inputs.tool == 'gatling'
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      annotations: ${{ inputs.annotations }}
+
+  performance-test-gatling-docker:
+    uses: perfana/afterburner/.github/workflows/run-gatling-docker-test.yml@main
+    if: inputs.tool == 'gatling-docker'
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      annotations: ${{ inputs.annotations }}
+
+  performance-test-k6:
+    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+    if: inputs.tool == 'k6'
     secrets: inherit
     with:
       systemUnderTest: ${{ inputs.systemUnderTest }}

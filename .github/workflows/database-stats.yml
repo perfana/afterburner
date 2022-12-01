@@ -1,0 +1,56 @@
+---
+name: Get database stats
+
+on:
+  workflow_dispatch:
+    inputs:
+
+jobs:
+
+  get-database-stats:
+    runs-on: self-hosted
+    steps:
+      - name: Download and install MySql APT repository
+        run: |
+          wget https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb;
+          sudo dpkg -i mysql-apt-config_0.8.22-1_all.deb;
+          sudo apt-get update
+      - name: Install mysql cli and msql-shell
+        run: sudo apt-get install mysql-apt-config && sudo apt-get install -y mysql-shell mysql-client 
+      - name: Checkout xdbtime repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'xdbtime/xdbtime'
+      - name: Prepare database scripts
+        run: |
+          mkdir -p ~/.mysqlsh/init.d;
+          pwd;
+          ls -all;
+          cd /runner/_work/afterburner/afterburner/mysql/init.d;
+          cp xdbperformance-status.py ~/.mysqlsh/init.d;
+      - name: Create perfomance report
+        run: |
+          cd /runner/_work/afterburner/afterburner/mysql
+          echo "report = shell.reports.performance(shell.getSession())" | mysqlsh root:${{ secrets.AFTERBURNER_DB_PASSWORD }}@afterburner-db-mysql-headless.acme.svc.cluster.local:3306 --js
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ inputs.system-under-test }}-${{ github.job }}-${{ github.run_number }}.html
+          path: /runner/_work/afterburner/afterburner/mysql/reports/*.html
+
+  publish:
+    needs: get-database-stats
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: pages
+    - name: Download report
+      uses: actions/download-artifact@v3
+      with:
+        path: ${{ inputs.system-under-test || 'test-sut' }}-${{ github.job }}-${{ github.run_number }}.html
+
+    - name: Commit
+      uses: stefanzweifel/git-auto-commit-action@v4        

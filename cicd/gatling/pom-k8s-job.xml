@@ -31,18 +31,23 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <events-scheduler-maven-plugin.version>2.2.0-SNAPSHOT</events-scheduler-maven-plugin.version>
-        <test-events-command-runner.version>1.1.0-SNAPSHOT</test-events-command-runner.version>
-        <perfana-java-client.version>2.0.5-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>1.1.1</test-events-wiremock.version>
-        <test-events-springboot.version>1.0.1-SNAPSHOT</test-events-springboot.version>
-        <test-events-test-run-config-command.version>1.0.0-SNAPSHOT</test-events-test-run-config-command.version>
+        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>2.0.6-SNAPSHOT</perfana-java-client.version>
+        <test-events-wiremock.version>2.0.0</test-events-wiremock.version>
+        <test-events-springboot.version>1.1.0</test-events-springboot.version>
+        <test-events-command-runner.version>1.1.0</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>1.0.1</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <influxDbUrl>http://influxdb:8086/myk6db</influxDbUrl>
 
+        <!-- Default Simulation class  -->
+        <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.OptimusPrime</systemUnderTestSimulation>
+
+        <!-- Default scenario -->
+        <scenario>acceptance</scenario>
 
         <!-- By default Jenkins build Url is used -->
         <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
@@ -53,14 +58,24 @@
         <!-- By default don't assert test results -->
         <assertResultsEnabled>false</assertResultsEnabled>
 
+        <!-- By default no proxy is used -->
+        <useProxy>false</useProxy>
+
+        <!-- By default debugmode is off -->
+        <debug>false</debug>
+
         <!-- By default disable events -->
         <eventsEnabled>false</eventsEnabled>
         <eventScheduleScript></eventScheduleScript>
 
         <!-- Settings for the Perfana Dashboard -->
-        <systemUnderTest>BumbleBee</systemUnderTest>
+        <systemUnderTest>OptimusPrime</systemUnderTest>
         <version>1.0</version>
         <tags></tags>
+        <influxDbHost>influxdb</influxDbHost>
+        <influxUrl>http://influxdb:8086</influxUrl>
+        <influxUser></influxUser>
+        <influxPassword></influxPassword>
 
 
     </properties>
@@ -78,7 +93,7 @@
                 <plugin>
                     <groupId>io.perfana</groupId>
                     <artifactId>event-scheduler-maven-plugin</artifactId>
-                    <version>${events-scheduler-maven-plugin.version}</version>
+                    <version>${event-scheduler-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -122,6 +137,7 @@
                             <constantLoadTimeInSeconds>${duration}</constantLoadTimeInSeconds>
                             <annotations>${annotations}</annotations>
                             <tags>${tags}</tags>
+                            
                         </testConfig>
                         <eventConfigs>
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
@@ -129,48 +145,68 @@
                                 <enabled>${perfanaEnabled}</enabled>
                                 <perfanaUrl>${perfanaUrl}</perfanaUrl>
                                 <apiKey>${apiKey}</apiKey>
+                                <retryCount>60</retryCount>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*bumble-bee.*</perfana-containers>
+                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
+                                    <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Run k6 job</name>
-                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onBeforeTest>kubectl delete secret k6-args --ignore-not-found; \
-                                    kubectl create secret generic k6-args -n acme \
-                                    --from-literal=K6_INFLUXDB_URL=${influxUrl} \
-                                    --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
-                                    --from-literal=K6_INFLUXDB_USERNAME=${influxUser} \
-                                    --from-literal=CONSTANT_LOAD_TIME=${duration}s \
-                                    --from-literal=RAMPUP_TIME=${rampUpTime}s \
-                                    --from-literal=START_RATE=${startRate} \
-                                    --from-literal=TARGET_RATE=${targetRate} \
+                                <name>Start Gatling performance test jobs</name>
+                                <continueOnKeepAliveParticipant>false</continueOnKeepAliveParticipant>
+                                <onBeforeTest>
+                                    kubectl delete secret gatling-args --ignore-not-found; \
+                                    kubectl create secret generic gatling-args -n acme \
+                                    --from-literal=SIMULATION=${systemUnderTestSimulation} \
+                                    --from-literal=SCENARIO=${scenario} \
+                                    --from-literal=INFLUX_DB_URL=${influxUrl} \
+                                    --from-literal=INFLUX_DB_USER=${influxUser} \
+                                    --from-literal=INFLUX_DB_PASSWORD=${influxPassword} \
+                                    --from-literal=CONSTANT_LOAD_TIME_IN_SECONDS=${constantLoadTimeInSeconds} \
+                                    --from-literal=RAMPUP_TIME_IN_SECONDS=${rampupTimeInSeconds} \
+                                    --from-literal=INITIAL_USERS_PER_SECOND=${initialUsersPerSecond} \
+                                    --from-literal=TARGET_USERS_PER_SECOND=${targetUsersPerSecond} \
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId}; \
-                                    kubectl delete jobs k6 -n acme --ignore-not-found; \
-                                    kubectl create -f k6-job.yml -n acme
+                                    --from-literal=TEST_RUN_ID=${testRunId} \
+                                    --from-literal=ELASTIC_PASSWORD=${elasticPassword} \
+                                    --from-literal=EMPLOYEE_DB_PASSWORD=foo \
+                                    --from-literal=DEBUG=${debug} \
+                                    --from-literal=USE_PROXY=${useProxy}; \
+                                    kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
+                                    kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found; \
+                                    kubectl create -f gatling-job.yml -n acme
                                 </onBeforeTest>
-                                <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
-                                <onAbort>kubectl delete secret k6-args --ignore-not-found; \
-                                    kubectl delete jobs k6 -n acme --ignore-not-found
-                                </onAbort>
-                                <onAfterTest>kubectl delete secret k6-args --ignore-not-found; \
-                                    kubectl delete jobs k6 -n acme --ignore-not-found
+                                <onAfterTest>
+                                    kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found; \
+                                    kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found
                                 </onAfterTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Handle gatling-lg-1</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <onKeepAlive>kubectl get jobs gatling-lg-1 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found</onAbort>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Handle gatling-lg-2</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <onKeepAlive>kubectl get jobs gatling-lg-2 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found</onAbort>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme.svc.cluster.local:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
@@ -292,15 +328,14 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <workload>k6-stressTest</workload>
-                <duration>1</duration>
-                <startRate>1</startRate>
-                <targetRate>250</targetRate>
-                <rampUpTime>900</rampUpTime>
+                <workload>stressTest</workload>
+                <initialUsersPerSecond>1</initialUsersPerSecond>
+                <targetUsersPerSecond>30</targetUsersPerSecond>
+                <rampupTimeInSeconds>1800</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>1</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-                <eventsEnabled>true</eventsEnabled>
-                <tags>k6,springboot-monitoring</tags>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
+                <tags>gatling,stress-test,springboot-monitoring</tags>
             </properties>
         </profile>
 
@@ -310,15 +345,18 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <workload>k6-loadTest</workload>
-                <duration>600</duration>
-                <startRate>1</startRate>
-                <targetRate>10</targetRate>
-                <rampUpTime>120</rampUpTime>
+                <workload>loadTest</workload>
+                <initialUsersPerSecond>1</initialUsersPerSecond>
+                <targetUsersPerSecond>2</targetUsersPerSecond>
+                <rampupTimeInSeconds>120</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,springboot-monitoring</tags>
+                <eventScheduleScript>
+                    PT0S|wiremock-change-delay(delay=400)|delay=400
+                </eventScheduleScript>
+                <tags>gatling-distributed,gatling,springboot-monitoring</tags>
             </properties>
         </profile>
 
