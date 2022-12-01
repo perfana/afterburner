@@ -61,9 +61,6 @@ public class AfterburnerConfig {
                 .build();
 
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultMaxPerRoute(connectionsMax);
-        connectionManager.setMaxTotal(connectionsMax);
-
 
         MicrometerHttpClientInterceptor interceptor = new MicrometerHttpClientInterceptor(Metrics.globalRegistry,
                 this::extractUriWithoutParamsAsString,
