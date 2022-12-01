@@ -46,7 +46,7 @@ public class CpuBurner {
         log.info("Calculate magic matrix identity for matrix size [{}].", matrixSize);
 
         // make some more variation: is more fun
-        int funSize = matrixSize * (1 + random.nextInt(4));
+        int funSize = matrixSize * (1 + random.nextInt(2));
 
         long[][] simpleMagicSquare;
         long[][] identitySquare;
