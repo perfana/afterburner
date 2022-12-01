@@ -47,7 +47,7 @@ jobs:
     secrets: inherit
 
   performance-test-gatling:
-    uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
+    uses: perfana/afterburner/.github/workflows/run-gatling-docker-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
     with:
