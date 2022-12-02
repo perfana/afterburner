@@ -43,8 +43,6 @@ public class CpuBurner {
 
         long startTime = System.currentTimeMillis();
 
-        log.info("Calculate magic matrix identity for matrix size [{}].", matrixSize);
-
         // make some more variation: is more fun
         int funSize = (int) (matrixSize * (1.0 + random.nextDouble()));
 
