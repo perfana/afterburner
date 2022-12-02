@@ -1,6 +1,5 @@
 package io.perfana.afterburner.controller;
 
-import io.perfana.afterburner.AfterburnerException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.perfana.afterburner.AfterburnerProperties;
 import io.perfana.afterburner.domain.BurnerMessage;
@@ -16,8 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.Random;
 
 @RestController
 public class CpuBurner {
@@ -27,7 +25,7 @@ public class CpuBurner {
 
     private final AfterburnerProperties props;
 
-    private final SecureRandom random = getSecureRandom();
+    private final Random random = createRandom();
 
     Tracer tracer;
 
@@ -86,12 +84,8 @@ public class CpuBurner {
     }
 
     @NotNull
-    private static SecureRandom getSecureRandom() {
-        try {
-            return SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new AfterburnerException(e.getMessage());
-        }
+    private static Random createRandom() {
+        return new Random();
     }
 
 }
