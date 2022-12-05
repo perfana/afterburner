@@ -31,8 +31,8 @@ public class MemoryChurn {
 
     @Operation(summary = "Simulate high object churn: lots of objects created per request.")
     @GetMapping("/memory/churn")
-    public BurnerMessage delay(@RequestParam(value = "objects", defaultValue = "181") int objects,
-                               @RequestParam(value = "duration", defaultValue = "100") String duration) {
+    public BurnerMessage memoryChurn(@RequestParam(value = "objects", defaultValue = "181") int objects,
+                                     @RequestParam(value = "duration", defaultValue = "100") String duration) {
         long startTime = System.currentTimeMillis();
 
         List<BigDecimal> numbers = IntStream.range(0, objects)

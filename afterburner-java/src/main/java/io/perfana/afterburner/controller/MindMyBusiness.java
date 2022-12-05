@@ -39,7 +39,7 @@ public class MindMyBusiness {
     @Secured("ROLE_USER")
     @Operation(summary = "Mind my business for 'duration' milliseconds.")
     @GetMapping(value = "/mind-my-business-s", produces = "application/json" )
-    public BurnerMessage mindMyBusinesss(@RequestParam(value = "duration", defaultValue = "5") String duration) {
+    public BurnerMessage mindMyBusinessSecure(@RequestParam(value = "duration", defaultValue = "5") String duration) {
         return mindMyBusiness(duration);
     }
 }
