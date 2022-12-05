@@ -11,7 +11,7 @@ Create a demo folder:
 
 Clone afterburner:
 
-    git clone git@github.com:perfana/afterburner.git
+    git clone https://github.com/perfana/afterburner.git
 
 Build afterburner:
 
