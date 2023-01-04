@@ -70,7 +70,7 @@
 
         <!-- By default enable events -->
         <eventsEnabled>true</eventsEnabled>
-        <eventScheduleScript></eventScheduleScript>
+        <eventScheduleScript/>
 
         <!-- Default load settings -->
         <initialUsersPerSecond>1</initialUsersPerSecond>
@@ -81,13 +81,13 @@
         <!-- Settings for the Perfana Dashboard -->
         <systemUnderTest>Afterburner</systemUnderTest>
         <version>1.0</version>
-        <tags></tags>
-        <apiKey></apiKey>
+        <tags/>
+        <apiKey/>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <influxDbHost>influxdb</influxDbHost>
         <influxUrl>http://influxdb:8086</influxUrl>
-        <influxUser></influxUser>
-        <influxPassword></influxPassword>
+        <influxUser/>
+        <influxPassword/>
 
 
     </properties>
@@ -126,7 +126,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
-            <version>1.12.131</version>
+            <version>1.12.377</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
