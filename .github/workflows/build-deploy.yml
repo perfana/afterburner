@@ -29,11 +29,16 @@ jobs:
         run: |
           git fetch --all --tags
           git checkout tags/${{ env.TAG_NAME }} -b ${{ env.TAG_NAME }}-tmp-branch
+      - name: Set outputs for short git sha
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Check outputs for short git sha
+        run: echo ${{ steps.vars.outputs.sha_short }}
       - name: Write tag to file
         uses: "finnp/create-file-action@master"
         env:
           FILE_NAME: "version.txt"
-          FILE_DATA: "${{ env.TAG_NAME }}-${{ github.sha }}"
+          FILE_DATA: "${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }}"
       - name: Upload versions.txt to use in performance-test job
         uses: actions/upload-artifact@v1
         with:
