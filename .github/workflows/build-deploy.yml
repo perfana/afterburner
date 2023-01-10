@@ -58,7 +58,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ../mvnw -DdockerTargetImageExtension=${{ github.sha }} -Pmulti-arch-docker,pyroscope clean package jib:build
+        run: ../mvnw -DdockerTargetImageExtension=${{ steps.vars.outputs.sha_short }} -Pmulti-arch-docker,pyroscope clean package jib:build
 
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
@@ -71,7 +71,7 @@ jobs:
         working-directory: perfana-gitops
         run: |
           repository="repository: perfana/afterburner"
-          tag="tag: ${{ env.TAG_NAME }}-${{ github.sha }} # date: $(date +'%Y-%m-%dT%H:%M:%S')"
+          tag="tag: ${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }} # date: $(date +'%Y-%m-%dT%H:%M:%S')"
           echo "$repository"
           echo "$tag"
           ls -all
