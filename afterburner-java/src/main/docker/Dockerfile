@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:20-ea-29-jdk-slim
 VOLUME /tmp
 ARG JAR_FILE
 COPY $JAR_FILE afterburner-springboot.jar
