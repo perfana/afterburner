@@ -67,9 +67,9 @@ public class BasketController {
         return new ResponseEntity<>(basketReply, HttpStatus.OK);
     }
 
-    @Operation(description = "Store a purchase in the database.")
+    @Operation(description = "Find all baskets.")
     @GetMapping(value = "/basket/all", produces = "application/json")
-    public ResponseEntity<BasketListReply> all() {
+    public ResponseEntity<BasketListReply> allBaskets() {
         long startTime = System.currentTimeMillis();
         List<Basket> allBaskets = basketService.findAllBaskets();
         BasketListReply reply = new BasketListReply(allBaskets);

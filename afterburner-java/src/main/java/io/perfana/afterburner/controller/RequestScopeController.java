@@ -26,7 +26,7 @@ public class RequestScopeController {
 
     @Operation(summary = "Check request scope behaviour")
     @GetMapping(value = "/request-scope", produces = "application/json" )
-    public BurnerMessage delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
+    public BurnerMessage requestScope(@RequestParam(value = "duration", defaultValue = "100") String duration) {
         long startTime = System.currentTimeMillis();
         log.info("Before:" + myRequestScopedThing);
         Sleeper.sleep(duration);

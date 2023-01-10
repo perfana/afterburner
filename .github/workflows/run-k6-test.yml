@@ -1,5 +1,5 @@
 ---
-name: Run performance tests with Gatling
+name: Run performance tests with K6
 
 on:
   workflow_call:

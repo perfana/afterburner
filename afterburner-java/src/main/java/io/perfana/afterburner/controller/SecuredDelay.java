@@ -25,7 +25,7 @@ public class SecuredDelay {
     @Secured("ROLE_USER")
     @Operation(summary = "The secured delay call does a simple java sleep in request thread for 'duration' milliseconds.")
     @GetMapping(value = "/secured-delay", produces = "application/json" )
-    public BurnerMessage delay(@RequestParam(value = "duration", defaultValue = "100") String duration) {
+    public BurnerMessage delaySecure(@RequestParam(value = "duration", defaultValue = "100") String duration) {
         long startTime = System.currentTimeMillis();
         Sleeper.sleep(duration);
         long durationMillis = System.currentTimeMillis() - startTime;
