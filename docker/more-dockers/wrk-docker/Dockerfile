@@ -1,4 +1,4 @@
-FROM alpine:3.15.4
+FROM alpine:3.15
 MAINTAINER stokpop
 
 RUN apk add --update --no-cache alpine-sdk openssl-dev zlib-dev git jq zsh perl linux-headers \
