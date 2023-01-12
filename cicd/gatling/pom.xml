@@ -29,13 +29,13 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <gatling.version>3.7.3</gatling.version>
-        <events-gatling-maven-plugin.version>4.1.0-events-3</events-gatling-maven-plugin.version>
-        <scala-maven-plugin.version>4.5.6</scala-maven-plugin.version>
+        <gatling.version>3.9.0</gatling.version>
+        <events-gatling-maven-plugin.version>4.1.0-events-4</events-gatling-maven-plugin.version>
+        <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
         <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
-        <test-events-wiremock.version>[2.0.0,2.1.0)</test-events-wiremock.version>
+        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
         <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
-        <test-events-command-runner.version>1.0.2</test-events-command-runner.version>
+        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
         <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
@@ -111,12 +111,12 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.3</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.29</version>
+            <version>8.0.31</version>
         </dependency>
         <dependency>
             <groupId>io.perfana</groupId>
@@ -126,12 +126,12 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-core</artifactId>
-            <version>1.12.380</version>
+            <version>1.12.381</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.12.1</version>
+            <version>2.14.1</version>
         </dependency>
     </dependencies>
 
@@ -294,7 +294,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingPush</name>
-                                <command>sh -c "./g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</command>
+                                <onStartTest>sh -c "./g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>

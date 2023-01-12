@@ -31,12 +31,12 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <events-scheduler-maven-plugin.version>2.2.0-SNAPSHOT</events-scheduler-maven-plugin.version>
-        <test-events-command-runner.version>1.1.0-SNAPSHOT</test-events-command-runner.version>
-        <perfana-java-client.version>2.0.5-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>1.1.1</test-events-wiremock.version>
-        <test-events-springboot.version>1.0.1-SNAPSHOT</test-events-springboot.version>
-        <test-events-test-run-config-command.version>1.0.0-SNAPSHOT</test-events-test-run-config-command.version>
+        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
+        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>

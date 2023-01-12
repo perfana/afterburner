@@ -1,9 +1,9 @@
-FROM alpine:3.15.4 as build
-MAINTAINER stokpop
+FROM alpine:3.15 as build
+MAINTAINER peterpaul@perfana.io
 RUN apk add --update --no-cache alpine-sdk openssl-dev zlib-dev git \
     && git clone https://github.com/kinvolk/wrk2 && cd wrk2 && make
 
-FROM alpine:3.15.4
+FROM alpine:3.15
 COPY --from=build /wrk2/wrk /wrk
 RUN apk add --update --no-cache git curl jq zsh gcc \
     && sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
