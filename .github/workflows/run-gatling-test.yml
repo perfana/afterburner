@@ -66,9 +66,8 @@ jobs:
         run: |
           cd cicd/gatling
           # make sure the commit message does not contain newlines or quotes (breaks maven command)
-          commit_message="${{ env.COMMIT_MESSAGE }}"
-          commit_message="$(printf '%s' "$commit_message" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
-          commit_message="$(printf '%s' "$commit_message" | awk '{gsub(/\"/, "\\\""); print $0}')"
+          clean_commit_message="$(printf '%s' "$COMMIT_MESSAGE" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+          clean_commit_message="$(printf '%s' "$commit_message" | awk '{gsub(/\"/, "\\\""); print $0}')"
           # fetch gatling 2 influx tool
           wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
           chmod +x g2i
@@ -80,7 +79,7 @@ jobs:
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
-          -Dannotations="$commit_message" \
+          -Dannotations="$clean_commit_message" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxUrl=https://influx.demo.perfana.cloud \
