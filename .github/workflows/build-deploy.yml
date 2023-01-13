@@ -16,7 +16,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Set tag name
@@ -40,7 +40,7 @@ jobs:
           FILE_NAME: "version.txt"
           FILE_DATA: "${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }}"
       - name: Upload versions.txt to use in performance-test job
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: version
           path: version.txt
@@ -62,7 +62,7 @@ jobs:
 
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: perfana/perfana-gitops
           token: ${{ secrets.PAT_GITHUB }}
