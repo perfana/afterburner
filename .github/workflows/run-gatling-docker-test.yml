@@ -55,9 +55,9 @@ jobs:
         run: |
           cd cicd/gatling
           # make sure the commit message does not contain newlines or quotes (breaks maven command)
-          local commit_message="${{ env.COMMIT_MESSAGE }}"
-          local commit_message="$(printf '%s' "$commit_message" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
-          local commit_message="$(printf '%s' "$commit_message" | awk '{gsub(/\"/, "\\\""); print $0}')"
+          commit_message="${{ env.COMMIT_MESSAGE }}"
+          commit_message="$(printf '%s' "$commit_message" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
+          commit_message="$(printf '%s' "$commit_message" | awk '{gsub(/\"/, "\\\""); print $0}')"
           # execute maven
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results -f pom-k8s-job.xml \
           -Dsut-config=${{ inputs.service }} \
