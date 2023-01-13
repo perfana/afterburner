@@ -66,9 +66,6 @@ jobs:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
-          # make sure the commit message does not contain newlines or quotes (breaks maven command)
-          clean_commit_message="$(printf '%s' "$COMMIT_MESSAGE" | awk 'NR > 1 { printf("\\n") } { printf("%s", $0) }')"
-          # clean_commit_message="$(printf '%s' "$clean_commit_message" | awk '{gsub(/\"/, "\\\""); print $0}')"
           # fetch gatling 2 influx tool
           wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
           chmod +x g2i
