@@ -13,7 +13,7 @@ jobs:
         uses: azure/setup-kubectl@v3
         id: install
       - name: Checkout code from code branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: main
           fetch-depth: 0
