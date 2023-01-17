@@ -28,10 +28,14 @@ jobs:
             sed -i 's/no variation: is no fun/some variation: is more fun/g' $java_file
             sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $java_file
           fi
-          echo "commit_message=$commit_message" >> $GITHUB_OUTPUT
+          echo "commit_message=$commit_message" >> $GITHUB_ENV
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Proxy Developer"
           git commit -m "Proxy Dev: $commit_message" -a
-          git push
+      # needed to trigger demo build: use explicit other PAT
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_GITHUB }}
