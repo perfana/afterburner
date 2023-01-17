@@ -84,6 +84,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
+          git pull
           git commit -m "Bumped afterburner OptimusPrimes to ${{ env.TAG_NAME }} in demo environment" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
