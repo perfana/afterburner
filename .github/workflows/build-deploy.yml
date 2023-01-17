@@ -71,6 +71,7 @@ jobs:
           path: perfana-gitops
           # needed to later push with PAT
           persist-credentials: false
+          fetch-depth: 0
       - name: Replace image snapshot
         working-directory: perfana-gitops
         run: |
