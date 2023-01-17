@@ -61,7 +61,7 @@ jobs:
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
-          -Dannotations="$clean_commit_message" \
+          -Dannotations="$COMMIT_MESSAGE" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxUrl=https://influx.demo.perfana.cloud \
