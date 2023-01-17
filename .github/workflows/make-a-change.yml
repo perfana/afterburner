@@ -18,6 +18,8 @@ jobs:
           ref: demo
       - name: Make a change
         run: |
+          pwd
+          ls -alh
           cd afterburner
           java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
           if grep -q "some variation: is more fun" "$File"; then
