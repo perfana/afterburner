@@ -30,7 +30,6 @@ jobs:
           fi
           echo "commit_message=$commit_message" >> $GITHUB_OUTPUT
       - name: Commit files
-        working-directory: afterburner
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Proxy Developer"
