@@ -83,8 +83,11 @@ jobs:
         working-directory: perfana-gitops
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "GitHub Action Afterburner"
           git commit -m "Bumped afterburner OptimusPrimes to ${{ env.TAG_NAME }} in demo environment" -a
-          git push
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_GITHUB }}
           
       
