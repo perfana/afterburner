@@ -16,6 +16,8 @@ jobs:
         with:
           fetch-depth: 0
           ref: demo
+          # needed to trigger CICD build with later push with PAT
+          persist-credentials: false
       - name: Make a change
         run: |
           java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
