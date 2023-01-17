@@ -39,7 +39,7 @@ jobs:
         uses: "finnp/create-file-action@master"
         env:
           FILE_NAME: "version.txt"
-          FILE_DATA: "$full_version"
+          FILE_DATA: "${{ env.full_version }}"
       - name: Upload versions.txt to use in performance-test job
         uses: actions/upload-artifact@v3
         with:
@@ -88,12 +88,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
           git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
-          git status
           git push
-#      - name: Push changes
-#        uses: ad-m/github-push-action@master
-#        with:
-#          github_token: ${{ secrets.PAT_GITHUB }}
-#          directory: perfana-gitops
-#          branch: main
-#          force: true
+
