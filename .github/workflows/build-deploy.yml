@@ -84,8 +84,8 @@ jobs:
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-be/values.yaml
       - name: Commit files
-        working-directory: perfana-gitops
         run: |
+          cd perfana-gitops
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
           git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
