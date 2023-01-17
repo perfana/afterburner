@@ -4,7 +4,7 @@
 name: Proxy dev
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
           fi
           echo "commit_message=$commit_message" >> $GITHUB_OUTPUT
       - name: Commit files
-        working-directory: .
+        #working-directory: .
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Proxy Developer"
