@@ -69,8 +69,6 @@ jobs:
           token: ${{ secrets.PAT_GITHUB }}
           ref: main
           path: perfana-gitops
-          # needed to later push with PAT
-          persist-credentials: false
           fetch-depth: 0
       - name: Replace image snapshot
         working-directory: perfana-gitops
@@ -91,11 +89,11 @@ jobs:
           git config --local user.name "GitHub Action Afterburner"
           git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
           git status
-          git pull
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PAT_GITHUB }}
-          directory: perfana-gitops
-          branch: main
-          force: true
+          git push
+#      - name: Push changes
+#        uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.PAT_GITHUB }}
+#          directory: perfana-gitops
+#          branch: main
+#          force: true
