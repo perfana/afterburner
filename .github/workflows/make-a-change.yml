@@ -5,6 +5,9 @@ name: Proxy dev
 
 on:
   workflow_dispatch:
+  schedule:
+    # At minute 13 past hour 8, 12, 15, and 20 on every day-of-week from Monday through Friday.
+    - cron: '13 8,12,15,20 * * 1-5'
 
 jobs:
   build:
