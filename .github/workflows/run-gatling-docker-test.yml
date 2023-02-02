@@ -56,7 +56,7 @@ jobs:
           cd cicd/gatling
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results -f pom-k8s-job.xml \
           -Dsut-config=${{ inputs.service }} \
-          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \

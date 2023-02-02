@@ -53,7 +53,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.2.1
+        uses: s4u/setup-maven-action@v1.6.0
         with:
           java-version: 17.0.4+101
           maven-version: 3.6.3
@@ -72,7 +72,7 @@ jobs:
           # execute maven
           mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -Dsut-config=${{ inputs.service }} \
-          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
