@@ -28,17 +28,18 @@ jobs:
         if: contains(env.TAG_NAME, 'SNAPSHOT') != true
         run: |
           git fetch --all --tags
-          git checkout tags/${{ env.TAG_NAME }} -b ${{ env.TAG_NAME }}-tmp-branch
+          git checkout tags/$TAG_NAME -b $TAG_NAME-tmp-branch
       - name: Set outputs for short git sha
         id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - name: Check outputs for short git sha
-        run: echo ${{ steps.vars.outputs.sha_short }}
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_ENV
+          echo "full_version=$TAG_NAME-$sha_short" >> $GITHUB_ENV
       - name: Write tag to file
         uses: "finnp/create-file-action@master"
         env:
           FILE_NAME: "version.txt"
-          FILE_DATA: "${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }}"
+          FILE_DATA: "${{ env.full_version }}"
       - name: Upload versions.txt to use in performance-test job
         uses: actions/upload-artifact@v3
         with:
@@ -58,7 +59,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ../mvnw -DdockerTargetImageExtension=${{ steps.vars.outputs.sha_short }} -Pmulti-arch-docker,pyroscope clean package jib:build
+        run: ../mvnw -DdockerTargetImageExtension=$sha_short -Pmulti-arch-docker,pyroscope clean package jib:build
 
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
@@ -66,12 +67,14 @@ jobs:
         with:
           repository: perfana/perfana-gitops
           token: ${{ secrets.PAT_GITHUB }}
+          ref: main
           path: perfana-gitops
+          fetch-depth: 0
       - name: Replace image snapshot
         working-directory: perfana-gitops
         run: |
           repository="repository: perfana/afterburner"
-          tag="tag: ${{ env.TAG_NAME }}-${{ steps.vars.outputs.sha_short }} # date: $(date +'%Y-%m-%dT%H:%M:%S')"
+          tag="tag: $full_version # date: $(date +'%Y-%m-%dT%H:%M:%S')"
           echo "$repository"
           echo "$tag"
           ls -all
@@ -80,11 +83,10 @@ jobs:
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-be/values.yaml
       - name: Commit files
-        working-directory: perfana-gitops
         run: |
+          cd perfana-gitops
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -m "Bumped afterburner OptimusPrimes to ${{ env.TAG_NAME }} in demo environment" -a
+          git config --local user.name "GitHub Action Afterburner"
+          git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
           git push
-          
-      
+

@@ -1,0 +1,47 @@
+---
+
+# make change in demo branch that effects cpu performance
+name: Proxy dev
+
+on:
+  workflow_dispatch:
+  schedule:
+    # At minute 13 past hour 8, 12, 15, and 20 on every day-of-week from Monday through Friday.
+    - cron: '13 8,12,15,20 * * 1-5'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: demo
+          # needed to trigger CICD build with later push with PAT
+          persist-credentials: false
+      - name: Make a change
+        run: |
+          java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
+          if grep -q "some variation: is more fun" "$java_file"; then
+            commit_message="make cpu more efficient"
+            sed -i 's/some variation: is more fun/no variation: is no fun/g' $java_file
+            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.2)))/int funSize = matrixSize/g' $java_file
+          else
+            commit_message="make matrix calculation more variable"
+            sed -i 's/no variation: is no fun/some variation: is more fun/g' $java_file
+            sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.2)))/g' $java_file
+          fi
+          echo "commit_message=$commit_message" >> $GITHUB_ENV
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Proxy Developer"
+          git commit -m "Proxy Dev: $commit_message" -a
+      # needed to trigger demo build: use explicit other PAT
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_GITHUB }}
+          branch: demo
