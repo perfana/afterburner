@@ -27,11 +27,11 @@ jobs:
           if grep -q "some variation: is more fun" "$java_file"; then
             commit_message="make cpu more efficient"
             sed -i 's/some variation: is more fun/no variation: is no fun/g' $java_file
-            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.2)))/int funSize = matrixSize/g' $java_file
+            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $java_file
           else
             commit_message="make matrix calculation more variable"
             sed -i 's/no variation: is no fun/some variation: is more fun/g' $java_file
-            sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.2)))/g' $java_file
+            sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $java_file
           fi
           echo "commit_message=$commit_message" >> $GITHUB_ENV
       - name: Commit files
