@@ -321,7 +321,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentMySql</name>
-                                <command>kubectl get statefulset afterburner-db-mysql -ojson</command>
+                                <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,secret,preferredDuringSchedulingIgnoredDuringExecution</excludes>
                                 <output>keys</output>
