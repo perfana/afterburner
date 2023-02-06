@@ -86,8 +86,11 @@ jobs:
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
           -DperfanaUrl=https://demo.perfana.cloud
 
+  summary:
+    runs-on: self-hosted
+    steps:
       - name: Generate integration summary
-      run: |
+        run: |
           echo "# Link to test run in Perfana" >> $GITHUB_STEP_SUMMARY
           echo "https://demo.perfana.cloud/test-run/${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2?systemUnderTest=${{ inputs.systemUnderTest }}&workload=${{ inputs.workload }}Test&testEnvironment=acme" >> $GITHUB_STEP_SUMMARY
           
