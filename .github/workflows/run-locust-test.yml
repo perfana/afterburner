@@ -23,11 +23,7 @@ jobs:
   performance-test-locust:
     runs-on: self-hosted
     steps:
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
-      - run: pip install locust influxdb
+      
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
@@ -39,6 +35,11 @@ jobs:
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - run: pip install -r cicd/locust 
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
