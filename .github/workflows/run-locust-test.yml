@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
-      - run: pip install -r cicd/locust 
+      - run: pip install -r cicd/locust/requirements.txt 
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
