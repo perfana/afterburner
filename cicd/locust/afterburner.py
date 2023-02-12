@@ -1,15 +1,23 @@
 import time
 from locust import FastHttpUser, task, between, events
-
 import json
+import os
 import datetime
 import pytz
 from influxdb import InfluxDBClient
 import socket
+import requests
+requests.packages.urllib3.disable_warnings() 
 
 hostname = socket.gethostname()
-client = InfluxDBClient(host="localhost", port="8086", username="admin", password="V2JAz8ae3YKcPZVfWsKe")
-client.switch_database('locust')
+client = InfluxDBClient(
+    ssl = True,
+    verify_ssl = False,
+    host = os.environ.get('INFLUXDB_HOST'),
+    port = os.environ.get('INFLUXDB_PORT'), 
+    username = os.environ.get('INFLUXDB_USERNAME'), 
+    password = os.environ.get('INFLUXDB_PASSWORD'))
+client.switch_database(os.environ.get('INFLUXDB_DATABASE'))
 
 
 
@@ -40,6 +48,11 @@ def _(parser):
     parser.add_argument("--test-run-id", type=str, env_var="TEST_RUN_ID", default="", help="Test run id")
     parser.add_argument("--system-under-test", type=str, env_var="SYSTEM_UNDER_TEST", default="", help="System under test")
     parser.add_argument("--test-environment", type=str, env_var="TEST_ENVIRONMENT", default="", help="Test environment")
+    parser.add_argument("--influxdb-host", type=str, env_var="INFLUXDB_HOST", default="", help="InfluxDb host")
+    parser.add_argument("--influxdb-port", type=str, env_var="INFLUXDB_PORT", default="", help="InfluxDb port")
+    parser.add_argument("--influxdb-username", type=str, env_var="INFLUXDB_USERNAME", default="", help="InfluxDb username")
+    parser.add_argument("--influxdb-password", type=str, env_var="INFLUXDB_PASSWORD", default="", help="InfluxDb password")
+    parser.add_argument("--influxdb-database", type=str, env_var="INFLUXDB_DATABAsE", default="", help="InfluxDb database")
 
 
 class MyTaskSet(FastHttpUser):
