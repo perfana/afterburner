@@ -72,7 +72,7 @@ jobs:
           -Dhost=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxDbHost=influx.demo.perfana.cloud \
           -DinfluxDbPort=443 \
-          -DinfluxDbUsername=admin
-          -DinfluxDbDatabase=locust
+          -DinfluxDbUsername=admin \
+          -DinfluxDbDatabase=locust \
           -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DperfanaUrl=https://demo.perfana.cloud
