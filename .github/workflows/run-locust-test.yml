@@ -1,0 +1,88 @@
+---
+name: Run performance tests with K6
+
+on:
+  workflow_call:
+    inputs:
+      systemUnderTest:
+        required: true
+        type: string
+      workload:
+        required: true
+        type: string
+      service:
+        required: true
+        type: string
+      annotations:
+        required: false
+        type: string
+
+
+jobs:
+
+  performance-test-locust:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - run: pip install locust influxdb
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get commit message
+        if: inputs.annotations == ''
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - name: get KUBECONFIG from secrets
+        env:
+          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+      - name: Get deployed version
+        if: env.TAG_NAME == ''
+        env:
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+        run: |
+          VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
+          echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.0.4+101'
+          distribution: 'temurin'
+          cache: maven
+      - name: Setup Maven Action
+        uses: s4u/setup-maven-action@v1.6.0
+        with:
+          java-version: 17.0.4+101
+          maven-version: 3.6.3
+      - name: get KUBECONFIG from secrets
+        env:
+          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+      - name: Build with Maven
+        env:
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+        run: |
+          cd cicd/locust
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
+          -Dsut-config=${{ inputs.service }} \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          -Dversion="${{ env.TAG_NAME }}" \
+          -DsystemUnderTest=${{ inputs.systemUnderTest }} \
+          -DtestEnvironment=acme \
+          -Dannotations="${{ env.COMMIT_MESSAGE }}" \
+          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+          -Dhost=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
+          -DinfluxDbHost=influx.demo.perfana.cloud \
+          -DinfluxDbPort=443 \
+          -DinfluxDbUsername=admin
+          -DinfluxDbDatabase=locust
+          -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
+          -DperfanaUrl=https://demo.perfana.cloud

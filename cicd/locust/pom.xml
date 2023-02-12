@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+
+    <groupId>io.perfana</groupId>
+    <artifactId>perfana-locust-afterburner</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <properties>
+
+        <encoding>UTF-8</encoding>
+
+        <!-- dependency versioning -->
+        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
+        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
+
+        <!-- Perfana url  -->
+        <perfanaUrl>http://perfana:3000</perfanaUrl>
+        <wiremockUrl>http://wiremock:8080</wiremockUrl>
+        <influxDbUrl>http://influxdb:8086/locust</influxDbUrl>
+
+
+        <!-- By default Jenkins build Url is used -->
+        <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
+
+        <!-- By default send data to perfana -->
+        <perfanaEnabled>true</perfanaEnabled>
+
+        <!-- By default don't assert test results -->
+        <assertResultsEnabled>false</assertResultsEnabled>
+
+        <!-- By default disable events -->
+        <eventsEnabled>false</eventsEnabled>
+        <eventScheduleScript></eventScheduleScript>
+
+        <!-- Settings for the Perfana Dashboard -->
+        <systemUnderTest>BumbleBee</systemUnderTest>
+        <version>1.0</version>
+        <tags></tags>
+
+
+    </properties>
+
+
+    <build>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.perfana</groupId>
+                    <artifactId>event-scheduler-maven-plugin</artifactId>
+                    <version>${events-scheduler-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>yyyyMMdd-HHmmss</pattern>
+                            <timeZone>CET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.perfana</groupId>
+                <artifactId>event-scheduler-maven-plugin</artifactId>
+                <configuration>
+                    <eventSchedulerConfig>
+                        <debugEnabled>true</debugEnabled>
+                        <schedulerEnabled>true</schedulerEnabled>
+                        <failOnError>true</failOnError>
+                        <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampUpTime}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${duration}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
+                        <eventConfigs>
+                            <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
+                                <name>PerfanaEvent</name>
+                                <enabled>${perfanaEnabled}</enabled>
+                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
+                                <apiKey>${apiKey}</apiKey>
+                                <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
+                                <variables>
+                                    <perfana-containers>.*mariadb.*|.*star-scream.*</perfana-containers>
+                                </variables>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>Run locust job</name>
+                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
+                                <onStartTest>export INFLUXDB_HOST=${influxDbHost}; \
+                                    export INFLUXDB_PORT=${influxDbPort}; \
+                                    export INFLUXDB_USERNAME=${influxDbUsername}; \
+                                    export INFLUXDB_PASSWORD=${influxDbPassword}; \
+                                    export INFLUXDB_DATABASE=${influxDbDatabase}; \
+                                    locust -f afterburner.py --headless -u 10 -r 5 -t ${duration}s --host=${host} --test-run-id=${testRunId} --system-under-test=${systemUnderTest} --test-environment=${testEnvironment}    
+                                </onStartTest>
+                                <onKeepAlive></onKeepAlive>
+                                <onAbort></onAbort>
+                                <onAfterTest></onAfterTest>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
+                                <name>ActuatorEventFrontend</name>
+                                <tags>${sut-config}-fe</tags>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
+                                <name>ActuatorEventBackend</name>
+                                <tags>${sut-config}-be</tags>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>GitGetHash</name>
+                                <command>git rev-parse --verify HEAD</command>
+                                <output>key</output>
+                                <key>https://github.com/perfana/afterburner</key>
+                                <tags>GitHub</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentFE</name>
+                                <command>kubectl get deployment ${sut-config}-fe-afterburner -n acme -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,TOKEN</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,${sut-config}-fe</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentBE</name>
+                                <command>kubectl get deployment ${sut-config}-be-afterburner -n acme -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,TOKEN</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,${sut-config}-be</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentMySql</name>
+                                <command>kubectl get statefulset afterburner-db-mysql -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,secret</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,afterburner-db-mysql</tags>
+                            </eventConfig>
+                        </eventConfigs>
+                    </eventSchedulerConfig>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>${perfana-java-client.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-springboot</artifactId>
+                        <version>${test-events-springboot.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-test-run-config-command</artifactId>
+                        <version>${test-events-test-run-config-command.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+
+    </build>
+
+
+    <!-- ************************************************************************ ==
+    == Below we have defined three sets of profiles, which control the type of    ==
+    == test that will be run and the targeted testEnvironment.                        ==
+    == If you wish to run a stress test on acceptance, use:                       ==
+    == mvn perfana-jmeter:integration-test -Ptest-type-stress,test-env-acc       ==
+    == ************************************************************************ -->
+
+    <profiles>
+
+        <profile>
+            <id>assert-results</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <assertResultsEnabled>true</assertResultsEnabled>
+            </properties>
+        </profile>
+
+
+        <!-- Test testEnvironment profiles -->
+
+        <profile>
+            <id>test-env-local</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <server_name>localhost</server_name>
+                <port>8888</port>
+                <testEnvironment>local</testEnvironment>
+                <perfanaUrl>http://localhost:4000</perfanaUrl>
+                <wiremockUrl>http://localhost:8060</wiremockUrl>
+                <influxDbUrl>localhost</influxDbUrl>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-env-demo</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <testEnvironment>acme</testEnvironment>
+            </properties>
+        </profile>
+
+
+
+        <!-- Test type profiles -->
+
+        <profile>
+            <id>test-type-stress</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <workload>locust-stressTest</workload>
+                <duration>1</duration>
+                <startRate>1</startRate>
+                <targetRate>250</targetRate>
+                <rampUpTime>900</rampUpTime>
+                <perfanaEnabled>true</perfanaEnabled>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+                <eventsEnabled>true</eventsEnabled>
+                <tags>locust,springboot-monitoring</tags>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-type-load</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <workload>locust-loadTest</workload>
+                <duration>600</duration>
+                <startRate>1</startRate>
+                <targetRate>10</targetRate>
+                <rampUpTime>120</rampUpTime>
+                <perfanaEnabled>true</perfanaEnabled>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+                <eventsEnabled>true</eventsEnabled>
+                <tags>locust,springboot-monitoring</tags>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-type-slow-backend</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <workload>slowBackendTest</workload>
+                <duration>7</duration>
+                <targetRate>50</targetRate>
+                <rampUpTime>3</rampUpTime>
+                <perfanaEnabled>true</perfanaEnabled>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+                <eventsEnabled>true</eventsEnabled>
+                <eventScheduleScript>
+                    PT0S|wiremock-change-delay(delay=400)|delay=400
+                    PT1M|wiremock-change-delay(delay=2000)|delay=2000
+                    PT2M|wiremock-change-delay(delay=4000)|delay=4000
+                    PT3M|wiremock-change-delay(delay=8000)|delay=8000
+                    PT4M|wiremock-change-delay(delay=12000)|delay=12000
+                    PT5M|wiremock-change-delay(delay=400)|delay=400
+                </eventScheduleScript>
+                <tags>perfana-demo-host</tags>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test-type-endurance</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <workload>enduranceTest</workload>
+                <duration>7</duration>
+                <targetRate>50</targetRate>
+                <rampUpTime>3</rampUpTime>
+                <perfanaEnabled>true</perfanaEnabled>
+                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
+            </properties>
+        </profile>
+
+
+
+
+
+    </profiles>
+</project>
+
