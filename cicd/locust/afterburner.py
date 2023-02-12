@@ -6,8 +6,12 @@ import datetime
 import pytz
 from influxdb import InfluxDBClient
 import socket
+from locust_plugins.csvreader import CSVReader
 import requests
 requests.packages.urllib3.disable_warnings() 
+
+first_name = CSVReader("first_names.csv")
+
 
 hostname = socket.gethostname()
 client = InfluxDBClient(
@@ -63,43 +67,7 @@ class MyTaskSet(FastHttpUser):
              'test_environment': self.environment.parsed_options.test_environment,
         }
     
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-        # self.context = {
-        #      'system_under_test': self.environment.parsed_options.system_under_test,
-        #      'test_environment': self.environment.parsed_options.test_environment,
-        # }
-
-        
-    #     events.request_success.add_listener(self.individual_success_handle)
-    #     events.request_failure.add_listener(self.individual_fail_handle)
-
-
-
-    # hostname = socket.gethostname()
-    # client = InfluxDBClient(host="localhost", port="8086", username="admin", password="V2JAz8ae3YKcPZVfWsKe")
-    # client.switch_database('locust')
-
-
-    # def individual_success_handle(self, request_type, name, response_time, response_length, response, instance, context):
-    #     SUCCESS_TEMPLATE = '[{"measurement": "%s","tags": {"hostname":"%s","requestName": "%s","requestType": "%s","status":"%s", "systemUnderTest":"%s", "testEnvironment":"%s"' \
-    #                     '},"time":"%s","fields": {"responseTime": %i, "responseLength":"%s"}' \
-    #                     '}]'
-    #     json_string = SUCCESS_TEMPLATE % (
-    #     "ResponseTable", hostname, name, request_type, "success", context['system_under_test'], context['test_environment'], datetime.datetime.now(tz=pytz.UTC), response_time,
-    #     response_length)
-    #     client.write_points(json.loads(json_string), time_precision='ms')
-
-
-    # def individual_fail_handle(self, request_type, name, response_time, response_length, exception, instance, context):
-    #     FAIL_TEMPLATE = '[{"measurement": "%s","tags": {"hostname":"%s","requestName": "%s","requestType": "%s","exception":"%s","status":"%s", "systemUnderTest":"%s", "testEnvironment":"%s"' \
-    #                     '},"time":"%s","fields": {"responseTime": %i,"responseLength":"%s"}' \
-    #                     '}]'
-    #     json_string = FAIL_TEMPLATE % (
-    #     "ResponseTable", hostname, name, request_type, exception, "fail", context['system_under_test'], context['test_environment'], datetime.datetime.now(tz=pytz.UTC),
-    #     response_time, response_length)
-    #     client.write_points(json.loads(json_string), time_precision='ms')
-
+   
 
    
   
@@ -111,8 +79,6 @@ class MyTaskSet(FastHttpUser):
             'perfana-request-name': 'remote_call_async',
             'perfana-test-run-id': self.environment.parsed_options.test_run_id
         })
-        # events.request_success.fire("GET", "remote_call_async", response.elapsed.total_seconds() * 1000, len(response.content), response, self, self.context)
-        # events.request_failure.fire("GET", "remote_call_async", response.elapsed.total_seconds() * 1000, len(response.content), exception, self, self.context)
 
 
     
@@ -124,8 +90,6 @@ class MyTaskSet(FastHttpUser):
             'perfana-request-name': 'flaky_call',
             'perfana-test-run-id': self.environment.parsed_options.test_run_id
         })
-        # events.request_success.fire("GET", "flaky_call", response.elapsed.total_seconds() * 1000, len(response.content), response, self, self.context)
-        # events.request_failure.fire("GET", "flaky_call", response.elapsed.total_seconds() * 1000, len(response.content), exception, self, self.context)
 
 
 
@@ -137,19 +101,16 @@ class MyTaskSet(FastHttpUser):
             'perfana-request-name': 'simple_delay',
             'perfana-test-run-id': self.environment.parsed_options.test_run_id
         })
-        # events.request_success.fire("GET", "simple_delay", response.elapsed.total_seconds() * 1000, len(response.content), response, self, self.context)
-        # events.request_failure.fire("GET", "simple_delay", response.elapsed.total_seconds() * 1000, len(response.content), exception, self, self.context)
     
     @task
     def get_db_employee_find_by_name(self):
-        response = self.client.get("/remote/call-many?count=1&path=/db/employee/find-by-name?firstName=${FIRST_NAME}", 
+        first_name = next(first_name)
+        response = self.client.get(f"/remote/call-many?count=1&path=/db/employee/find-by-name?firstName={first_name[0]}", 
         name="database_call",
         headers={
             'perfana-request-name': 'database_call',
             'perfana-test-run-id': self.environment.parsed_options.test_run_id
         })
-        # events.request_success.fire("GET", "database_call", response.elapsed.total_seconds() * 1000, len(response.content), response, self, self.context)
-        # events.request_failure.fire("GET", "database_call", response.elapsed.total_seconds() * 1000, len(response.content), exception, self, self.context)
 
     @task
     def get_cpu_magic_identity_check(self):
@@ -159,8 +120,6 @@ class MyTaskSet(FastHttpUser):
             'perfana-request-name': 'simple_cpu_burn',
             'perfana-test-run-id': self.environment.parsed_options.test_run_id
         })
-        # events.request_success.fire("GET", "simple_cpu_burn", response.elapsed.total_seconds() * 1000, len(response.content), response, self, self.context)
-        # events.request_failure.fire("GET", "simple_cpu_burn", response.elapsed.total_seconds() * 1000, len(response.content), exception, self, self.context)
 
 
 class MyLocust(FastHttpUser):
