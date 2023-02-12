@@ -104,8 +104,8 @@ class MyTaskSet(FastHttpUser):
     
     @task
     def get_db_employee_find_by_name(self):
-        first_name = next(first_name)
-        response = self.client.get(f"/remote/call-many?count=1&path=/db/employee/find-by-name?firstName={first_name[0]}", 
+        firstName = next(first_name)
+        response = self.client.get(f"/remote/call-many?count=1&path=/db/employee/find-by-name?firstName={firstName[0]}", 
         name="database_call",
         headers={
             'perfana-request-name': 'database_call',
