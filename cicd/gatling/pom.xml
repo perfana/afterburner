@@ -271,6 +271,7 @@
                                     afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.socket.timeout.millis,
                                     afterburner.remote.call.httpclient.connect.timeout.millis,
+                                    afterburner.remote.call.httpclient.connections.max,
                                     afterburner.remote.call.base_url,
                                     server.tomcat.threads.max,
                                     afterburner.async_max_pool_size,
