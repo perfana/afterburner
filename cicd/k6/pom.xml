@@ -165,7 +165,7 @@
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix</actuatorEnvProperties>
+                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix,afterburner.remote.call.httpclient.connections.max</actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
