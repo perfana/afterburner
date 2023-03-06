@@ -71,7 +71,7 @@ jobs:
           # execute maven
           mvn clean install -X -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -Dsut-config=${{ inputs.service }} \
-          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2" \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-${{ github.run_id }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
