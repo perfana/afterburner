@@ -12,6 +12,23 @@
     <artifactId>afterburner-loadtest-gatling</artifactId>
     <version>${revision}</version>
 
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -20,8 +37,8 @@
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <kotlin.version>1.6.21</kotlin.version>
 
-        <events-gatling-maven-plugin.version>4.1.0-events-3</events-gatling-maven-plugin.version>
-        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
+        <events-gatling-maven-plugin.version>4.1.0-events-5-SNAPSHOT</events-gatling-maven-plugin.version>
+        <perfana-java-client.version>2.1.0-SNAPSHOT</perfana-java-client.version>
         <test-events-hello-world.version>[2.1.0,2.2.0)</test-events-hello-world.version>
 
         <!-- By default enable events -->
