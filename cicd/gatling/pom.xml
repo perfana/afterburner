@@ -229,6 +229,18 @@
                         <scheduleScript>
                             ${eventScheduleScript}
                         </scheduleScript>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
                         <eventConfigs>
                             <eventConfig implementation="io.perfana.event.wiremock.WiremockEventConfig">
                                 <name>MyWiremockEvent</name>
@@ -249,18 +261,6 @@
                                     <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                     <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
-                                <testConfig>
-                                    <systemUnderTest>${systemUnderTest}</systemUnderTest>
-                                    <version>${version}</version>
-                                    <workload>${workload}</workload>
-                                    <testEnvironment>${testEnvironment}</testEnvironment>
-                                    <testRunId>${testRunId}</testRunId>
-                                    <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
-                                    <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
-                                    <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
-                                    <annotations>${annotations}</annotations>
-                                    <tags>${tags}</tags>
-                                </testConfig>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
