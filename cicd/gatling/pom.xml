@@ -32,11 +32,11 @@
         <gatling.version>3.9.0</gatling.version>
         <events-gatling-maven-plugin.version>4.1.0-events-5-SNAPSHOT</events-gatling-maven-plugin.version>
         <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
-        <perfana-java-client.version>2.1.0-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
-        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
-        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
-        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
+        <perfana-java-client.version>3.0.0-SNAPSHOT</perfana-java-client.version>
+        <test-events-wiremock.version>3.0.0-SNAPSHOT</test-events-wiremock.version>
+        <test-events-springboot.version>2.0.0-SNAPSHOT</test-events-springboot.version>
+        <test-events-command-runner.version>2.0.0-SNAPSHOT</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>2.0.0-SNAPSHOT</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
@@ -229,6 +229,18 @@
                         <scheduleScript>
                             ${eventScheduleScript}
                         </scheduleScript>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
                         <eventConfigs>
                             <eventConfig implementation="io.perfana.event.wiremock.WiremockEventConfig">
                                 <name>MyWiremockEvent</name>
@@ -241,24 +253,14 @@
                                 <enabled>${perfanaEnabled}</enabled>
                                 <perfanaUrl>${perfanaUrl}</perfanaUrl>
                                 <apiKey>${apiKey}</apiKey>
+                                <retryCount>60</retryCount>
+                                <retryDelaySeconds>30</retryDelaySeconds>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
                                     <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
                                     <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                     <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
-                                <testConfig>
-                                    <systemUnderTest>${systemUnderTest}</systemUnderTest>
-                                    <version>${version}</version>
-                                    <workload>${workload}</workload>
-                                    <testEnvironment>${testEnvironment}</testEnvironment>
-                                    <testRunId>${testRunId}</testRunId>
-                                    <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
-                                    <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
-                                    <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
-                                    <annotations>${annotations}</annotations>
-                                    <tags>${tags}</tags>
-                                </testConfig>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
@@ -267,7 +269,6 @@
                                 <actuatorEnvProperties>
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
-                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.socket.timeout.millis,
                                     afterburner.remote.call.httpclient.connect.timeout.millis,
@@ -320,7 +321,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentMySql</name>
-                                <command>kubectl get statefulset afterburner-db-mysql -ojson</command>
+                                <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,secret,preferredDuringSchedulingIgnoredDuringExecution</excludes>
                                 <output>keys</output>
