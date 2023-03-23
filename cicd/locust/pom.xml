@@ -300,7 +300,7 @@
                 <workload>locust-loadTest</workload>
                 <duration>600</duration>
                 <startRate>1</startRate>
-                <targetRate>10</targetRate>
+                <targetRate>20</targetRate>
                 <rampUpTime>120</rampUpTime>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
