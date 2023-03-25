@@ -21,7 +21,7 @@ on:
 jobs:
 
   performance-test-locust:
-    runs-on: self-hosted
+    runs-on: [self-hosted, demo]
     steps:
       
       - name: Install kubectl
