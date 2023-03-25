@@ -21,7 +21,7 @@ on:
 jobs:
 
   performance-test-k6:
-    runs-on: self-hosted
+    runs-on: [self-hosted, demo]
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
