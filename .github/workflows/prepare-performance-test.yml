@@ -11,8 +11,7 @@ on:
 
 jobs:
 
-  performance-test-gatling:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "demo"]') }}
+  prepare-performance-test:
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
