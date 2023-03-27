@@ -3,11 +3,16 @@ name: Prepare for performance test
 
 on:
   workflow_call:
+    inputs:
+      runner:
+        type: string
+        default: 'demo'
+
 
 jobs:
 
   performance-test-gatling:
-    runs-on: self-hosted
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "demo"]') }}
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
@@ -29,7 +34,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Check deployed version
         env:
