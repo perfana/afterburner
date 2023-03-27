@@ -17,7 +17,7 @@ on:
         required: false
         type: string
       runner:
-        rdefault: 'demo'
+        default: 'demo'
         type: string
 
 
