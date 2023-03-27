@@ -17,8 +17,8 @@ on:
         required: false
         type: string
       runner:
-        required: true
         type: string
+        default: 'demo'
 
 
 jobs:
