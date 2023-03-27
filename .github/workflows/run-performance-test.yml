@@ -47,7 +47,6 @@ on:
         required: false
       runner:
         description: 'Runner environment'
-        required: true
         default: 'demo'
         type: choice
         options:
