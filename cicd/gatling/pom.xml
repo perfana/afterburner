@@ -39,7 +39,7 @@
         <test-events-test-run-config-command.version>2.0.0-SNAPSHOT</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
-        <perfanaUrl>http://perfana:3000</perfanaUrl>
+        <perfanaUrl>http://perfana-fe.perfana:3000</perfanaUrl>
 
         <!-- Default Simulation class  -->
         <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.OptimusPrime</systemUnderTestSimulation>
