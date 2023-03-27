@@ -24,7 +24,9 @@ on:
 jobs:
 
   performance-test-gatling-docker:
-    runs-on: [self-hosted, inputs.runner]
+    runs-on:
+      - self-hosted
+      - inputs.runner
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
