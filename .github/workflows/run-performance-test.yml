@@ -47,7 +47,6 @@ on:
         required: false
       runner:
         description: 'Runner environment'
-        type: string
         required: true
         default: 'demo'
         type: choice
@@ -57,7 +56,6 @@ on:
 
 
 jobs:
-
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
