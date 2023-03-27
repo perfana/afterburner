@@ -45,6 +45,15 @@ on:
         description: 'Test run annotation'
         type: string
         required: false
+      runner:
+        description: 'Runner environment'
+        type: string
+        required: true
+        default: 'demo'
+        type: choice
+        options:
+          - demo
+          - test
 
 
 jobs:
@@ -59,6 +68,7 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
 
   performance-test-gatling-docker:
     uses: perfana/afterburner/.github/workflows/run-gatling-docker-test.yml@main
@@ -69,6 +79,8 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
+
 
   performance-test-k6:
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
@@ -79,4 +91,6 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
+
 

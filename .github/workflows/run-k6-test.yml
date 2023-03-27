@@ -16,12 +16,15 @@ on:
       annotations:
         required: false
         type: string
+      runner:
+        required: true
+        type: string
 
 
 jobs:
 
   performance-test-k6:
-    runs-on: [self-hosted, demo]
+    runs-on: [self-hosted, ${{ inputs.runner }}]
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
