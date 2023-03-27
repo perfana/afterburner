@@ -1,0 +1,5 @@
+export CONSTANT_LOAD_TIME=600
+export RAMPUP_TIME=120
+export START_RATE=1
+export TARGET_RATE=10
+export TARGET_BASE_URL=http://localhost:8080
