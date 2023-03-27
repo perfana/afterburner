@@ -24,10 +24,8 @@ on:
 jobs:
 
   performance-test-gatling:
-    runs-on:
-      - self-hosted
-      - demo
-    steps:
+      runs-on: [ self-hosted, "${{ inputs.runner }}" ]
+      steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
