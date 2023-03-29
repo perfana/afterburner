@@ -78,7 +78,7 @@
                 <plugin>
                     <groupId>io.perfana</groupId>
                     <artifactId>event-scheduler-maven-plugin</artifactId>
-                    <version>${events-scheduler-maven-plugin.version}</version>
+                    <version>${event-scheduler-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
