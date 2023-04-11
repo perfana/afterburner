@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
-
     <groupId>io.perfana</groupId>
     <artifactId>perfana-k6-afterburner</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -31,12 +29,12 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
-        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
-        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
-        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
-        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
-        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
+        <event-scheduler-maven-plugin.version>3.0.0-SNAPSHOT</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>3.0.0-SNAPSHOT</perfana-java-client.version>
+        <test-events-wiremock.version>3.0.0-SNAPSHOT</test-events-wiremock.version>
+        <test-events-springboot.version>2.0.0-SNAPSHOT</test-events-springboot.version>
+        <test-events-command-runner.version>2.0.0-SNAPSHOT</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>2.0.0-SNAPSHOT</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
@@ -165,13 +163,24 @@
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix,afterburner.remote.call.httpclient.connections.max</actuatorEnvProperties>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.async_core_pool_size,
+                                    featureToggleIdentityMatrix,
+                                    afterburner.remote.call.httpclient.connections.max
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
                                 <actuatorBaseUrl>http://${sut-config}-be-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.datasource.employee.maximum-pool-size
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
@@ -361,10 +370,6 @@
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
             </properties>
         </profile>
-
-
-
-
 
     </profiles>
 </project>
