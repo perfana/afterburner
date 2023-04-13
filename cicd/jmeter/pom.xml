@@ -25,6 +25,7 @@
         <test-events-wiremock.version>3.0.0-SNAPSHOT</test-events-wiremock.version>
         <test-events-springboot.version>2.0.0-SNAPSHOT</test-events-springboot.version>
         <test-events-test-run-config-command.version>2.0.0-SNAPSHOT</test-events-test-run-config-command.version>
+        <test-events-command-runner.version>2.0.0-SNAPSHOT</test-events-command-runner.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
@@ -285,6 +286,11 @@
                         <groupId>io.perfana</groupId>
                         <artifactId>test-events-test-run-config-command</artifactId>
                         <version>${test-events-test-run-config-command.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
