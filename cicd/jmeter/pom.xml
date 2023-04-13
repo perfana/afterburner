@@ -29,9 +29,6 @@
         <!-- Perfana url  -->
         <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
 
-        <!-- Default Simulation class  -->
-        <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.StarScream</systemUnderTestSimulation>
-
         <!-- By default Jenkins build Url is used -->
         <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
 
