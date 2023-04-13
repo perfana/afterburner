@@ -206,6 +206,10 @@
                                     <perfana-containers>.*mariadb.*|.*star-scream.*</perfana-containers>
                                 </variables>
                             </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>CommandRunnerJMeterPush</name>
+                                <onStartTest>sh -c "./j2i ./target/jmeter/results -u ${influxUser} -p ${influxPassword} -a ${influxUrl} -b jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                            </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
