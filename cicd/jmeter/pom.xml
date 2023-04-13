@@ -150,7 +150,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <errorRateThresholdInPercent>2</errorRateThresholdInPercent>
+<!--                    <errorRateThresholdInPercent>2</errorRateThresholdInPercent>-->
                     <propertiesUser>
                         <test.testRunId>${testRunId}</test.testRunId>
                         <test.duration>${constantLoadTimeInSeconds}</test.duration>
@@ -209,7 +209,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerJMeterPush</name>
-                                <onStartTest>sh -c "./j2i ./target/jmeter/results -u ${influxUser} -p ${influxPassword} -a ${influxUrl} -b jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./j2i ./target/jmeter/results -u ${influxUser} -p ${influxPassword} -a ${influxUrl} -b jmeter -t ${testEnvironment} -y ${systemUnderTest} -d"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>

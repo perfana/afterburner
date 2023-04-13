@@ -81,7 +81,9 @@ jobs:
           -DtestEnvironment=acme \
           -Dannotations="$COMMIT_MESSAGE" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
-          -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
+          -DtargetProtocol=http \
+          -DtargetDomain=${{ inputs.service }}-fe-afterburner.acme \
+          -DtargetPort=8080 \
           -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
