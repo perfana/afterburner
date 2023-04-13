@@ -204,7 +204,9 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*star-scream.*</perfana-containers>
+                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
+                                    <perfana-pods>${sut-config}.*</perfana-pods>
                                 </variables>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
