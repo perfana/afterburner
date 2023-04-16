@@ -23,3 +23,4 @@ afterburner-loadtest-jmeter/tmp/
 /afterburner-java/src/main/jib/pyroscope.jar
 
 prometheus-data/
+afterburner-java/src/main/jib/dd-java-agent.jar
