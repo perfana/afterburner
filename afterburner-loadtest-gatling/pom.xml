@@ -20,9 +20,9 @@
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <kotlin.version>1.6.21</kotlin.version>
 
-        <events-gatling-maven-plugin.version>4.1.0-events-4</events-gatling-maven-plugin.version>
-        <perfana-java-client.version>[2.0.0,2.1.0)</perfana-java-client.version>
-        <test-events-hello-world.version>[2.1.0,2.2.0)</test-events-hello-world.version>
+        <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-hello-world.version>[3.0.0,3.1.0)</test-events-hello-world.version>
 
         <!-- By default enable events -->
         <eventsEnabled>false</eventsEnabled>
