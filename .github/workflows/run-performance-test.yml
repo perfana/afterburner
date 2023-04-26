@@ -1,6 +1,7 @@
 ---
 
 name: Run performance test
+run-name: performance test for runner ${{ github.event.inputs.runner }} sut ${{ github.event.inputs.systemUnderTest }} workload ${{ github.event.inputs.workload }} service ${{ github.event.inputs.service }} tool ${{ github.event.inputs.tool }}
 
 on:
   workflow_dispatch:
