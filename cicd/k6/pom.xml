@@ -147,7 +147,10 @@
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId}; \
+                                    --from-literal=TEST_RUN_ID=${testRunId} \
+                                    --from-literal=K6_PROMETHEUS_RW_SERVER_URL=http://mimir-distributed-nginx/api/v1/push \
+                                    --from-literal=K6_PROMETHEUS_RW_USERNAME=perfana \
+                                    --from-literal=K6_PROMETHEUS_RW_PASSWORD=${influxPassword}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
                                     kubectl create -f k6-job.yml -n acme
                                 </onBeforeTest>
