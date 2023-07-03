@@ -257,7 +257,7 @@
                                 <retryDelaySeconds>30</retryDelaySeconds>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-containers>.*afterburner-db.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
                                     <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                     <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
