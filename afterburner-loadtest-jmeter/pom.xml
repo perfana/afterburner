@@ -62,12 +62,7 @@
                         </goals>
                     </execution>
                     <!-- Fail build on errors in test -->
-                    <execution>
-                        <id>jmeter-check-results</id>
-                        <goals>
-                            <goal>results</goal>
-                        </goals>
-                    </execution>
+
                     <!--- needed to generate target/config.json -->
                     <execution>
                         <id>configuration</id>

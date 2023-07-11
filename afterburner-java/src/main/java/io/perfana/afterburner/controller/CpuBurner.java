@@ -1,5 +1,7 @@
 package io.perfana.afterburner.controller;
 
+import brave.Span;
+import brave.Tracer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.perfana.afterburner.AfterburnerProperties;
 import io.perfana.afterburner.domain.BurnerMessage;
@@ -8,8 +10,6 @@ import io.perfana.afterburner.matrix.MatrixCalculator;
 import io.perfana.afterburner.matrix.MatrixEqualResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.sleuth.Span;
-import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,30 +42,30 @@ public class CpuBurner {
         long[][] identitySquare;
         
         Span matrixInitSpan = tracer.nextSpan().name("matrix-init").start();
-        try (Tracer.SpanInScope ws = tracer.withSpan(matrixInitSpan)) {
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixInitSpan)) {
             simpleMagicSquare = MatrixCalculator.simpleMagicSquare(matrixSize);
             identitySquare = MatrixCalculator.identitySquare(matrixSize);
         }
         finally {
-            matrixInitSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixInitSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).finish();
         }
 
         long[][] multiplyMatrix;
         Span matrixMultiplySpan = tracer.nextSpan().name("matrix-multiply").start();
-        try (Tracer.SpanInScope ws = tracer.withSpan(matrixMultiplySpan.start())) {
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixMultiplySpan.start())) {
             multiplyMatrix = MatrixCalculator.multiply(simpleMagicSquare, identitySquare);
         }
         finally {
-            matrixMultiplySpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixMultiplySpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).finish();
         }
 
         MatrixEqualResult matrixEqualResult;
         Span matrixEqualCheckSpan = tracer.nextSpan().name("matrix-equal-check").start();
-        try (Tracer.SpanInScope ws = tracer.withSpan(matrixEqualCheckSpan.start())) {
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(matrixEqualCheckSpan.start())) {
             matrixEqualResult = MatrixCalculator.areEqual(simpleMagicSquare, multiplyMatrix);
         }
         finally {
-            matrixEqualCheckSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixEqualCheckSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).finish();
         }
 
         String message = String.format("A simple magic square multiplied by an identity square of size [%d] [%s] to the magic square.",

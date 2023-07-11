@@ -2,6 +2,7 @@ package io.perfana.afterburner.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.perfana.afterburner.AfterburnerException;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -12,7 +13,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -48,7 +48,7 @@ public class FileUpload {
         long size = file.getSize();
         log.info("Upload file: [{}] of size [{}] bytes.", filename, size);
         saveFile(file);
-        log.info("Stored file: " + storedFile);
+        log.info("Stored file: {}", storedFile);
         return ResponseEntity.ok().body(String.format("File upload succeeded [%s] of size [%d] bytes.", filename, size));
     }
 

@@ -1,5 +1,7 @@
 package io.perfana.afterburner.error;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Configuration
 public class AfterburnerWebMvcConfigurer implements WebMvcConfigurer {
 
-    private static Logger log = LoggerFactory.getLogger(AfterburnerWebMvcConfigurer.class);
+    private static final Logger log = LoggerFactory.getLogger(AfterburnerWebMvcConfigurer.class);
     
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {

@@ -1,11 +1,11 @@
 package io.perfana.afterburner.basket;
 
+import brave.Span;
+import brave.Tracer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.perfana.afterburner.util.Sleeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.sleuth.Span;
-import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class FundCheckController {
     private final Tracer tracer;
 
     // hmmm... makes it thread safe?
-    private Random random = ThreadLocalRandom.current();
+    private final Random random = ThreadLocalRandom.current();
 
     public FundCheckController(Tracer tracer) {
         this.tracer = tracer;
@@ -38,7 +38,7 @@ public class FundCheckController {
         boolean hasFund = false;
 
         Span fundCheckSpan = tracer.nextSpan().name("backend-fund-check").start();
-        try (Tracer.SpanInScope ws = tracer.withSpan(fundCheckSpan.start())) {
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(fundCheckSpan.start())) {
             // simulate some processing/db check time
             Sleeper.sleep(Duration.ofMillis(10));
             hasFund = random.nextGaussian() < 0.1;
@@ -47,7 +47,7 @@ public class FundCheckController {
             fundCheckSpan.tag("customer", customer)
                     .tag("amount", String.valueOf(amount))
                     .tag("fund-check-result", String.valueOf(hasFund))
-                    .end();
+                    .finish();
         }
 
         FundReply reply = FundReply.builder()
@@ -57,7 +57,7 @@ public class FundCheckController {
                 .build();
 
         long durationMillis = System.currentTimeMillis() - startTime;
-        log.info("Check funds. Duration ms: " + durationMillis);
+        log.info("Check funds. Duration ms: {}", durationMillis);
         return new ResponseEntity<>(reply, HttpStatus.OK);
     }
 }

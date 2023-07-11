@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import lombok.extern.slf4j.Slf4j;
 import io.perfana.afterburner.AfterburnerProperties;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.cloud.sleuth.instrument.async.LazyTraceExecutor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -51,7 +50,7 @@ public class AfterburnerAsyncConfig implements AsyncConfigurer {
             Executor monitoredExecutor = ExecutorServiceMetrics.monitor(registry, executor.getThreadPoolExecutor(), executorName);
 
             // enable tracing for @Async: have one parent trace instead of all separate traces
-            return new LazyTraceExecutor(this.beanFactory, monitoredExecutor);
+            return monitoredExecutor;
         }
         else {
             // "simulate" the default task executor or the executor created via spring xml config
