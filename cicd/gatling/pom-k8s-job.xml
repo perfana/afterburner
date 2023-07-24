@@ -335,7 +335,7 @@
                 <constantLoadTimeInSeconds>1</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <tags>gatling,stress-test,springboot-monitoring</tags>
+                <tags>gatling,stress-test,spring-boot,kubernetes</tags>
             </properties>
         </profile>
 
@@ -356,7 +356,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>gatling-distributed,gatling,springboot-monitoring</tags>
+                <tags>gatling-distributed,gatling,spring-boot,kubernetes</tags>
             </properties>
         </profile>
 

@@ -406,7 +406,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>load-test,springboot-monitoring,jmeter</tags>
+                <tags>load-test,spring-boot,kubernetes,jmeter</tags>
             </properties>
         </profile>
 
