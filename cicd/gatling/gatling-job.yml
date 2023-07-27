@@ -3,9 +3,9 @@ kind: Job
 metadata:
   name: gatling-lg-1
 spec:
+  completions: 2
   template:
     spec:
-      completions: 2
       restartPolicy: Never
       containers:
         - name: gatling-lg-1
