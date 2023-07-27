@@ -4,6 +4,7 @@ metadata:
   name: gatling-lg-1
 spec:
   completions: 2
+  parallelism: 2
   template:
     spec:
       restartPolicy: Never
