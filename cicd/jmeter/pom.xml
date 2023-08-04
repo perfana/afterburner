@@ -415,7 +415,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>spring-boot,kubernetes,jmeter</tags>
+                <tags>spring-boot-kubernetes,kubernetes,jmeter</tags>
             </properties>
         </profile>
 
