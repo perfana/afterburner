@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gatling-plugin.version>3.9.0</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <kotlin.version>1.6.21</kotlin.version>
+        <kotlin.version>1.8.22</kotlin.version>
 
         <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
@@ -21,7 +21,7 @@
 
         <!-- By default enable events -->
         <eventsEnabled>false</eventsEnabled>
-        <eventScheduleScript></eventScheduleScript>
+        <eventScheduleScript/>
 
         <!-- Default load settings -->
         <initialUsersPerSecond>1</initialUsersPerSecond>
@@ -37,8 +37,8 @@
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <buildResultsUrl>http://jenkins:8080</buildResultsUrl>
         <influxUrl>http://localhost:8086</influxUrl>
-        <influxUser></influxUser>
-        <influxPassword></influxPassword>
+        <influxUser/>
+        <influxPassword/>
 
         <scenario>cpu</scenario>
         <workload>loadTestCpu</workload>
@@ -48,7 +48,7 @@
         <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
         <perfanaEnabled>true</perfanaEnabled>
         <eventsEnabled>true</eventsEnabled>
-        <annotations></annotations>
+        <annotations/>
     </properties>
 
     <dependencies>
