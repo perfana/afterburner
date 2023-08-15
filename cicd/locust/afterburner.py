@@ -1,4 +1,4 @@
-import time
+import os
 from locust import FastHttpUser, task, between, events
 
 import json
@@ -8,7 +8,7 @@ from influxdb import InfluxDBClient
 import socket
 
 hostname = socket.gethostname()
-client = InfluxDBClient(host="localhost", port="8086", username="admin", password="V2JAz8ae3YKcPZVfWsKe")
+client = InfluxDBClient(host="localhost", port="8086", username=os.environ["INFLUX_USER"], password=os.environ["INFLUX_PASSWORD"])
 client.switch_database('locust')
 
 
