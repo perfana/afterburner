@@ -78,7 +78,7 @@ jobs:
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
-          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086/myk6db' || 'https://influx.demo.perfana.cloud/myk6db' }} \
+          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086/k6' || 'https://influx.demo.perfana.cloud/k6' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
