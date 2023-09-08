@@ -312,7 +312,7 @@
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,spring-boot,kubernetes</tags>
+                <tags>k6,spring-boot-kubernetes,kubernetes</tags>
             </properties>
         </profile>
 
@@ -330,7 +330,7 @@
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,spring-boot,kubernetes</tags>
+                <tags>k6,spring-boot-kubernetes,kubernetes</tags>
             </properties>
         </profile>
 
