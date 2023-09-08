@@ -29,7 +29,7 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <event-scheduler-maven-plugin.version>3.0.1</event-scheduler-maven-plugin.version>
+        <event-scheduler-maven-plugin.version>[3.0.0,3.1.0)</event-scheduler-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
@@ -147,10 +147,7 @@
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId} \
-                                    --from-literal=K6_PROMETHEUS_RW_SERVER_URL=https://mimir.demo.perfana.cloud/api/v1/push \
-                                    --from-literal=K6_PROMETHEUS_RW_USERNAME=perfana \
-                                    --from-literal=K6_PROMETHEUS_RW_PASSWORD=${influxPassword}; \
+                                    --from-literal=TEST_RUN_ID=${testRunId}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
                                     kubectl create -f k6-job.yml -n acme
                                 </onBeforeTest>

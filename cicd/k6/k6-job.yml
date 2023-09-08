@@ -8,7 +8,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: k6
-          image: "perfana/k6-afterburner:1.1.0"
+          image: "perfana/k6-afterburner:1.0.0"
           imagePullPolicy: Always
           env:
             - name: K6_INFLUXDB_URL
@@ -66,26 +66,11 @@ spec:
                 secretKeyRef:
                   name: k6-args
                   key: TEST_RUN_ID
-            - name: K6_PROMETHEUS_RW_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: k6-args
-                  key: K6_PROMETHEUS_RW_USERNAME
-            - name: K6_PROMETHEUS_RW_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: k6-args
-                  key: K6_PROMETHEUS_RW_PASSWORD
-            - name: K6_PROMETHEUS_RW_SERVER_URL
-              valueFrom:
-                secretKeyRef:
-                  name: k6-args
-                  key: K6_PROMETHEUS_RW_SERVER_URL
 
           args:
             - "run"
-            - "-o"
-            - "experimental-prometheus-rw"
+            - "--out"
+            - "influxdb=$(K6_INFLUXDB_URL)"
             - "-e"
             - "K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
             - "-e"
@@ -106,10 +91,4 @@ spec:
             - "TEST_ENVIRONMENT=$(TEST_ENVIRONMENT)"
             - "-e"
             - "TEST_RUN_ID=$(TEST_RUN_ID)"
-            - "-e"
-            - "K6_PROMETHEUS_RW_SERVER_URL=$(K6_PROMETHEUS_RW_SERVER_URL)"
-            - "-e"
-            - "K6_PROMETHEUS_RW_USERNAME=$(K6_PROMETHEUS_RW_USERNAME)"
-            - "-e"
-            - "K6_PROMETHEUS_RW_PASSWORD=$(K6_PROMETHEUS_RW_PASSWORD)"
             - "/home/k6/script.js"

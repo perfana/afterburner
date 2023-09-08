@@ -154,7 +154,7 @@
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">perfana-request-name</stringProp>
-                <stringProp name="Header.value">flaky_call</stringProp>
+                <stringProp name="Header.value">simple_delay</stringProp>
               </elementProp>
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">perfana-test-run-id</stringProp>
