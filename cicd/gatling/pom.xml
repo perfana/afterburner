@@ -30,7 +30,7 @@
 
         <!-- dependency versioning -->
         <gatling.version>3.9.5</gatling.version>
-        <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
+        <events-gatling-maven-plugin.version>4.3.0-events-1-SNAPSHOT</events-gatling-maven-plugin.version>
         <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
