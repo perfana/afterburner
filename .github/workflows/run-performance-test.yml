@@ -55,9 +55,10 @@ on:
         default: 'demo'
         type: choice
         options:
-          - demo
+          - acme
+          - acme-0
           - test
-          - demo-0
+          
 
 
 jobs:
