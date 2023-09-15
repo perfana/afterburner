@@ -24,7 +24,7 @@ on:
 jobs:
 
   performance-test-gatling-docker:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "demo"]') }}
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || ${{ (inputs.runner == 'demo-0') && fromJSON('["self-hosted", "demo-0"]') || fromJSON('["self-hosted", "demo"]') }}
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
