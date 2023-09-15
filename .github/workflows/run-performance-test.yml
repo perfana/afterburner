@@ -57,6 +57,7 @@ on:
         options:
           - demo
           - test
+          - demo-0
 
 
 jobs:
