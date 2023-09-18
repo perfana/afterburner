@@ -21,7 +21,7 @@ on:
 jobs:
 
   performance-test-locust:
-    runs-on: self-hosted
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
       - uses: actions/setup-python@v4
         with:
