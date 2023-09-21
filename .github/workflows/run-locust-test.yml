@@ -23,6 +23,11 @@ jobs:
   performance-test-locust:
     runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
@@ -31,11 +36,6 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout afterburner repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
