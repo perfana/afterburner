@@ -138,7 +138,7 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onBeforeTest>kubectl delete secret k6-args --ignore-not-found; \
+                                <onBeforeTest>kubectl delete secret k6-args -n acme --ignore-not-found; \
                                     kubectl create secret generic k6-args -n acme \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
@@ -162,7 +162,7 @@
                                 <onAbort>kubectl delete secret k6-args --ignore-not-found; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found
                                 </onAbort>
-                                <onAfterTest>kubectl delete secret k6-args --ignore-not-found; \
+                                <onAfterTest>kubectl delete secret k6-args -n acme --ignore-not-found; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found
                                 </onAfterTest>
                             </eventConfig>
