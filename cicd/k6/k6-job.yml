@@ -85,7 +85,7 @@ spec:
           args:
             - "run"
             - "--out"
-            - "influxdb=$(K6_INFLUXDB_URL)"
+            - "experimental-prometheus-rw"
             - "-e"
             - "K6_INFLUXDB_USERNAME=$(K6_INFLUXDB_USERNAME)"
             - "-e"
