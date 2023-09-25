@@ -35,15 +35,28 @@ const SLEEP_DURATION = 0.1;
 export const options = {
     discardResponseBodies: true,
     scenarios: {
-        afterburner: {
+        scenario1: {
             executor: 'ramping-arrival-rate',
             startRate: __ENV.START_RATE,
             timeUnit: '1s',
+            exec: 'scenario1',
             preAllocatedVUs: 50,
             maxVUs: 500,
             stages: [
                 { target: __ENV.TARGET_RATE, duration: __ENV.RAMPUP_TIME },
                 { target: __ENV.TARGET_RATE, duration: __ENV.CONSTANT_LOAD_TIME },
+            ],
+        },
+        scenario2: {
+            executor: 'ramping-arrival-rate',
+            startRate: __ENV.START_RATE,
+            timeUnit: '1s',
+            exec: 'scenario2',
+            preAllocatedVUs: 50,
+            maxVUs: 500,
+            stages: [
+                { target: __ENV.TARGET_RATE / 2, duration: __ENV.RAMPUP_TIME },
+                { target: __ENV.TARGET_RATE / 2, duration: __ENV.CONSTANT_LOAD_TIME },
             ],
         },
     },
@@ -55,7 +68,111 @@ export const options = {
 };
 
 
-export default function() {
+export function scenario1() {
+
+    group("simple_delay", () => {
+        let duration = '350'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        const params2 = {
+            headers: {
+                'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=simple_delay`,
+            },
+        };
+        // Request No. 1
+        {
+            let url = BASE_URL + `/delay?duration=${duration}`;
+            let request = http.get(url, params2);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+
+    group("simple_cpu_burn", () => {
+        let matrixSize = '133'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        const params = {
+            headers: {
+                'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=simple_cpu_burn`,
+            },
+        };
+        // Request No. 1
+        {
+            let url = BASE_URL + `/cpu/magic-identity-check?matrixSize=${matrixSize}`;
+            let request = http.get(url);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+}
+
+export function scenario2() {
+
+    group("remote_call_delayed", () => {
+        let path = 'delay'; // specify value as there is no example value for this parameter in OpenAPI spec
+        let count = '3'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        const params = {
+            headers: {
+                'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=remote_call_delayed`,
+            },
+        };
+
+        // Request No. 1
+        {
+            let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
+            let request = http.get(url, params);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+
+    group("database_call", () => {
+        const random = firstNames[Math.floor(Math.random() * firstNames.length)];
+
+        let path = '/db/employee/find-by-name?firstName=${random.first_name}'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        let count = '1'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        const params = {
+            headers: {
+                'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=database_call`,
+            },
+        };
+
+        // Request No. 1
+        {
+            let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
+            let request = http.get(url, params);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+
+    group("flaky_call", () => {
+        let flakiness = 5; // specify value as there is no example value for this parameter in OpenAPI spec
+        let maxRandomDelay = 240; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        // Request No. 1
+        {
+            let url = BASE_URL + `/flaky?flakiness=${flakiness}&maxRandomDelay=${maxRandomDelay}`;
+            let request = http.get(url);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
+
+}
+
     // group("/memory/churn", () => {
     //     let duration = 'TODO_EDIT_THE_DURATION'; // specify value as there is no example value for this parameter in OpenAPI spec
     //     let objects = 'TODO_EDIT_THE_OBJECTS'; // specify value as there is no example value for this parameter in OpenAPI spec
@@ -150,26 +267,7 @@ export default function() {
     //     }
     // });
 
-    group("simple_delay", () => {
-        let duration = '350'; // specify value as there is no example value for this parameter in OpenAPI spec
 
-         const params2 = {
-            headers: {
-              'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=simple_delay`,
-            },
-        };
-        // Request No. 1
-        {
-            let url = BASE_URL + `/delay?duration=${duration}`;
-            let request = http.get(url, params2);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
-
-    
     
     // group("secured-delay", () => {
     //     let duration = '200'; // specify value as there is no example value for this parameter in OpenAPI spec
@@ -294,69 +392,7 @@ export default function() {
     //     }
     // });
 
-    group("simple_cpu_burn", () => {
-        let matrixSize = '133'; // specify value as there is no example value for this parameter in OpenAPI spec
 
-        const params = {
-            headers: {
-                'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=simple_cpu_burn`,
-            },
-        };
-        // Request No. 1
-        {
-            let url = BASE_URL + `/cpu/magic-identity-check?matrixSize=${matrixSize}`;
-            let request = http.get(url);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
-
-    group("remote_call_delayed", () => {
-        let path = 'delay'; // specify value as there is no example value for this parameter in OpenAPI spec
-        let count = '3'; // specify value as there is no example value for this parameter in OpenAPI spec
-
-         const params = {
-            headers: {
-              'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=remote_call_delayed`,
-            },
-       };
-
-        // Request No. 1
-        {
-            let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
-            let request = http.get(url, params);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
-
-    group("database_call", () => {
-        const random = firstNames[Math.floor(Math.random() * firstNames.length)];
-
-        let path = '/db/employee/find-by-name?firstName=${random.first_name}'; // specify value as there is no example value for this parameter in OpenAPI spec
-
-        let count = '1'; // specify value as there is no example value for this parameter in OpenAPI spec
-
-         const params = {
-            headers: {
-              'baggage': `perfana-test-run-id=${testRunId},perfana-request-name=database_call`,
-            },
-       };
-
-        // Request No. 1
-        {
-            let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
-            let request = http.get(url, params);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
 
     // group("/memory/clear", () => {
 
@@ -504,20 +540,6 @@ export default function() {
     //     }
     // });
 
-    group("flaky_call", () => {
-        let flakiness = 5; // specify value as there is no example value for this parameter in OpenAPI spec
-        let maxRandomDelay = 240; // specify value as there is no example value for this parameter in OpenAPI spec
-
-        // Request No. 1
-        {
-            let url = BASE_URL + `/flaky?flakiness=${flakiness}&maxRandomDelay=${maxRandomDelay}`;
-            let request = http.get(url);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
 
     // group("/basket/all", () => {
 
@@ -551,4 +573,4 @@ export default function() {
     //     }
     // });
 
-}
+// }
