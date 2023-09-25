@@ -17,7 +17,7 @@ on:
         required: false
         type: string
       runner:
-        default: 'demo'
+        default: 'acme'
         type: string
 
 
