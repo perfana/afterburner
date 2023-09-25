@@ -504,20 +504,20 @@ export default function() {
     //     }
     // });
 
-    // group("/flaky", () => {
-    //     let flakiness = 'TODO_EDIT_THE_FLAKINESS'; // specify value as there is no example value for this parameter in OpenAPI spec
-    //     let maxRandomDelay = 'TODO_EDIT_THE_MAXRANDOMDELAY'; // specify value as there is no example value for this parameter in OpenAPI spec
+    group("flaky_call", () => {
+        let flakiness = 5; // specify value as there is no example value for this parameter in OpenAPI spec
+        let maxRandomDelay = 240; // specify value as there is no example value for this parameter in OpenAPI spec
 
-    //     // Request No. 1
-    //     {
-    //         let url = BASE_URL + `/flaky?flakiness=${flakiness}&maxRandomDelay=${maxRandomDelay}`;
-    //         let request = http.get(url);
+        // Request No. 1
+        {
+            let url = BASE_URL + `/flaky?flakiness=${flakiness}&maxRandomDelay=${maxRandomDelay}`;
+            let request = http.get(url);
 
-    //         check(request, {
-    //             "OK": (r) => r.status === 200
-    //         });
-    //     }
-    // });
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
 
     // group("/basket/all", () => {
 
