@@ -1,0 +1,33 @@
+name: Build k6 image
+
+on:
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        required: true
+        type: string
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code from code branch
+      uses: actions/checkout@v2
+      with:
+        path: main
+        fetch-depth: 0
+
+    - name: Login to Docker registry
+      working-directory: main
+      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: Build the Docker image
+      working-directory: main
+      run: |
+         cd cicd/k6
+         docker build --tag perfana/k6-afterburner:${{ inputs.image-tag }} .
+    - name: Push the tagged Docker image
+      working-directory: main
+      run: docker push perfana/k6-afterburner:${{ env.TAG_NAME }}
