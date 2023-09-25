@@ -66,6 +66,21 @@ spec:
                 secretKeyRef:
                   name: k6-args
                   key: TEST_RUN_ID
+            - name: K6_PROMETHEUS_RW_SERVER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: k6-args
+                  key: K6_PROMETHEUS_RW_SERVER_URL
+            - name: K6_PROMETHEUS_RW_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: k6-args
+                  key: K6_PROMETHEUS_RW_USERNAME
+            - name: K6_PROMETHEUS_RW_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: k6-args
+                  key: K6_PROMETHEUS_RW_PASSWORD
 
           args:
             - "run"
