@@ -30,4 +30,4 @@ jobs:
          docker build --tag perfana/k6-afterburner:${{ inputs.image-tag }} .
     - name: Push the tagged Docker image
       working-directory: main
-      run: docker push perfana/k6-afterburner:${{ image-tag }}
+      run: docker push perfana/k6-afterburner:${{ inputs.image-tag }}
