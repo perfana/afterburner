@@ -336,7 +336,7 @@
                 <workload>k6-loadTest</workload>
                 <duration>600</duration>
                 <startRate>1</startRate>
-                <targetRate>4</targetRate>
+                <targetRate>2</targetRate>
                 <rampUpTime>120</rampUpTime>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>

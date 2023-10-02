@@ -27,13 +27,13 @@ const BASE_URL = __ENV.TARGET_BASE_URL;
 const testRunId = __ENV.TEST_RUN_ID;
 // Sleep duration between successive requests.
 // You might want to edit the value of this variable or remove calls to the sleep function on the script.
-const SLEEP_DURATION = 0.1;
+const SLEEP_DURATION = 1;
 // Global variables should be initialized.
 
 
 
 export const options = {
-    discardResponseBodies: true,
+    // discardResponseBodies: true,
     scenarios: {
         scenario1: {
             executor: 'ramping-arrival-rate',
@@ -92,6 +92,8 @@ export function scenario1() {
         }
     });
 
+    sleep(Math.random() * 10);
+
     group("simple_cpu_burn", () => {
         let matrixSize = '133'; // specify value as there is no example value for this parameter in OpenAPI spec
 
@@ -142,6 +144,8 @@ export function scenario2() {
         }
     });
 
+    sleep(Math.random() * 10);
+
     group("database_call", () => {
         const random = firstNames[Math.floor(Math.random() * firstNames.length)];
 
@@ -168,6 +172,8 @@ export function scenario2() {
             });
         }
     });
+
+    sleep(Math.random() * 10);
 
     group("flaky_call", () => {
         let flakiness = 5; // specify value as there is no example value for this parameter in OpenAPI spec
