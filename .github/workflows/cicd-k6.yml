@@ -50,7 +50,7 @@ jobs:
     secrets: inherit
 
   prepare-performance-test:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "acme"]') }}
+    runs-on: [self-hosted, acme]
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     needs: build
     secrets: inherit
@@ -58,7 +58,7 @@ jobs:
       service: ${{ inputs.service }}
 
   performance-test-k6:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "acme"]') }}
+    runs-on: [self-hosted, acme]
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
