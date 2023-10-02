@@ -16,12 +16,15 @@ on:
       annotations:
         required: false
         type: string
+      runner:
+        type: string
+        default: 'acme'
 
 
 jobs:
 
   performance-test-gatling-docker:
-    runs-on: [self-hosted, demo]
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
@@ -36,7 +39,7 @@ jobs:
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Get deployed version
         if: env.TAG_NAME == ''
@@ -47,7 +50,7 @@ jobs:
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Build with Maven
         env:
@@ -64,8 +67,8 @@ jobs:
           -Dannotations="$COMMIT_MESSAGE" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
-          -DinfluxUrl=https://influx.demo.perfana.cloud \
+          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=https://demo.perfana.cloud
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}

@@ -30,13 +30,13 @@
 
         <encoding>UTF-8</encoding>
 
-       <!-- dependency versioning -->
+        <!-- dependency versioning -->
         <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
-        <perfana-java-client.version>2.0.6-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>2.0.0</test-events-wiremock.version>
-        <test-events-springboot.version>1.1.0</test-events-springboot.version>
-        <test-events-command-runner.version>1.1.0</test-events-command-runner.version>
-        <test-events-test-run-config-command.version>1.0.1</test-events-test-run-config-command.version>
+        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
+        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
@@ -78,7 +78,7 @@
                 <plugin>
                     <groupId>io.perfana</groupId>
                     <artifactId>event-scheduler-maven-plugin</artifactId>
-                    <version>${event-scheduler-maven-plugin.version}</version>
+                    <version>${events-scheduler-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -300,7 +300,7 @@
                 <workload>locust-loadTest</workload>
                 <duration>600</duration>
                 <startRate>1</startRate>
-                <targetRate>20</targetRate>
+                <targetRate>10</targetRate>
                 <rampUpTime>120</rampUpTime>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>

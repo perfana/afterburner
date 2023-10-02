@@ -1,6 +1,7 @@
 ---
 
 name: Run performance test
+run-name: performance test for runner ${{ github.event.inputs.runner }} sut ${{ github.event.inputs.systemUnderTest }} workload ${{ github.event.inputs.workload }} service ${{ github.event.inputs.service }} tool ${{ github.event.inputs.tool }}
 
 on:
   workflow_dispatch:
@@ -42,16 +43,25 @@ on:
         options:
           - gatling
           - gatling-docker
+          - jmeter
           - k6
           - locust
       annotations:
         description: 'Test run annotation'
         type: string
         required: false
+      runner:
+        description: 'Runner environment'
+        default: 'acme'
+        type: choice
+        options:
+          - acme
+          - acme-0
+          - test
+
 
 
 jobs:
-
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
@@ -62,6 +72,7 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
 
   performance-test-gatling-docker:
     uses: perfana/afterburner/.github/workflows/run-gatling-docker-test.yml@main
@@ -72,6 +83,7 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
 
   performance-test-k6:
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
@@ -82,9 +94,21 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
+
+  performance-test-jmeter:
+    uses: perfana/afterburner/.github/workflows/run-jmeter-test.yml@main
+    if: inputs.tool == 'jmeter'
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      annotations: ${{ inputs.annotations }}
+      runner: ${{ inputs.runner }}
 
   performance-test-locust:
-    uses: perfana/afterburner/.github/workflows/run-locust-test.yml@demo
+    uses: perfana/afterburner/.github/workflows/run-locust-test.yml@main
     if: inputs.tool == 'locust'
     secrets: inherit
     with:
@@ -93,11 +117,3 @@ jobs:
       service: ${{ inputs.service }}
       annotations: ${{ inputs.annotations }}
 
-  summary:
-    runs-on: self-hosted
-    steps:
-      - name: Generate integration summary
-        run: |
-          echo "# Link to test run in Perfana" >> $GITHUB_STEP_SUMMARY
-          echo "https://demo.perfana.cloud/test-run/${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2?systemUnderTest=${{ inputs.systemUnderTest }}&workload=${{ inputs.workload }}Test&testEnvironment=acme" >> $GITHUB_STEP_SUMMARY
-           

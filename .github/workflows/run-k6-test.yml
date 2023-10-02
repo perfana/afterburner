@@ -16,12 +16,15 @@ on:
       annotations:
         required: false
         type: string
+      runner:
+        default: 'acme'
+        type: string
 
 
 jobs:
 
   performance-test-k6:
-    runs-on: [self-hosted, demo]
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
@@ -36,7 +39,7 @@ jobs:
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Get deployed version
         if: env.TAG_NAME == ''
@@ -48,17 +51,17 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '17.0.4+101'
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
       - name: Setup Maven Action
         uses: s4u/setup-maven-action@v1.6.0
         with:
-          java-version: 17.0.4+101
+          java-version: 17
           maven-version: 3.6.3
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Build with Maven
         env:
@@ -75,8 +78,8 @@ jobs:
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
-          -DinfluxUrl=https://influx.demo.perfana.cloud/myk6db \
+          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086/k6' || 'https://influx.demo.perfana.cloud/k6' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=https://demo.perfana.cloud
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}

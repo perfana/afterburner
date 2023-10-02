@@ -188,14 +188,8 @@
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Handle gatling-lg-1</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onKeepAlive>kubectl get jobs gatling-lg-1 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
+                                <onKeepAlive>kubectl get jobs gatling-lg-1 -o jsonpath={$.status.active} | grep -v 0 -q</onKeepAlive>
                                 <onAbort>kubectl delete jobs gatling-lg-1 -n acme --ignore-not-found</onAbort>
-                            </eventConfig>
-                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Handle gatling-lg-2</name>
-                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onKeepAlive>kubectl get jobs gatling-lg-2 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
-                                <onAbort>kubectl delete jobs gatling-lg-2 -n acme --ignore-not-found</onAbort>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
@@ -335,7 +329,7 @@
                 <constantLoadTimeInSeconds>1</constantLoadTimeInSeconds>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <tags>gatling,stress-test,springboot-monitoring</tags>
+                <tags>gatling,stress-test,spring-boot,kubernetes</tags>
             </properties>
         </profile>
 
@@ -356,7 +350,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>gatling-distributed,gatling,springboot-monitoring</tags>
+                <tags>gatling-distributed,gatling,spring-boot,kubernetes</tags>
             </properties>
         </profile>
 

@@ -3,11 +3,14 @@
 Example of how to run a k6 script in a container, using a kubernetes job, orchestrated by the events-scheduler plugin combine with the CommandRunner plugin 
 # Build script container
 
-```docker build -t perfana/k6-afterburner:1.0.0 .```
+```shell
+docker build -t perfana/k6-afterburner:1.0.0 .
+```
 
 # Kubernetes job manifest
 
-```apiVersion: batch/v1
+```yml
+apiVersion: batch/v1
 kind: Job
 metadata:
   name: k6
@@ -110,7 +113,7 @@ spec:
 * onAbort:  delete job and secret in case of abort event
 * onAfterTest: : delete job and secret after test
 
-```
+```xml
    <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
         <name>Run k6 job</name>
         <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>

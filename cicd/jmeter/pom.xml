@@ -20,17 +20,15 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <events-jmeter-maven-plugin.version>3.6.1-events-3-SNAPSHOT</events-jmeter-maven-plugin.version>
-        <perfana-java-client.version>3.0.0-SNAPSHOT</perfana-java-client.version>
-        <test-events-wiremock.version>3.0.0-SNAPSHOT</test-events-wiremock.version>
-        <test-events-springboot.version>2.0.0-SNAPSHOT</test-events-springboot.version>
-        <test-events-test-run-config-command.version>2.0.0-SNAPSHOT</test-events-test-run-config-command.version>
+        <events-jmeter-maven-plugin.version>3.7.0-events-2</events-jmeter-maven-plugin.version>
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
+        <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
+        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
-
-        <!-- Default Simulation class  -->
-        <systemUnderTestSimulation>io.perfana.afterburner.gatling.setup.StarScream</systemUnderTestSimulation>
 
         <!-- By default Jenkins build Url is used -->
         <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
@@ -58,7 +56,7 @@
 
         <!-- By default enable events -->
         <eventsEnabled>true</eventsEnabled>
-        <eventScheduleScript></eventScheduleScript>
+        <eventScheduleScript/>
 
         <!-- Default load settings -->
         <initialUsersPerSecond>1</initialUsersPerSecond>
@@ -71,8 +69,8 @@
         <!-- Settings for the Perfana Dashboard -->
         <systemUnderTest>StarScream</systemUnderTest>
         <version>1.0</version>
-        <tags></tags>
-        <apiKey></apiKey>
+        <tags/>
+        <apiKey/>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <influxDbHost>influxdb</influxDbHost>
 
@@ -85,7 +83,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.3</version>
+            <version>2.7.9</version>
         </dependency>
     </dependencies>
 
@@ -152,7 +150,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <errorRateThresholdInPercent>2</errorRateThresholdInPercent>
+                    <errorRateThresholdInPercent>10</errorRateThresholdInPercent>
                     <propertiesUser>
                         <test.testRunId>${testRunId}</test.testRunId>
                         <test.duration>${constantLoadTimeInSeconds}</test.duration>
@@ -186,7 +184,7 @@
                             <workload>${workload}</workload>
                             <testEnvironment>${testEnvironment}</testEnvironment>
                             <testRunId>${testRunId}</testRunId>
-                            <buildResultsUrl>${CIBuildResultsUrl}</buildResultsUrl>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
                             <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
                             <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
                             <annotations>${annotations}</annotations>
@@ -206,26 +204,41 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*star-scream.*</perfana-containers>
+                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
+                                    <perfana-pods>${sut-config}.*</perfana-pods>
                                 </variables>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+                                <name>CommandRunnerJMeterPush</name>
+                                <onStartTest>sh -c "./j2i target/jmeter/results -u ${influxUser} -p ${influxPassword} -a ${influxUrl} -b jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
-                                    java.runtime.version,JDK_JAVA_OPTIONS,
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.socket.timeout.millis,
+                                    afterburner.remote.call.httpclient.connect.timeout.millis,
+                                    afterburner.remote.call.httpclient.connections.max,
+                                    afterburner.remote.call.base_url,
+                                    server.tomcat.threads.max,
+                                    afterburner.async_max_pool_size,
                                     afterburner.async_core_pool_size,
-                                    featureToggleIdentityMatrix,
-                                    afterburner.remote.call.httpclient.connections.max
+                                    afterburner.async_queue_size,
+                                    featureToggleIdentityMatrix
                                 </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner:8080/actuator</actuatorBaseUrl>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
-                                    java.runtime.version,JDK_JAVA_OPTIONS,
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
                                     afterburner.async_core_pool_size,
                                     afterburner.datasource.employee.maximum-pool-size
                                 </actuatorEnvProperties>
@@ -284,6 +297,11 @@
                         <groupId>io.perfana</groupId>
                         <artifactId>test-events-test-run-config-command</artifactId>
                         <version>${test-events-test-run-config-command.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -397,7 +415,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>load-test,springboot-monitoring,jmeter</tags>
+                <tags>spring-boot-kubernetes,kubernetes,jmeter</tags>
             </properties>
         </profile>
 

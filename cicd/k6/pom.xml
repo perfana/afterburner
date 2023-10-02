@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
-
     <groupId>io.perfana</groupId>
     <artifactId>perfana-k6-afterburner</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -31,12 +29,12 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <event-scheduler-maven-plugin.version>2.2.0</event-scheduler-maven-plugin.version>
-        <perfana-java-client.version>[2.0.5,2.1.0)</perfana-java-client.version>
-        <test-events-wiremock.version>[2.1.0,2.2.0)</test-events-wiremock.version>
-        <test-events-springboot.version>[1.1.0,1.2.0)</test-events-springboot.version>
-        <test-events-command-runner.version>[1.1.0,1.2.0)</test-events-command-runner.version>
-        <test-events-test-run-config-command.version>[1.0.0,1.1.0)</test-events-test-run-config-command.version>
+        <event-scheduler-maven-plugin.version>3.0.1</event-scheduler-maven-plugin.version>
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
+        <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
+        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
+        <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
         <perfanaUrl>http://perfana:3000</perfanaUrl>
@@ -78,7 +76,7 @@
                 <plugin>
                     <groupId>io.perfana</groupId>
                     <artifactId>event-scheduler-maven-plugin</artifactId>
-                    <version>${events-scheduler-maven-plugin.version}</version>
+                    <version>${event-scheduler-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -131,13 +129,16 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*bumble-bee.*</perfana-containers>
+                                    <perfana-containers>.*afterburner-db.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
+                                    <perfana-pods>${sut-config}.*</perfana-pods>
                                 </variables>
+
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onBeforeTest>kubectl delete secret k6-args --ignore-not-found; \
+                                <onBeforeTest>kubectl delete secret k6-args -n acme --ignore-not-found; \
                                     kubectl create secret generic k6-args -n acme \
                                     --from-literal=K6_INFLUXDB_URL=${influxUrl} \
                                     --from-literal=K6_INFLUXDB_PASSWORD=${influxPassword} \
@@ -149,29 +150,50 @@
                                     --from-literal=TARGET_BASE_URL=${targetBaseUrl} \
                                     --from-literal=SYSTEM_UNDER_TEST=${systemUnderTest} \
                                     --from-literal=TEST_ENVIRONMENT=${testEnvironment} \
-                                    --from-literal=TEST_RUN_ID=${testRunId}; \
+                                    --from-literal=TEST_RUN_ID=${testRunId} \
+                                    --from-literal=K6_PROMETHEUS_RW_SERVER_URL=https://mimir.demo.perfana.cloud/api/v1/push \
+                                    --from-literal=K6_PROMETHEUS_RW_USERNAME=perfana \
+                                    --from-literal=K6_PROMETHEUS_RW_PASSWORD=${influxPassword}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
-                                    kubectl create -f k6-job.yml -n acme
+                                    kubectl create -f k6-job.yml -n acme; \
                                 </onBeforeTest>
-                                <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} | grep -q 1</onKeepAlive>
-                                <onAbort>kubectl delete secret k6-args --ignore-not-found; \
+                                <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} -n acme | grep -q 1</onKeepAlive>
+                                <onAbort>kubectl delete secret k6-args -n acme --ignore-not-found; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found
                                 </onAbort>
-                                <onAfterTest>kubectl delete secret k6-args --ignore-not-found; \
+                                <onAfterTest>kubectl delete secret k6-args -n acme --ignore-not-found; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found
                                 </onAfterTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
-                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,featureToggleIdentityMatrix,afterburner.remote.call.httpclient.connections.max</actuatorEnvProperties>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.socket.timeout.millis,
+                                    afterburner.remote.call.httpclient.connect.timeout.millis,
+                                    afterburner.remote.call.httpclient.connections.max,
+                                    afterburner.remote.call.base_url,
+                                    server.tomcat.threads.max,
+                                    afterburner.async_max_pool_size,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.async_queue_size,
+                                    featureToggleIdentityMatrix
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
                                 <tags>${sut-config}-be</tags>
-                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.svc.cluster.local:8080/actuator</actuatorBaseUrl>
-                                <actuatorEnvProperties>java.runtime.version,JDK_JAVA_OPTIONS,afterburner.async_core_pool_size,afterburner.datasource.employee.maximum-pool-size</actuatorEnvProperties>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.datasource.employee.maximum-pool-size
+                                </actuatorEnvProperties>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
@@ -198,7 +220,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentMySql</name>
-                                <command>kubectl get statefulset afterburner-db-mysql -ojson</command>
+                                <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,secret</excludes>
                                 <output>keys</output>
@@ -300,7 +322,7 @@
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,springboot-monitoring</tags>
+                <tags>k6,spring-boot-kubernetes,kubernetes</tags>
             </properties>
         </profile>
 
@@ -318,7 +340,7 @@
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,springboot-monitoring</tags>
+                <tags>k6,spring-boot-kubernetes,kubernetes</tags>
             </properties>
         </profile>
 
@@ -361,10 +383,6 @@
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
             </properties>
         </profile>
-
-
-
-
 
     </profiles>
 </project>

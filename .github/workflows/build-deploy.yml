@@ -82,11 +82,23 @@ jobs:
           sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/optimus-prime-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/optimus-prime-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/bumble-bee-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/bumble-bee-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/bumble-bee-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/bumble-bee-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
       - name: Commit files
         run: |
           cd perfana-gitops
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
-          git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
+          git commit -m "Bumped afterburner Afterburner images to $full_version in demo environment" -a
           git push
 

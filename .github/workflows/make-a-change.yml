@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
   schedule:
     # At minute 13 past hour 8 and 12 AND 15 and 20 on every day-of-week from Monday through Friday.
-    - cron: '13 8,12 * * 1-5'
-    - cron: '13 15,20 * * 1-5'
+     - cron: '13 8,12 * * 1-5'
+     - cron: '13 15,20 * * 1-5'
 
 jobs:
   build:

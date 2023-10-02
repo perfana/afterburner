@@ -21,12 +21,8 @@ on:
 jobs:
 
   performance-test-locust:
-    runs-on: [self-hosted, demo]
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
-      
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v3
-        id: install
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
         uses: actions/checkout@v3
@@ -39,7 +35,13 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
-      - run: pip install -r cicd/locust/requirements.txt 
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        id: install
+      - name: Get commit message
+        if: inputs.annotations == ''
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - run: pip install -r cicd/locust/requirements.txt
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
@@ -51,6 +53,17 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.0.4+101'
+          distribution: 'temurin'
+          cache: maven
+      - name: Setup Maven Action
+        uses: s4u/setup-maven-action@v1.6.0
+        with:
+          java-version: 17.0.4+101
+          maven-version: 3.6.3
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
@@ -72,15 +85,7 @@ jobs:
           -Dhost=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxDbHost=influx.demo.perfana.cloud \
           -DinfluxDbPort=443 \
-          -DinfluxDbUsername=admin \
-          -DinfluxDbDatabase=locust \
+          -DinfluxDbUsername=admin
+          -DinfluxDbDatabase=locust
           -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DperfanaUrl=https://demo.perfana.cloud
-  perfana:
-    runs-on: self-hosted
-    steps:
-      - name: Generate summary
-        run: |
-          echo "# Link to test run in Perfana" >> $GITHUB_STEP_SUMMARY
-          echo "https://demo.perfana.cloud/test-run/${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-2?systemUnderTest=${{ inputs.systemUnderTest }}&workload=locust-${{ inputs.workload }}Test&testEnvironment=acme" >> $GITHUB_STEP_SUMMARY
-          

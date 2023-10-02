@@ -3,14 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>io.perfana</groupId>
-        <artifactId>afterburner</artifactId>
-        <version>${revision}</version>
-    </parent>
-
     <artifactId>afterburner-loadtest-gatling</artifactId>
-    <version>${revision}</version>
+    <groupId>io.perfana</groupId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -18,15 +13,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gatling-plugin.version>3.9.0</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <kotlin.version>1.6.21</kotlin.version>
+        <kotlin.version>1.8.22</kotlin.version>
 
         <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
-        <test-events-hello-world.version>[3.0.0,3.1.0)</test-events-hello-world.version>
+        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
 
         <!-- By default enable events -->
         <eventsEnabled>false</eventsEnabled>
-        <eventScheduleScript></eventScheduleScript>
+        <eventScheduleScript/>
 
         <!-- Default load settings -->
         <initialUsersPerSecond>1</initialUsersPerSecond>
@@ -38,11 +33,12 @@
         <systemUnderTest>Afterburner</systemUnderTest>
         <testEnvironment>test</testEnvironment>
         <version>1.0</version>
-        <tags></tags>
-        <apiKey></apiKey>
+        <tags>jfr,gatling-raw</tags>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
         <buildResultsUrl>http://jenkins:8080</buildResultsUrl>
-        <influxDbHost>influxdb</influxDbHost>
+        <influxUrl>http://localhost:8086</influxUrl>
+        <influxUser/>
+        <influxPassword/>
 
         <scenario>cpu</scenario>
         <workload>loadTestCpu</workload>
@@ -51,10 +47,8 @@
         <rampupTimeInSeconds>30</rampupTimeInSeconds>
         <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
         <perfanaEnabled>true</perfanaEnabled>
-        <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
         <eventsEnabled>true</eventsEnabled>
-        <annotations></annotations>
-        <tags>load-test,micro-service</tags>
+        <annotations/>
     </properties>
 
     <dependencies>
@@ -123,6 +117,7 @@
                 <artifactId>events-gatling-maven-plugin</artifactId>
                 <version>${events-gatling-maven-plugin.version}</version>
                 <configuration>
+                    <resultsFolder>target/gatling/results</resultsFolder>
                     <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
                     <eventSchedulerConfig>
                         <debugEnabled>true</debugEnabled>
@@ -130,10 +125,6 @@
                         <failOnError>true</failOnError>
                         <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
                         <scheduleScript>
-                            PT5S|restart|{ server:'myserver' replicas:2 tags: [ 'first', 'second' ] }
-                            PT10S|scale-down
-                            PT30S|heapdump|server=myserver.example.com;port=1567
-                            PT1M|scale-up|{ replicas:2 }
                         </scheduleScript>
                         <testConfig>
                             <systemUnderTest>${systemUnderTest}</systemUnderTest>
@@ -148,21 +139,20 @@
                             <tags>${tags}</tags>
                         </testConfig>
                         <eventConfigs>
-                            <eventConfig implementation="io.perfana.helloworld.event.HelloWorldEventConfig">
-                                <name>HelloWorldEvent1</name>
-                                <helloInitialSleepSeconds>40</helloInitialSleepSeconds>
-                                <myRestService>https://my-rest-api</myRestService>
-                                <myCredentials>secret</myCredentials>
-                            </eventConfig>
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
                                 <name>PerfanaEvent1</name>
                                 <enabled>${eventsEnabled}</enabled>
-                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
-                                <apiKey>${apiKey}</apiKey>
+                                <perfanaUrl>http://localhost:4000</perfanaUrl>
+                                <apiKey>${env.PERFANA_API_KEY}</apiKey>
                                 <assertResultsEnabled>false</assertResultsEnabled>
                                 <variables>
                                     <var1>my_value</var1>
                                 </variables>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
+				<name>CommandRunnerGatlingPush</name>
+				<onBeforeTest>if [ -f ./g2i ]; then echo "g2i is present"; else wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i; chmod +x g2i; fi</onBeforeTest>
+				<onStartTest>sh -c "./g2i ./target/gatling/results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                         </eventConfigs>
                     </eventSchedulerConfig>
@@ -170,13 +160,13 @@
                 <dependencies>
                     <dependency>
                         <groupId>io.perfana</groupId>
-                        <artifactId>test-events-hello-world</artifactId>
-                        <version>${test-events-hello-world.version}</version>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>${perfana-java-client.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>io.perfana</groupId>
-                        <artifactId>perfana-java-client</artifactId>
-                        <version>${perfana-java-client.version}</version>
+                        <artifactId>test-events-command-runner</artifactId>
+                        <version>${test-events-command-runner.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
