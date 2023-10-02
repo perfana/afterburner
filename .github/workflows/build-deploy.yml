@@ -99,6 +99,6 @@ jobs:
           cd perfana-gitops
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
-          git commit -m "Bumped afterburner OptimusPrimes to $full_version in demo environment" -a
+          git commit -m "Bumped afterburner Afterburner images to $full_version in demo environment" -a
           git push
 
