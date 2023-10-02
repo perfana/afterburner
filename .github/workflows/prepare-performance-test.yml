@@ -15,7 +15,7 @@ on:
 jobs:
 
   prepare-performance-test:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme') && fromJSON('["self-hosted", "acme"]') || fromJSON('["self-hosted", "acme"]') }}
+    runs-on: [self-hosted, acme]
     steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
@@ -45,17 +45,17 @@ jobs:
           IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
           while true; do
-             echo "Waiting for deployment ${{ (inputs.service }}-fe-afterburner ..."
-             if [[ $(kubectl get deployment ${{ (inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ${{ (inputs.service }}-fe-afterburner ready"
+             echo "Waiting for deployment ${{ inputs.service }}-fe-afterburner ..."
+             if [[ $(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment ${{ inputs.service }}-fe-afterburner ready"
                 break
              fi
              sleep 10
           done
           while true; do
-             echo "Waiting for deployment ${{ (inputs.service }}-be-afterburner ..."
-             if [[ $(kubectl get deployment ${{ (inputs.service }}-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ${{ (inputs.service }}-be-afterburner ready"
+             echo "Waiting for deployment ${{ inputs.service }}-be-afterburner ..."
+             if [[ $(kubectl get deployment ${{ inputs.service }}-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment ${{ inputs.service }}-be-afterburner ready"
                 break
              fi
              sleep 10
