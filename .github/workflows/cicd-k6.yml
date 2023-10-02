@@ -54,6 +54,8 @@ jobs:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     needs: build
     secrets: inherit
+    with:
+      service: ${{ inputs.service }}
 
   performance-test-k6:
     runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "acme"]') }}
