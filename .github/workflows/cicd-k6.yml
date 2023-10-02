@@ -1,6 +1,6 @@
 ---
 
-name: CI/CD
+name: CI/CD K6
 
 on:
   push:

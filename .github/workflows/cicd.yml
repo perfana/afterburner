@@ -12,35 +12,36 @@ on:
     inputs:
       systemUnderTest:
         description: 'System Under Test'
-        required: true
+        required: false
         default: 'OptimusPrime'
-        type: choice
-        options:
-          - OptimusPrime
-          - JetFire
+        type: string
+#        options:
+#          - OptimusPrime
+#          - JetFire
       workload:
         description: 'Workload'
-        required: true
+        required: false
         default: 'load'
-        type: choice
-        options:
-          - load
-          - stress
+        type: string
+#        options:
+#          - load
+#          - stress
       service:
         description: 'Service name'
-        required: true
+        required: false
         default: 'optimus-prime'
-        type: choice
-        options:
-          - optimus-prime
-          - jet-fire
+        type: string
+#        options:
+#          - optimus-prime
+#          - jet-fire
       runner:
         description: 'Runner environment'
-        default: 'demo'
-        type: choice
-        options:
-          - demo
-          - test
+        required: false
+        default: 'acme'
+        type: string
+#        options:
+#          - demo
+#          - test
 
 jobs:
 
