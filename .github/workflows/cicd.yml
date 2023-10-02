@@ -53,6 +53,9 @@ jobs:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     needs: build
     secrets: inherit
+    with:
+      service: ${{ inputs.service }}
+
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
