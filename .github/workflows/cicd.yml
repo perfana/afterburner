@@ -49,13 +49,13 @@ jobs:
     secrets: inherit
 
   prepare-performance-test:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "demo"]') }}
+    runs-on: [self-hosted, acme]
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     needs: build
     secrets: inherit
 
   performance-test-gatling:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "demo"]') }}
+    runs-on: [self-hosted, acme]
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
@@ -64,3 +64,7 @@ jobs:
       workload: ${{ inputs.workload }}
       service: ${{ inputs.service }}
       runner: ${{ inputs.runner }}
+
+  deploy-to-production:
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
+    needs: performance-test-gatling
