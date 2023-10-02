@@ -7,41 +7,7 @@ on:
     branches: [demo]
   pull_request:
     branches: [demo]
-  workflow_call:
-    inputs:
-      systemUnderTest:
-        description: 'System Under Test'
-        required: false
-        default: 'BumbleBee'
-        type: string
-#        options:
-#          - BumbleBee
-#          - JetFire
-      workload:
-        description: 'Workload'
-        required: false
-        default: 'load'
-        type: string
-#        options:
-#          - load
-#          - stress
-      service:
-        description: 'Service name'
-        required: false
-        default: 'bumble-bee'
-        type: string
-#        options:
-#          - bumble-bee
-#          - optimus-prime
-#          - jet-fire
-      runner:
-        description: 'Runner environment'
-        default: 'acme'
-        required: false
-        type: string
-#        options:
-#          - acme
-#          - test
+
 
 jobs:
 
@@ -54,14 +20,14 @@ jobs:
     needs: build
     secrets: inherit
     with:
-      service: ${{ inputs.service }}
+      service: bumble-bee
 
   performance-test-k6:
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
     with:
-      systemUnderTest: ${{ inputs.systemUnderTest }}
-      workload: ${{ inputs.workload }}
-      service: ${{ inputs.service }}
-      runner: ${{ inputs.runner }}
+      systemUnderTest: BumbleBee
+      workload: load
+      service: bumble-bee
+      runner: acme
