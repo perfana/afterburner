@@ -1,0 +1,67 @@
+---
+
+name: CI/CD
+
+on:
+  push:
+    branches: [demo]
+  pull_request:
+    branches: [demo]
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      systemUnderTest:
+        description: 'System Under Test'
+        required: true
+        default: 'BumbleBee'
+        type: choice
+        options:
+          - OptimusPrime
+          - JetFire
+      workload:
+        description: 'Workload'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - load
+          - stress
+      service:
+        description: 'Service name'
+        required: true
+        default: 'bumble-bee'
+        type: choice
+        options:
+          - bumble-bee
+          - optimus-prime
+          - jet-fire
+      runner:
+        description: 'Runner environment'
+        default: 'acme'
+        type: choice
+        options:
+          - acme
+          - test
+
+jobs:
+
+  build:
+    uses: perfana/afterburner/.github/workflows/build-deploy.yml@main
+    secrets: inherit
+
+  prepare-performance-test:
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "acme"]') }}
+    uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
+    needs: build
+    secrets: inherit
+
+  performance-test-k6:
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || fromJSON('["self-hosted", "acme"]') }}
+    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+    needs: prepare-performance-test
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      runner: ${{ inputs.runner }}
