@@ -155,7 +155,7 @@
                                     --from-literal=K6_PROMETHEUS_RW_USERNAME=perfana \
                                     --from-literal=K6_PROMETHEUS_RW_PASSWORD=${influxPassword}; \
                                     kubectl delete jobs k6 -n acme --ignore-not-found; \
-                                    kubectl create -f k6-job.yml -n acme; \
+                                    kubectl create -f k6-job.yml -n acme;
                                 </onBeforeTest>
                                 <onKeepAlive>kubectl get jobs k6 -o jsonpath={$.status.active} -n acme | grep -q 1</onKeepAlive>
                                 <onAbort>kubectl delete secret k6-args -n acme --ignore-not-found; \
