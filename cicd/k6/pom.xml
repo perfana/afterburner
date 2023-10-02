@@ -108,7 +108,7 @@
                         <debugEnabled>true</debugEnabled>
                         <schedulerEnabled>true</schedulerEnabled>
                         <failOnError>true</failOnError>
-                        <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
+                        <continueOnEventCheckFailure>false</continueOnEventCheckFailure>
                         <testConfig>
                             <systemUnderTest>${systemUnderTest}</systemUnderTest>
                             <version>${version}</version>
