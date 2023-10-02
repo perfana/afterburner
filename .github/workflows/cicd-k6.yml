@@ -11,36 +11,37 @@ on:
     inputs:
       systemUnderTest:
         description: 'System Under Test'
-        required: true
+        required: false
         default: 'BumbleBee'
-        type: choice
-        options:
-          - BumbleBee
-          - JetFire
+        type: string
+#        options:
+#          - BumbleBee
+#          - JetFire
       workload:
         description: 'Workload'
-        required: true
+        required: false
         default: 'load'
-        type: choice
-        options:
-          - load
-          - stress
+        type: string
+#        options:
+#          - load
+#          - stress
       service:
         description: 'Service name'
-        required: true
+        required: false
         default: 'bumble-bee'
-        type: choice
-        options:
-          - bumble-bee
-          - optimus-prime
-          - jet-fire
+        type: string
+#        options:
+#          - bumble-bee
+#          - optimus-prime
+#          - jet-fire
       runner:
         description: 'Runner environment'
         default: 'acme'
-        type: choice
-        options:
-          - acme
-          - test
+        required: false
+        type: string
+#        options:
+#          - acme
+#          - test
 
 jobs:
 
