@@ -7,41 +7,6 @@ on:
     branches: [demo]
   pull_request:
     branches: [demo]
-  workflow_dispatch:
-    # Inputs the workflow accepts.
-    inputs:
-      systemUnderTest:
-        description: 'System Under Test'
-        required: false
-        default: 'OptimusPrime'
-        type: string
-#        options:
-#          - OptimusPrime
-#          - JetFire
-      workload:
-        description: 'Workload'
-        required: false
-        default: 'load'
-        type: string
-#        options:
-#          - load
-#          - stress
-      service:
-        description: 'Service name'
-        required: false
-        default: 'optimus-prime'
-        type: string
-#        options:
-#          - optimus-prime
-#          - jet-fire
-      runner:
-        description: 'Runner environment'
-        required: false
-        default: 'acme'
-        type: string
-#        options:
-#          - demo
-#          - test
 
 jobs:
 
@@ -54,7 +19,7 @@ jobs:
     needs: build
     secrets: inherit
     with:
-      service: ${{ inputs.service }}
+      service: optimus-prime
 
 
   performance-test-gatling:
@@ -62,10 +27,10 @@ jobs:
     needs: prepare-performance-test
     secrets: inherit
     with:
-      systemUnderTest: ${{ inputs.systemUnderTest }}
-      workload: ${{ inputs.workload }}
-      service: ${{ inputs.service }}
-      runner: ${{ inputs.runner }}
+      systemUnderTest: OptimusPrime
+      workload: load
+      service: optimus-prime
+      runner: acme
 
   deploy-to-production:
     uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
