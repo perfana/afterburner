@@ -7,8 +7,7 @@ on:
     branches: [demo]
   pull_request:
     branches: [demo]
-  workflow_dispatch:
-    # Inputs the workflow accepts.
+  workflow_call:
     inputs:
       systemUnderTest:
         description: 'System Under Test'
@@ -16,7 +15,7 @@ on:
         default: 'BumbleBee'
         type: choice
         options:
-          - OptimusPrime
+          - BumbleBee
           - JetFire
       workload:
         description: 'Workload'
