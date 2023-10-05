@@ -86,7 +86,7 @@ jobs:
           -Dversion="${{ env.TAG_NAME }}" \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
-          -DtestEnvironment=opentelemetry-demo \
+          -DtestEnvironment=acme \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
           -DinfluxDbUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana.svc.cluster.local:8086' || 'https://influx.demo.perfana.cloud' }} \
