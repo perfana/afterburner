@@ -20,7 +20,7 @@ import { SharedArray } from 'k6/data';
 
 const firstNames = new SharedArray('another data name', function () {
     // Load CSV file and parse it using Papa Parse
-    return papaparse.parse(open('./first_names.csv'), { header: true }).data;
+    return papaparse.parse(open('./data/first_names.csv'), { header: true }).data;
 });
 
 const BASE_URL = __ENV.TARGET_BASE_URL;
