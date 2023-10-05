@@ -81,6 +81,7 @@ jobs:
           chmod +x k2i
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -Dsut-config=${{ inputs.service }} \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \

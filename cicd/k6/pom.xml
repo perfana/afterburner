@@ -143,7 +143,7 @@
                                 <name>Run k6 job</name>
                                 <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
                                 <onStartTest>k6 run --out csv=test_results.csv \
-                                    -e CONSTANT_LOAD_TIME=${constantLoadTime}s \
+                                    -e CONSTANT_LOAD_TIME=${duration}s \
                                     -e RAMPUP_TIME=${rampUpTime}s \
                                     -e START_RATE=${startRate} \
                                     -e TARGET_RATE=${targetRate} \
