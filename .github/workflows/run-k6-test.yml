@@ -78,7 +78,6 @@ jobs:
           cd cicd/k6
           # fetch k6 2 influx tool
           wget https://github.com/perfana/gatling-to-influxdb/releases/download/k2i-0.0.1/k2i
-          chmod +x k2i
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -Dsut-config=${{ inputs.service }} \
