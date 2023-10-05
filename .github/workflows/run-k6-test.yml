@@ -63,23 +63,32 @@ jobs:
         env:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/k6
+          # fetch k6 2 influx tool
+          wget https://github.com/perfana/gatling-to-influxdb/releases/download/k2i-0.0.1/k2i
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
-          -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -Dsut-config=${{ inputs.service }} \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
+          -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
-          -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
-          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086/k6' || 'https://influx.demo.perfana.cloud/k6' }} \
-          -DinfluxUser=admin \
-          -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}
+          -DinfluxDbUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana.svc.cluster.local:8086' || 'https://influx.demo.perfana.cloud' }} \
+          -DinfluxDbUsername=admin \
+          -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana.svc.cluster.local:3000' || 'https://demo.perfana.cloud' }}

@@ -20,7 +20,7 @@ import { SharedArray } from 'k6/data';
 
 const firstNames = new SharedArray('another data name', function () {
     // Load CSV file and parse it using Papa Parse
-    return papaparse.parse(open('./first_names.csv'), { header: true }).data;
+    return papaparse.parse(open('./data/first_names.csv'), { header: true }).data;
 });
 
 const BASE_URL = __ENV.TARGET_BASE_URL;
@@ -147,9 +147,9 @@ export function scenario2() {
     sleep(Math.random() * 10);
 
     group("database_call", () => {
-        const random = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const randomName = firstNames[Math.floor(Math.random() * firstNames.length)];
 
-        let path = '/db/employee/find-by-name?firstName=${random.first_name}'; // specify value as there is no example value for this parameter in OpenAPI spec
+        let path = `/db/employee/find-by-name?firstName=${randomName.first_name}`; // specify value as there is no example value for this parameter in OpenAPI spec
 
         let count = '1'; // specify value as there is no example value for this parameter in OpenAPI spec
 
@@ -184,7 +184,7 @@ export function scenario2() {
                 'perfana-test-run-id': `${testRunId}`,
                 'perfana-request-name': 'flaky_call'
             },
-            tags: { name: 'remote_call_delayed' }
+            tags: { name: 'flaky_call' }
 
         };
         // Request No. 1
