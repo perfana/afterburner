@@ -133,7 +133,7 @@
                                     <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                     <perfana-pods>${sut-config}.*</perfana-pods>
                                 </variables>
-
+                                <overrideTestRunId>false</overrideTestRunId>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerK6ToInflux</name>

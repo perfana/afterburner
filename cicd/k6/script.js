@@ -147,9 +147,9 @@ export function scenario2() {
     sleep(Math.random() * 10);
 
     group("database_call", () => {
-        const random = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const randomName = firstNames[Math.floor(Math.random() * firstNames.length)];
 
-        let path = '/db/employee/find-by-name?firstName=${random.first_name}'; // specify value as there is no example value for this parameter in OpenAPI spec
+        let path = '/db/employee/find-by-name?firstName=${randomName}'; // specify value as there is no example value for this parameter in OpenAPI spec
 
         let count = '1'; // specify value as there is no example value for this parameter in OpenAPI spec
 
