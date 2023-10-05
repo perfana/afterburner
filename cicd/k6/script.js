@@ -184,7 +184,7 @@ export function scenario2() {
                 'perfana-test-run-id': `${testRunId}`,
                 'perfana-request-name': 'flaky_call'
             },
-            tags: { name: 'remote_call_delayed' }
+            tags: { name: 'flaky_call' }
 
         };
         // Request No. 1
