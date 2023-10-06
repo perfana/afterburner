@@ -7,15 +7,24 @@
     <groupId>io.perfana</groupId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling-plugin.version>3.9.0</gatling-plugin.version>
+        <gatling-plugin.version>3.9.5</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <kotlin.version>1.8.22</kotlin.version>
 
-        <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
+        <events-gatling-maven-plugin.version>4.3.0-events-1</events-gatling-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
 
@@ -45,7 +54,7 @@
         <initialUsersPerSecond>1</initialUsersPerSecond>
         <targetUsersPerSecond>10</targetUsersPerSecond>
         <rampupTimeInSeconds>30</rampupTimeInSeconds>
-        <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+        <constantLoadTimeInSeconds>66</constantLoadTimeInSeconds>
         <perfanaEnabled>true</perfanaEnabled>
         <eventsEnabled>true</eventsEnabled>
         <annotations/>
@@ -144,7 +153,7 @@
                                 <enabled>${eventsEnabled}</enabled>
                                 <perfanaUrl>http://localhost:4000</perfanaUrl>
                                 <apiKey>${env.PERFANA_API_KEY}</apiKey>
-                                <assertResultsEnabled>false</assertResultsEnabled>
+                                <assertResultsEnabled>true</assertResultsEnabled>
                                 <variables>
                                     <var1>my_value</var1>
                                 </variables>
