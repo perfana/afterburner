@@ -116,6 +116,32 @@ export function scenario1() {
             });
         }
     });
+
+    sleep(Math.random() * 10);
+
+    group("remote_call_async", () => {
+        let duration = 300; // specify value as there is no example value for this parameter in OpenAPI spec
+        let count = '5'; // specify value as there is no example value for this parameter in OpenAPI spec
+
+        const params = {
+            headers: {
+                'perfana-test-run-id': `${testRunId}`,
+                'perfana-request-name': 'remote_call_async'
+            },
+            tags: { name: 'remote_call_async' }
+
+        };
+
+        // Request No. 1
+        {
+            let url = BASE_URL + `/remote/call-many?${count}=5&path=delay?duration=${duration}`;
+            let request = http.get(url, params);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
+    });
 }
 
 export function scenario2() {
