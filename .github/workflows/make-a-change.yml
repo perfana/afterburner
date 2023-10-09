@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   schedule:
     # At minute 13 past hour 8 from 8 to 20 h
-     - cron: '05 8-20 * * *'
+     - cron: '10 8-20 * * *'
 
 jobs:
   build:
@@ -53,7 +53,7 @@ jobs:
             sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
           fi
           if [ $connectionPoolIssue -eq 0 ]; then
-            commit_message= "${commit_message}tune http connection pool size"
+            commit_message="${commit_message}tune http connection pool size"
             sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
           fi
 
