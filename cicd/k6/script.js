@@ -78,7 +78,7 @@ export function scenario1() {
                 'perfana-test-run-id': `${testRunId}`,
                 'perfana-request-name': 'simple_delay'
             },
-            tags: { name: 'remote_call_delayed' }
+            tags: { name: 'simple_delay' }
 
         };
         // Request No. 1
@@ -146,29 +146,29 @@ export function scenario1() {
 
 export function scenario2() {
 
-    group("remote_call_delayed", () => {
-        let path = 'delay'; // specify value as there is no example value for this parameter in OpenAPI spec
-        let count = '3'; // specify value as there is no example value for this parameter in OpenAPI spec
-
-        const params = {
-            headers: {
-                'perfana-test-run-id': `${testRunId}`,
-                'perfana-request-name': 'remote_call_delayed'
-            },
-            tags: { name: 'remote_call_delayed' }
-
-        };
-
-        // Request No. 1
-        {
-            let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
-            let request = http.get(url, params);
-
-            check(request, {
-                "OK": (r) => r.status === 200
-            });
-        }
-    });
+    // group("remote_call_delayed", () => {
+    //     let path = 'delay'; // specify value as there is no example value for this parameter in OpenAPI spec
+    //     let count = '3'; // specify value as there is no example value for this parameter in OpenAPI spec
+    //
+    //     const params = {
+    //         headers: {
+    //             'perfana-test-run-id': `${testRunId}`,
+    //             'perfana-request-name': 'remote_call_delayed'
+    //         },
+    //         tags: { name: 'remote_call_delayed' }
+    //
+    //     };
+    //
+    //     // Request No. 1
+    //     {
+    //         let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
+    //         let request = http.get(url, params);
+    //
+    //         check(request, {
+    //             "OK": (r) => r.status === 200
+    //         });
+    //     }
+    // });
 
     sleep(Math.random() * 10);
 
