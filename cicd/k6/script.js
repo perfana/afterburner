@@ -55,8 +55,8 @@ export const options = {
             preAllocatedVUs: 50,
             maxVUs: 500,
             stages: [
-                { target: __ENV.TARGET_RATE / 2, duration: __ENV.RAMPUP_TIME },
-                { target: __ENV.TARGET_RATE / 2, duration: __ENV.CONSTANT_LOAD_TIME },
+                { target: __ENV.TARGET_RATE, duration: __ENV.RAMPUP_TIME },
+                { target: __ENV.TARGET_RATE, duration: __ENV.CONSTANT_LOAD_TIME },
             ],
         },
     },
