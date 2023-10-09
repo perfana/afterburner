@@ -41,7 +41,7 @@ jobs:
           echo "commit_message=$commit_message" >> $GITHUB_ENV
       - name: Make a change - pool
 #        if: github.event.schedule == '13 8,12 * * *'
-        if: github.event.schedule == '13 16,17,18 * * *'
+        if: github.event.schedule == '13 13,14,15 * * *'
         run: |
           prop_file=afterburner-java/src/main/resources/application.properties
           if grep -q "afterburner.remote.call.httpclient.connections.max=60" "$prop_file"; then
