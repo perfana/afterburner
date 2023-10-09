@@ -9,8 +9,8 @@ on:
     # At minute 13 past hour 8 and 12 AND 15 and 20 on every day-of-week.
 #     - cron: '13 8,12 * * *'
 #     - cron: '13 15,20 * * *'
-     - cron: '13 13,14,15 * * *'
-     - cron: '13 16,17,18 * * *'
+     - cron: '13 13,14 * * *'
+     - cron: '13 15,16 * * *'
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
           persist-credentials: false
       - name: Make a change - cpu
 #        if: github.event.schedule != '13 8,12 * * *'
-        if: github.event.schedule != '13 13,14,15 * * *'
+        if: github.event.schedule != '13 13,14 * * *'
         run: |
           java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
           if grep -q "some variation: is more fun" "$java_file"; then
@@ -41,7 +41,7 @@ jobs:
           echo "commit_message=$commit_message" >> $GITHUB_ENV
       - name: Make a change - pool
 #        if: github.event.schedule == '13 8,12 * * *'
-        if: github.event.schedule == '13 13,14,15 * * *'
+        if: github.event.schedule == '13 13,14 * * *'
         run: |
           prop_file=afterburner-java/src/main/resources/application.properties
           if grep -q "afterburner.remote.call.httpclient.connections.max=60" "$prop_file"; then
