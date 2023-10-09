@@ -46,9 +46,9 @@ jobs:
           if [[ $cpuIssue -eq 0 && $connectionPoolIssue -eq 0 ]]; then
             echo both performance issues are _not_ found, now generate one or the other based on the hour of the day
             current_run=${{ github.run_number }}
-            mod_run=$((current_run % 4))
+            mod_run=$((current_run % 2))
             if [[ $mod_run -eq 0 || $mod_run -eq 1 ]]; then
-              echo "current run mod 4 is 0 or 1 ($current_run/$mod_run), generate cpu issue"
+              echo "current run mod 2 is 0 or 1 ($current_run/$mod_run), generate cpu issue"
               commit_message="make matrix calculation more variable"
               sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
               sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
