@@ -38,8 +38,8 @@ jobs:
             even_hour=$((current_hour % 2))
             if [ $even_hour -eq 0 ]; then
               commit_message="make matrix calculation more variable"
-              sed -i 's/no variation: is no fun/some variation: is more fun/g' $java_file
-              sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $java_file
+              sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
+              sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
             else
               commit_message="tune http connection pool size"
               sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
