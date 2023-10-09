@@ -27,34 +27,46 @@ jobs:
           prop_file=afterburner-java/src/main/resources/application.properties
 
           echo check if performance issue patterns are present
-          # grep returns an exit status of 0
-          grep -q "some variation: is more fun" "$cpu_java_file"
-          cpuIssue=$?
-          grep -q "afterburner.remote.call.httpclient.connections.max=2" "$prop_file"
-          connectionPoolIssue=$?
+          if grep -q "some variation: is more fun" "$cpu_java_file"; then
+            echo cpu issue found
+            cpuIssue=1
+          else
+            echo cpu issue not found
+            cpuIssue=0
+          fi
+          
+          if grep -q "afterburner.remote.call.httpclient.connections.max=2" "$prop_file"; then
+            echo connection pool issue found
+            connectionPoolIssue=1
+          else
+            echo connection pool issue not found
+            connectionPoolIssue=0
+          fi
 
-          if [[ $cpuIssue -eq 1 && $connectionPoolIssue -eq 1 ]]; then
-            echo both issues are _not_ found, now generate one or the other
+          if [[ $cpuIssue -eq 0 && $connectionPoolIssue -eq 0 ]]; then
+            echo both performance issues are _not_ found, now generate one or the other based on the hour of the day
             current_hour=$(date +%H)
             even_hour=$((current_hour % 2))
             if [ $even_hour -eq 0 ]; then
+              echo "even hour ($current_hour), generate cpu issue"
               commit_message="make matrix calculation more variable"
               sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
               sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
             else
+              echo "odd hour ($current_hour), generate connection pool issue"
               commit_message="tune http connection pool size"
               sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
             fi
           fi
 
           # reset issue into a fix
-          if [ $cpuIssue -eq 0 ]; then
+          if [ $cpuIssue -eq 1 ]; then
             echo cpu issue is found, now fix it
             commit_message="make cpu more efficient "
             sed -i 's/some variation: is more fun/no variation: is no fun/g' $cpu_java_file
             sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
           fi
-          if [ $connectionPoolIssue -eq 0 ]; then
+          if [ $connectionPoolIssue -eq 1 ]; then
             echo connection pool issue is found, now fix it
             commit_message="${commit_message}tune http connection pool size"
             sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
