@@ -51,7 +51,7 @@ jobs:
               echo "current run mod 2 is 0 or 1 ($current_run/$mod_run), generate cpu issue"
               commit_message="make matrix calculation more variable"
               sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
-              sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
+              sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.0)))/g' $cpu_java_file
             else
               echo "current run mod 4 is 2 or 3 ($current_run/$mod_run), generate connection pool issue"
               commit_message="tune http connection pool size"
