@@ -64,7 +64,7 @@ jobs:
             echo cpu issue is found, now fix it
             commit_message="make cpu more efficient "
             sed -i 's/some variation: is more fun/no variation: is no fun/g' $cpu_java_file
-            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
+            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 4.0)))/int funSize = matrixSize/g' $cpu_java_file
           fi
           if [ $connectionPoolIssue -eq 1 ]; then
             echo connection pool issue is found, now fix it
