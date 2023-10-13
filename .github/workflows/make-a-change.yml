@@ -44,7 +44,7 @@ jobs:
           fi
 
           if [[ $cpuIssue -eq 0 && $connectionPoolIssue -eq 0 ]]; then
-            echo both performance issues are _not_ found, now generate one or the other based on the hour of the day
+            echo both performance issues are _not_ found, now generate one or the other based the modulo of the current run number
             current_run=${{ github.run_number }}
             mod_run=$((current_run % 2))
             if [[ $mod_run -eq 0 || $mod_run -eq 1 ]]; then
