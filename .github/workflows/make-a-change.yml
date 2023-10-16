@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   schedule:
     # At minute 10 past hour 8 from 8h to 13h AMS time (6-11 UTC)
-    - cron: '10 6-11 * * *'
+    - cron: '10 6-20 * * *'
 
 jobs:
   build:
@@ -52,7 +52,7 @@ jobs:
               commit_message="make matrix calculation more variable"
               sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
               sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
-            elsif [[ $mod_run -eq 2 || $mod_run -eq 3 ]]; then
+            elif [[ $mod_run -eq 2 || $mod_run -eq 3 ]]; then
               echo "current run mod 4 is 2 or 3 ($current_run/$mod_run), generate connection pool issue"
               commit_message="tune http connection pool size"
               sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
