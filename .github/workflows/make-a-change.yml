@@ -5,9 +5,9 @@ name: Proxy dev
 
 on:
   workflow_dispatch:
-#  schedule:
-    # At minute 10 past hour 8 from 8 to 20 h
-#     - cron: '10 8-20 * * *'
+  schedule:
+    # At minute 10 past hour 8 from 8h to 13h AMS time (6-11 UTC)
+    - cron: '10 6-11 * * *'
 
 jobs:
   build:
@@ -46,16 +46,18 @@ jobs:
           if [[ $cpuIssue -eq 0 && $connectionPoolIssue -eq 0 ]]; then
             echo both performance issues are _not_ found, now generate one or the other based the modulo of the current run number
             current_run=${{ github.run_number }}
-            mod_run=$((current_run % 2))
+            mod_run=$((current_run % 4))
             if [[ $mod_run -eq 0 || $mod_run -eq 1 ]]; then
               echo "current run mod 2 is 0 or 1 ($current_run/$mod_run), generate cpu issue"
               commit_message="make matrix calculation more variable"
               sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
               sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
-            else
+            elsif [[ $mod_run -eq 2 || $mod_run -eq 3 ]]; then
               echo "current run mod 4 is 2 or 3 ($current_run/$mod_run), generate connection pool issue"
               commit_message="tune http connection pool size"
               sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
+            else
+              echo "WARN: current run mod 4 is $mod_run, this is not expected"
             fi
           fi
 
