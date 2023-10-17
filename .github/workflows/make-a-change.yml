@@ -54,8 +54,8 @@ jobs:
               sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
             elif [[ $mod_run -eq 2 || $mod_run -eq 3 ]]; then
               echo "current run mod 4 is 2 or 3 ($current_run/$mod_run), generate connection pool issue"
-              commit_message="tune http connection pool size"
-              sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
+              commit_message="use default httpclient connection pool size"
+              sed -i 's/afterburner.remote.call.httpclient.connections.max=60/afterburner.remote.call.httpclient.connections.max=2/g' $prop_file
             else
               echo "WARN: current run mod 4 is $mod_run, this is not expected"
             fi
