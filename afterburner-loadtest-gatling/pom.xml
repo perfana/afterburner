@@ -16,11 +16,11 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling-plugin.version>3.9.0</gatling-plugin.version>
+        <gatling-plugin.version>3.9.5</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
-        <kotlin.version>1.6.21</kotlin.version>
+        <kotlin.version>1.9.10</kotlin.version>
 
-        <events-gatling-maven-plugin.version>4.1.0-events-5</events-gatling-maven-plugin.version>
+        <events-gatling-maven-plugin.version>4.3.0-events-1</events-gatling-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-hello-world.version>[3.0.0,3.1.0)</test-events-hello-world.version>
 
@@ -150,7 +150,7 @@
                         <eventConfigs>
                             <eventConfig implementation="io.perfana.helloworld.event.HelloWorldEventConfig">
                                 <name>HelloWorldEvent1</name>
-                                <helloInitialSleepSeconds>40</helloInitialSleepSeconds>
+                                <helloInitialSleepSeconds>4</helloInitialSleepSeconds>
                                 <myRestService>https://my-rest-api</myRestService>
                                 <myCredentials>secret</myCredentials>
                             </eventConfig>

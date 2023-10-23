@@ -1,14 +1,20 @@
 package afterburner
 
 import io.gatling.javaapi.core.*
-import io.gatling.javaapi.http.*
 import io.gatling.javaapi.core.CoreDsl.*
 import io.gatling.javaapi.http.HttpDsl.*
 import java.time.Duration
 
 class AfterburnerBasicSimulation : Simulation() {
 
-    private val baseUrl = System.getenv()["targetBaseUrl"] ?: "http://localhost:8080"
+    private val testRunId = System.getProperty("testRunId") ?: "test-run-id-from-script-" + System.currentTimeMillis()
+
+    private val baseUrl = System.getProperty("targetBaseUrl") ?: "http://localhost:8080"
+
+    private val initialUsersPerSecond: Int = (System.getProperty("initialUsersPerSecond") ?: "1").toInt()
+    private val targetConcurrency: Int = (System.getProperty("targetConcurrency") ?: "10").toInt()
+    private val rampupTimeInSeconds: Long = (System.getProperty("rampupTimeInSeconds") ?: "10").toLong()
+    private val constantLoadTimeInSeconds: Long = (System.getProperty("constantLoadTimeInSeconds") ?: "40").toLong()
 
     private val contentType = "application/json"
 
@@ -18,7 +24,7 @@ class AfterburnerBasicSimulation : Simulation() {
         .acceptHeader("*/*")
         .contentTypeHeader(contentType)
         .userAgentHeader("curl/7.54.0")
-        .header("perfana-test-run-id", "my-test-run-1")
+        .header("perfana-test-run-id", testRunId)
         .warmUp("$baseUrl/memory/clear")
 
     val scn = scenario("AfterburnerBasicSimulation")
@@ -86,9 +92,18 @@ class AfterburnerBasicSimulation : Simulation() {
         )
 
     init {
+        println("(ignored) initialUsersPerSecond:     $initialUsersPerSecond")
+        println("(ignored) rampupTimeInSeconds:       $rampupTimeInSeconds")
+        println("targetConcurrency:         $targetConcurrency")
+        println("constantLoadTimeInSeconds: $constantLoadTimeInSeconds")
+
         setUp(
-            scn.injectOpen(constantUsersPerSec(6.0).during(Duration.ofSeconds(30))
-        ).protocols(httpProtocol))
+            scn.injectOpen(
+                //atOnceUsers(initialUsersPerSecond),
+                //rampUsers(initialUsersPerSecond).during(Duration.ofSeconds(rampupTimeInSeconds)),
+                constantUsersPerSec(targetConcurrency.toDouble()).during(Duration.ofSeconds(constantLoadTimeInSeconds))
+            ).protocols(httpProtocol)
+        )
     }
 
 }

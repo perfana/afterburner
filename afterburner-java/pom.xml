@@ -22,8 +22,8 @@
         <encoding>UTF-8</encoding>
         <!-- find latest here: https://hub.docker.com/r/bellsoft/liberica-openjdk-alpine/tags -->
         <!-- to find the digest of the manifest LIST for multi-arch builds use: docker buildx imagetools inspect bellsoft/liberica-openjdk-alpine:11 -->
-        <docker-base-image>bellsoft/liberica-openjdk-alpine:11@sha256:c77c9415ebfedd4ae13104228baf5a3a736e28c03265bb2609636beb4ceb5632</docker-base-image>
-        <dockerTargetImageExtension>jdk11</dockerTargetImageExtension>
+        <docker-base-image>bellsoft/liberica-openjdk-alpine:17@sha256:e82fb905ca6efffcdb1b0ed58f207b0ce91aeada78c218ae7dbb16bb31635728</docker-base-image>
+        <dockerTargetImageExtension>jdk17</dockerTargetImageExtension>
         <docker-target-image>perfana/afterburner:${project.version}-${dockerTargetImageExtension}</docker-target-image>
         <docker-arch>amd64</docker-arch>
     </properties>
@@ -148,7 +148,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -172,22 +172,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.4.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.5.6</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>jib-maven-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
