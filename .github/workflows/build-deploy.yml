@@ -3,6 +3,9 @@
 name: Build afterburner and deploy
 
 on:
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
     inputs:
   workflow_call:
