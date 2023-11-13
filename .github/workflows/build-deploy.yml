@@ -50,11 +50,6 @@ jobs:
         with:
           name: version
           path: version.txt
-      - name: Create GHA release
-        uses: ncipollo/release-action@v1
-        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
-        with:
-          artifacts: "afterburner-java/target/afterburner-java-*-exec.jar"
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -63,6 +58,11 @@ jobs:
       - name: Build local
         working-directory: afterburner-java
         run: ../mvnw clean install
+      - name: Create GHA release
+        uses: ncipollo/release-action@v1
+        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
+        with:
+          artifacts: "afterburner-java/target/afterburner-java-*-exec.jar"
       # Build docker image
       - name: Create and push docker image
         working-directory: afterburner-java
