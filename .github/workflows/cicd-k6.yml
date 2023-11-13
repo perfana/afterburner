@@ -31,3 +31,7 @@ jobs:
       workload: load
       service: bumble-bee
       runner: acme
+
+  deploy-to-production:
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
+    needs: performance-test-gatling
