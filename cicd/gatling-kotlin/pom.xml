@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+<!--    <parent>-->
+<!--        <groupId>io.perfana</groupId>-->
+<!--        <artifactId>afterburner</artifactId>-->
+<!--        <version>2.2.0-SNAPSHOT</version>-->
+<!--    </parent>-->
+
+    <groupId>io.perfana</groupId>
+    <artifactId>afterburner-loadtest-gatling-kotlin</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gatling-plugin.version>3.9.5</gatling-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <kotlin.version>1.9.10</kotlin.version>
+
+        <events-gatling-maven-plugin.version>4.3.0-events-1</events-gatling-maven-plugin.version>
+        <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
+        <test-events-hello-world.version>[3.0.0,3.1.0)</test-events-hello-world.version>
+
+        <!-- By default enable events -->
+        <eventsEnabled>false</eventsEnabled>
+        <eventScheduleScript></eventScheduleScript>
+
+        <!-- Default load settings -->
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetUsersPerSecond>1</targetUsersPerSecond>
+        <rampupTimeInSeconds>60</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>900</constantLoadTimeInSeconds>
+
+        <!-- Settings for the Perfana Dashboard -->
+        <systemUnderTest>Afterburner</systemUnderTest>
+        <testEnvironment>test</testEnvironment>
+        <version>1.0</version>
+        <tags></tags>
+        <apiKey></apiKey>
+        <wiremockUrl>http://wiremock:8080</wiremockUrl>
+        <buildResultsUrl>http://jenkins:8080</buildResultsUrl>
+        <influxDbHost>influxdb</influxDbHost>
+
+        <scenario>cpu</scenario>
+        <workload>loadTestCpu</workload>
+        <initialUsersPerSecond>1</initialUsersPerSecond>
+        <targetUsersPerSecond>10</targetUsersPerSecond>
+        <rampupTimeInSeconds>30</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
+        <perfanaEnabled>true</perfanaEnabled>
+        <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
+        <eventsEnabled>true</eventsEnabled>
+        <annotations></annotations>
+        <tags>load-test,micro-service</tags>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling-plugin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>yyyyMMdd-HHmmss</pattern>
+                            <timeZone>CET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.perfana</groupId>
+                <artifactId>events-gatling-maven-plugin</artifactId>
+                <version>${events-gatling-maven-plugin.version}</version>
+                <configuration>
+                    <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
+                    <eventSchedulerConfig>
+                        <debugEnabled>true</debugEnabled>
+                        <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
+                        <failOnError>true</failOnError>
+                        <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
+                        <scheduleScript>
+                            PT5S|restart|{ server:'myserver' replicas:2 tags: [ 'first', 'second' ] }
+                            PT10S|scale-down
+                            PT30S|heapdump|server=myserver.example.com;port=1567
+                            PT1M|scale-up|{ replicas:2 }
+                        </scheduleScript>
+                        <testConfig>
+                            <systemUnderTest>${systemUnderTest}</systemUnderTest>
+                            <version>${version}</version>
+                            <workload>${workload}</workload>
+                            <testEnvironment>${testEnvironment}</testEnvironment>
+                            <testRunId>${testRunId}</testRunId>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
+                            <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
+                            <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
+                            <annotations>${annotations}</annotations>
+                            <tags>${tags}</tags>
+                        </testConfig>
+                        <eventConfigs>
+                            <eventConfig implementation="io.perfana.helloworld.event.HelloWorldEventConfig">
+                                <name>HelloWorldEvent1</name>
+                                <helloInitialSleepSeconds>4</helloInitialSleepSeconds>
+                                <myRestService>https://my-rest-api</myRestService>
+                                <myCredentials>secret</myCredentials>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
+                                <name>PerfanaEvent1</name>
+                                <enabled>${eventsEnabled}</enabled>
+                                <perfanaUrl>${perfanaUrl}</perfanaUrl>
+                                <apiKey>${apiKey}</apiKey>
+                                <assertResultsEnabled>false</assertResultsEnabled>
+                                <variables>
+                                    <var1>my_value</var1>
+                                </variables>
+                            </eventConfig>
+                        </eventConfigs>
+                    </eventSchedulerConfig>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-hello-world</artifactId>
+                        <version>${test-events-hello-world.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>perfana-java-client</artifactId>
+                        <version>${perfana-java-client.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>../../afterburner-loadtest-gatling-kotlin/src/test/kotlin</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
