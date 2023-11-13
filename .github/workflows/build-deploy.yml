@@ -47,11 +47,11 @@ jobs:
         with:
           name: version
           path: version.txt
-      - name: Upload exec jar for releases (non-SNAPSHOT)
-        uses: actions/upload-artifact@v3
+      - name: Create GHA release
+        uses: ncipollo/release-action@v1
         if: contains(env.TAG_NAME, 'SNAPSHOT') != true
         with:
-          path: afterburner-java/target/afterburner-java-*-exec.jar
+          artifacts: "afterburner-java/target/afterburner-java-*-exec.jar"
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
