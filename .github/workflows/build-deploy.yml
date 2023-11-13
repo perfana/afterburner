@@ -57,7 +57,7 @@ jobs:
           java-version: '17'
       - name: Build local
         working-directory: afterburner-java
-        run: ../mvnw clean install
+        run: ../mvnw -Drevision=${{ env.TAG_NAME }} clean install
       - name: Create GHA release
         uses: ncipollo/release-action@v1
         if: contains(env.TAG_NAME, 'SNAPSHOT') != true
