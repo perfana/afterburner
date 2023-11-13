@@ -3,6 +3,8 @@
 name: Build afterburner and deploy
 
 on:
+  workflow_dispatch:
+    inputs:
   workflow_call:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -45,6 +47,11 @@ jobs:
         with:
           name: version
           path: version.txt
+      - name: Upload exec jar for releases (non-SNAPSHOT)
+        uses: actions/upload-artifact@v3
+        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
+        with:
+          path: afterburner-java/target/afterburner-java-*-exec.jar
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
