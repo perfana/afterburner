@@ -1,0 +1,88 @@
+---
+
+# make change in test branch that effects cpu performance
+name: Proxy dev
+
+on:
+  workflow_dispatch:
+  schedule:
+    # At minute 10 past every 2nd hour from 8h to 16h AMS time (6-14 UTC)
+    - cron: '10 6-14/2 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
+          # needed to trigger CICD build with later push with PAT
+          persist-credentials: false
+      - name: Make a change
+        run: |
+          cpu_java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
+          prop_file=afterburner-java/src/main/resources/application.properties
+
+          echo check if performance issue patterns are present
+          if grep -q "some variation: is more fun" "$cpu_java_file"; then
+            echo cpu issue found
+            cpuIssue=1
+          else
+            echo cpu issue not found
+            cpuIssue=0
+          fi
+          
+          if grep -q "afterburner.remote.call.httpclient.connections.max=2" "$prop_file"; then
+            echo connection pool issue found
+            connectionPoolIssue=1
+          else
+            echo connection pool issue not found
+            connectionPoolIssue=0
+          fi
+
+          if [[ $cpuIssue -eq 0 && $connectionPoolIssue -eq 0 ]]; then
+            echo both performance issues are _not_ found, now generate one or the other based the modulo of the current run number
+            current_run=${{ github.run_number }}
+            mod_run=$((current_run % 4))
+            if [[ $mod_run -eq 0 || $mod_run -eq 1 ]]; then
+              echo "current run mod 2 is 0 or 1 ($current_run/$mod_run), generate cpu issue"
+              commit_message="make matrix calculation more variable"
+              sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
+              sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
+            elif [[ $mod_run -eq 2 || $mod_run -eq 3 ]]; then
+              echo "current run mod 4 is 2 or 3 ($current_run/$mod_run), generate connection pool issue"
+              commit_message="use default httpclient connection pool size"
+              sed -i 's/afterburner.remote.call.httpclient.connections.max=60/afterburner.remote.call.httpclient.connections.max=2/g' $prop_file
+            else
+              echo "WARN: current run mod 4 is $mod_run, this is not expected"
+            fi
+          fi
+
+          # reset issue into a fix
+          if [ $cpuIssue -eq 1 ]; then
+            echo cpu issue is found, now fix it
+            commit_message="make cpu more efficient "
+            sed -i 's/some variation: is more fun/no variation: is no fun/g' $cpu_java_file
+            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
+          fi
+          if [ $connectionPoolIssue -eq 1 ]; then
+            echo connection pool issue is found, now fix it
+            commit_message="${commit_message}tune http connection pool size"
+            sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
+          fi
+
+          echo "commit_message=$commit_message" >> $GITHUB_ENV
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Proxy Developer"
+          git commit -m "Proxy Dev: $commit_message" -a
+      # needed to trigger test build: use explicit other PAT
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.PAT_GITHUB }}
+          branch: develop

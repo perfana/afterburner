@@ -4,9 +4,9 @@ name: CI/CD K6
 
 on:
   push:
-    branches: [demo]
+    branches: [demo, develop]
   pull_request:
-    branches: [demo]
+    branches: [demo, develop]
 
 
 jobs:
