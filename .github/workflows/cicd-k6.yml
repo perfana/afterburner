@@ -1,19 +1,14 @@
 ---
 
-name: CI/CD K6
+name: CI/CD Performance test K6
 
 on:
-  push:
-    branches: [demo, develop]
-  pull_request:
-    branches: [demo, develop]
-
+  workflow_run:
+    workflows: ["Build afterburner and deploy"]
+    types:
+      - completed
 
 jobs:
-
-  build:
-    uses: perfana/afterburner/.github/workflows/build-deploy.yml@main
-    secrets: inherit
 
   prepare-performance-test:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main

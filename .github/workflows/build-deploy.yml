@@ -6,6 +6,9 @@ on:
   push:
     tags:
       - '*'
+    branches: [demo]
+  pull_request:
+    branches: [demo]
   workflow_dispatch:
     inputs:
   workflow_call:

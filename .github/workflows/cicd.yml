@@ -1,18 +1,14 @@
 ---
 
-name: CI/CD
+name: CI/CD Performance test Gatling
 
 on:
-  push:
-    branches: [demo]
-  pull_request:
-    branches: [demo]
+  workflow_run:
+    workflows: ["Build afterburner and deploy"]
+    types:
+      - completed
 
 jobs:
-
-  build:
-    uses: perfana/afterburner/.github/workflows/build-deploy.yml@main
-    secrets: inherit
 
   prepare-performance-test:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
@@ -20,7 +16,6 @@ jobs:
     secrets: inherit
     with:
       service: optimus-prime
-
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
