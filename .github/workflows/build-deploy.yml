@@ -4,8 +4,6 @@ name: Build afterburner and deploy
 
 on:
   push:
-    tags:
-      - '*'
     branches: [demo]
   pull_request:
     branches: [demo]
