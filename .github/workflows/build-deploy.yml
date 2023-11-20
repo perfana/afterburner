@@ -3,6 +3,14 @@
 name: Build afterburner and deploy
 
 on:
+  push:
+    tags:
+      - '*'
+    branches: [demo]
+  pull_request:
+    branches: [demo]
+  workflow_dispatch:
+    inputs:
   workflow_call:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -52,7 +60,12 @@ jobs:
           java-version: '17'
       - name: Build local
         working-directory: afterburner-java
-        run: ../mvnw clean install
+        run: ../mvnw -Drevision=${{ env.TAG_NAME }} clean install
+      - name: Create GHA release
+        uses: ncipollo/release-action@v1
+        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
+        with:
+          artifacts: "afterburner-java/target/afterburner-java-*-exec.jar"
       # Build docker image
       - name: Create and push docker image
         working-directory: afterburner-java
@@ -90,15 +103,20 @@ jobs:
           sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
-          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-fe/values.yaml
-          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
-          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
-          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
+          
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/development/optimus-prime-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/development/optimus-prime-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/development/optimus-prime-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/development/optimus-prime-be/values.yaml
       - name: Commit files
         run: |
           cd perfana-gitops
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
-          git commit -m "Bumped afterburner Afterburner images to $full_version in demo environment" -a
+          git commit -m "Bumped afterburner Afterburner images to $full_version in demo and test environment" -a
           git push
 
