@@ -1,6 +1,6 @@
 ---
 
-name: CI/CD Performance test Gatling
+name: Performance test Gatling test
 
 on:
   workflow_run:
@@ -15,6 +15,7 @@ jobs:
     secrets: inherit
     with:
       service: optimus-prime
+      runner: test
 
   performance-test-gatling:
     uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main

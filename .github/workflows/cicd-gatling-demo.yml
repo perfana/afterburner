@@ -1,6 +1,6 @@
 ---
 
-name: CI/CD Performance test Gatling
+name: Performance test Gatling demo
 
 on:
   workflow_run:
