@@ -68,7 +68,7 @@ jobs:
       - name: Create and push docker image
         working-directory: afterburner-java
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: ../mvnw -Drevision=${{ env.TAG_NAME }} -DdockerTargetImageExtension=$sha_short -Pmulti-arch-docker,pyroscope clean package jib:build
 
