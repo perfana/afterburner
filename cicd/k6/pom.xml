@@ -29,7 +29,7 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <event-scheduler-maven-plugin.version>[3.0.1,3.1.0)</event-scheduler-maven-plugin.version>
+        <event-scheduler-maven-plugin.version>3.0.2</event-scheduler-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
