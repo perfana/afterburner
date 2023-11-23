@@ -29,4 +29,4 @@ jobs:
 
   deploy-to-production:
     uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
-    needs: performance-test-gatling
+    needs: performance-test-k6
