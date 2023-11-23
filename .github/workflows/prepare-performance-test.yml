@@ -60,5 +60,3 @@ jobs:
              fi
              kubectl wait --for condition=Ready deployment/${{ inputs.service }}-be-afterburner -n acme --timeout=300s
           done
-          echo "Deployment ready, waiting 60s to make sure pods have started"
-          sleep 60

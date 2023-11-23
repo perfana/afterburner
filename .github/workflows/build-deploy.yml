@@ -3,6 +3,14 @@
 name: Build afterburner and deploy
 
 on:
+  push:
+    paths-ignore:
+      - '.github/**'
+    branches: [demo]
+  pull_request:
+    branches: [demo]
+  workflow_dispatch:
+    inputs:
   workflow_call:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -35,16 +43,6 @@ jobs:
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_ENV
           echo "full_version=$TAG_NAME-$sha_short" >> $GITHUB_ENV
-      - name: Write tag to file
-        uses: "finnp/create-file-action@master"
-        env:
-          FILE_NAME: "version.txt"
-          FILE_DATA: "${{ env.full_version }}"
-      - name: Upload versions.txt to use in performance-test job
-        uses: actions/upload-artifact@v3
-        with:
-          name: version
-          path: version.txt
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -52,14 +50,19 @@ jobs:
           java-version: '17'
       - name: Build local
         working-directory: afterburner-java
-        run: ../mvnw clean install
+        run: ../mvnw -Drevision=${{ env.TAG_NAME }} clean install
+      - name: Create GHA release
+        uses: ncipollo/release-action@v1
+        if: contains(env.TAG_NAME, 'SNAPSHOT') != true
+        with:
+          artifacts: "afterburner-java/target/afterburner-java-*-exec.jar"
       # Build docker image
       - name: Create and push docker image
         working-directory: afterburner-java
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ../mvnw -DdockerTargetImageExtension=$sha_short -Pmulti-arch-docker,pyroscope clean package jib:build
+        run: ../mvnw -Drevision=${{ env.TAG_NAME }} -DdockerTargetImageExtension=$sha_short -Pmulti-arch-docker,pyroscope clean package jib:build
 
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
@@ -90,15 +93,20 @@ jobs:
           sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
-          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-fe/values.yaml
-          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
-          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
-          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
+          
+          sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/optimus-prime-be/values.yaml
       - name: Commit files
         run: |
           cd perfana-gitops
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Afterburner"
-          git commit -m "Bumped afterburner Afterburner images to $full_version in demo environment" -a
+          git commit -m "Bumped afterburner Afterburner images to $full_version in demo and test environment" -a
           git push
 
