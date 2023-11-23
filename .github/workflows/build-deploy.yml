@@ -4,6 +4,8 @@ name: Build afterburner and deploy
 
 on:
   push:
+    paths-ignore:
+      - '.github/**'
     branches: [demo]
   pull_request:
     branches: [demo]

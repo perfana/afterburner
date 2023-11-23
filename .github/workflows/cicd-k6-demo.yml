@@ -1,6 +1,6 @@
 ---
 
-name: CI/CD Performance test K6
+name: Performance test K6 demo
 
 on:
   workflow_run:
@@ -15,6 +15,7 @@ jobs:
     secrets: inherit
     with:
       service: bumble-bee
+      runner: acme
 
   performance-test-k6:
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
