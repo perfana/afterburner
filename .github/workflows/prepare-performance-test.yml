@@ -17,19 +17,6 @@ jobs:
   prepare-performance-test:
     runs-on: [self-hosted, acme]
     steps:
-      ## checkout perfana-gitops
-      - name: Checkout perfana-gitops
-        uses: actions/checkout@v3
-        with:
-          repository: perfana/perfana-gitops
-          token: ${{ secrets.PAT_GITHUB }}
-          ref: main
-          path: perfana-gitops
-          fetch-depth: 0
-      - name: Find image version
-        working-directory: perfana-gitops
-        run: |
-          echo "TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')" >> $GITHUB_ENV
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
@@ -38,6 +25,16 @@ jobs:
         with:
           path: main
           fetch-depth: 0
+      - name: Download version file
+        uses: actions/download-artifact@v1
+        with:
+          name: version
+      - name: Set version from file
+        run: |
+          ls -all
+          cat /runner/_work/afterburner/afterburner/version/version.txt
+          echo "TAG_NAME=$(cat /runner/_work/afterburner/afterburner/version/version.txt)" >> $GITHUB_ENV
+      - uses: actions/checkout@v3
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
@@ -53,7 +50,7 @@ jobs:
                 echo "Deployment ${{ inputs.service }}-fe-afterburner ready"
                 break
              fi
-             sleep 10
+             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-fe-afterburner -n acme --timeout=300s
           done
           while true; do
              echo "Waiting for deployment ${{ inputs.service }}-be-afterburner ..."
@@ -61,7 +58,5 @@ jobs:
                 echo "Deployment ${{ inputs.service }}-be-afterburner ready"
                 break
              fi
-             sleep 10
+             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-be-afterburner -n acme --timeout=300s
           done
-          echo "Deployment ready, waiting 60s to make sure pods have started"
-          sleep 60
