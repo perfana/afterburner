@@ -4,5 +4,5 @@ public class AfterburnerTemplatedConstants {
 
     private AfterburnerTemplatedConstants() {}
 
-    public static final String APPLICATION_VERSION = "r${project.version}";
+    public static final String APPLICATION_VERSION = "${revision}";
 }
