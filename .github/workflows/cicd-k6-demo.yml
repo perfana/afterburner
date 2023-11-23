@@ -1,26 +1,21 @@
 ---
 
-name: CI/CD K6
+name: Performance test K6 demo
 
 on:
-  push:
-    branches: [demo]
-  pull_request:
-    branches: [demo]
-
+  workflow_run:
+    workflows: ["Build afterburner and deploy"]
+    types:
+      - completed
 
 jobs:
 
-  build:
-    uses: perfana/afterburner/.github/workflows/build-deploy.yml@main
-    secrets: inherit
-
   prepare-performance-test:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
-    needs: build
     secrets: inherit
     with:
       service: bumble-bee
+      runner: acme
 
   performance-test-k6:
     uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
@@ -34,4 +29,4 @@ jobs:
 
   deploy-to-production:
     uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
-    needs: performance-test-gatling
+    needs: performance-test-k6

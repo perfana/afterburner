@@ -1,0 +1,32 @@
+---
+
+name: Performance test K6 test
+
+on:
+  workflow_run:
+    workflows: ["Build afterburner and deploy"]
+    types:
+      - completed
+
+jobs:
+
+  prepare-performance-test:
+    uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
+    secrets: inherit
+    with:
+      service: bumble-bee
+      runner: test
+
+  performance-test-k6:
+    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+    needs: prepare-performance-test
+    secrets: inherit
+    with:
+      systemUnderTest: BumbleBee
+      workload: load
+      service: bumble-bee
+      runner: test
+
+  deploy-to-production:
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
+    needs: performance-test-k6
