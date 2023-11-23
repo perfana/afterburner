@@ -245,7 +245,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
-                                <command>git rev-parse --verify demo</command>
+                                <command>git rev-parse --verify HEAD</command>
                                 <output>key</output>
                                 <key>https://github.com/perfana/perfana-gatling-afterburner</key>
                                 <tags>GitHub</tags>

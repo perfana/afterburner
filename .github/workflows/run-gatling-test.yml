@@ -24,8 +24,8 @@ on:
 jobs:
 
   performance-test-gatling:
-      runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
-      steps:
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
+    steps:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
@@ -35,6 +35,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: demo
+          path: performance-test
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
@@ -65,6 +66,7 @@ jobs:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Start Gatling test
+        working-directory: performance-test
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
