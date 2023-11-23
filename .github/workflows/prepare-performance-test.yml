@@ -50,7 +50,7 @@ jobs:
                 echo "Deployment ${{ inputs.service }}-fe-afterburner ready"
                 break
              fi
-             sleep 10
+             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-fe-afterburner -n acme --timeout=300s
           done
           while true; do
              echo "Waiting for deployment ${{ inputs.service }}-be-afterburner ..."
@@ -58,7 +58,7 @@ jobs:
                 echo "Deployment ${{ inputs.service }}-be-afterburner ready"
                 break
              fi
-             sleep 10
+             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-be-afterburner -n acme --timeout=300s
           done
           echo "Deployment ready, waiting 60s to make sure pods have started"
           sleep 60
