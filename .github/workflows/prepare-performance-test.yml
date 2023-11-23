@@ -39,7 +39,7 @@ jobs:
         env:
           KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
         run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
-      - name: Check deployed version
+      - name: Check deployed version fe-afterburner
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
           IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
@@ -50,13 +50,29 @@ jobs:
                 echo "Deployment ${{ inputs.service }}-fe-afterburner ready"
                 break
              fi
-             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-fe-afterburner -n acme --timeout=300s
           done
+          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/${{ inputs.service }}-fe-afterburner -n acme"
+          until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+           $ROLLOUT_STATUS_CMD
+           ATTEMPTS=$((attempts + 1))
+           sleep 10
+          done
+      - name: Check deployed version be-afterburner
+        env:
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+          IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
+        run: |
           while true; do
              echo "Waiting for deployment ${{ inputs.service }}-be-afterburner ..."
              if [[ $(kubectl get deployment ${{ inputs.service }}-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
                 echo "Deployment ${{ inputs.service }}-be-afterburner ready"
                 break
              fi
-             kubectl wait --for condition=Ready deployment/${{ inputs.service }}-be-afterburner -n acme --timeout=300s
           done
+          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/${{ inputs.service }}-be-afterburner -n acme"
+          until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+           $ROLLOUT_STATUS_CMD
+           ATTEMPTS=$((attempts + 1))
+           sleep 10
+          done
+
