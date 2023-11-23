@@ -29,7 +29,6 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
         id: install
-        working-directory: performance-test
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
         uses: actions/checkout@v3
