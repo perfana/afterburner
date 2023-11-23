@@ -1,6 +1,6 @@
 ---
 
-name: CI/CD Performance test K6
+name: Performance test Gatling test
 
 on:
   workflow_run:
@@ -14,17 +14,18 @@ jobs:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     secrets: inherit
     with:
-      service: bumble-bee
+      service: optimus-prime
+      runner: test
 
-  performance-test-k6:
-    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+  performance-test-gatling:
+    uses: perfana/afterburner/.github/workflows/run-gatling-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
     with:
-      systemUnderTest: BumbleBee
+      systemUnderTest: OptimusPrime
       workload: load
-      service: bumble-bee
-      runner: acme
+      service: optimus-prime
+      runner: test
 
   deploy-to-production:
     uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
