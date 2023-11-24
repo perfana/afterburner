@@ -38,6 +38,8 @@ jobs:
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - name: Get commit sha
+        run: echo "GIT_SHA=$(git rev-parse --verify demo)" >> $GITHUB_ENV
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
@@ -84,6 +86,7 @@ jobs:
           -Dsut-config=${{ inputs.service }} \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
+          -DgitSha="${{ env.GIT_SHA }}" \
           -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
