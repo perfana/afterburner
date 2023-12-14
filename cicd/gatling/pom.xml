@@ -466,7 +466,7 @@
                 <eventScheduleScript>
                     PT0S|wiremock-change-delay(delay=400)|delay=400
                 </eventScheduleScript>
-                <tags>gatling,spring-boot-kubernetes,kubernetes,spanmetrics</tags>
+                <tags>gatling,spring-boot-kubernetes,kubernetes,spanmetrics,foo</tags>
             </properties>
         </profile>
 
