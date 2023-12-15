@@ -91,12 +91,6 @@
             <version>1.7.0</version>
         </dependency>
         <dependency>
-            <!-- explicitly added to avoid security issues with 1.30, remove when part of parent -->
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.32</version>
-        </dependency>
-        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
