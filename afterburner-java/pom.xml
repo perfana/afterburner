@@ -20,10 +20,10 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <encoding>UTF-8</encoding>
-        <!-- find latest here: https://hub.docker.com/r/bellsoft/liberica-openjdk-alpine/tags -->
+        <!-- find latest here: https://hub.docker.com/_/amazoncorretto/tags -->
         <!-- to find the digest of the manifest LIST for multi-arch builds use: docker buildx imagetools inspect bellsoft/liberica-openjdk-alpine:11 -->
         <!-- to find the digest you can also just goto dockerhub click on the tag and it will be shown at the top of the page -->
-        <docker-base-image>bellsoft/liberica-openjdk-alpine:17.0.9@sha256:9a477ffe78b15c956665326497a6591e6a9ca1be83f3792e8f4ae2f7893fca82</docker-base-image>
+        <docker-base-image>amazoncorretto:17.0.9-al2023-headless</docker-base-image>
         <dockerTargetImageExtension>jdk17</dockerTargetImageExtension>
         <docker-target-image>perfana/afterburner:${revision}-${dockerTargetImageExtension}</docker-target-image>
         <docker-arch>amd64</docker-arch>
