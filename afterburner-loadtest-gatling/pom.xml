@@ -156,7 +156,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
                                 <name>PerfanaEvent1</name>
-                                <enabled>${eventsEnabled}</enabled>
+                                <enabled>${perfanaEnabled}</enabled>
                                 <perfanaUrl>${perfanaUrl}</perfanaUrl>
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>false</assertResultsEnabled>
