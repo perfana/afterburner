@@ -4,6 +4,8 @@ import io.perfana.afterburner.gatling.configuration.Configuration
 import io.perfana.afterburner.gatling.useCases._
 import io.perfana.afterburner.gatling.feeders._
 import io.gatling.core.Predef._
+import test.scala.io.perfana.afterburner.gatling.useCases.FlakyCallDynamicRequestName
+
 import scala.concurrent.duration._
 
 /**
@@ -35,17 +37,21 @@ object Scenarios {
     .exec(Database.call)
     .exec(FlakyCall.call)
 
-val lotsOfRequestNamesScenario = scenario("Lots of request names test")
-.feed(CSVFeeder.firstName)
+  // Define a feeder with a random request name generator
+  val requestNameFeeder = Iterator.continually(Map("requestName" -> s"flaky_call_${Random.nextInt(60)}"))
+
+  val lotsOfRequestNamesScenario = scenario("Lots of request names test")
+  .feed(CSVFeeder.firstName)
     .exec(session => session.set("testRunId", Configuration.testRunId))
      .exec(SimpleCpuBurn.call)
      .pause(3)
       .exec(SimpleDelay.call)
       .pause(3)
       .exec(CallMany.call)
-      .pause(3)
       .exec(Database.call)
-      .exec(FlakyCall.call)
+      .pause(3)
+      .feed(requestNameFeeder)
+      .exec(FlakyCallDynamicRequestName.call)
 
   val slowBackendTestScenario = scenario("Slow backend test")
 .feed(CSVFeeder.firstName)
