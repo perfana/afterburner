@@ -3,6 +3,9 @@
 name: Build afterburner and deploy
 
 on:
+  create:
+    tags:
+      - '*'
   push:
     paths-ignore:
       - '.github/**'
