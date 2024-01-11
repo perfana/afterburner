@@ -5,6 +5,7 @@ import io.perfana.afterburner.gatling.useCases._
 import io.perfana.afterburner.gatling.feeders._
 import io.gatling.core.Predef._
 import test.scala.io.perfana.afterburner.gatling.useCases.FlakyCallDynamicRequestName
+import scala.util.Random
 
 import scala.concurrent.duration._
 
