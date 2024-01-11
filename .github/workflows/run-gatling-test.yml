@@ -91,3 +91,4 @@ jobs:
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
           -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}
+          -Dscenario=${{ (inputs.runner == 'test') && 'lotsOfRequestNames' || 'acceptance' }}

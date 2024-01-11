@@ -45,6 +45,7 @@ object Configuration {
     case "acceptance"  => Scenarios.acceptanceTestScenario
     case "slowbackend"  => Scenarios.slowBackendTestScenario
     case "cpu"  => Scenarios.cpuTestScenario
+    case "lotsOfRequestNames"  => Scenarios.lotsOfRequestNamesScenario
 
     case _ => Scenarios.acceptanceTestScenario
 
