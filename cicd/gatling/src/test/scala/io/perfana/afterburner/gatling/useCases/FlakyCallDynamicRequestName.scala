@@ -1,6 +1,8 @@
 package test.scala.io.perfana.afterburner.gatling.useCases
 
 
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
 object FlakyCallDynamicRequestName {
 
 
