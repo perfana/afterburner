@@ -3,7 +3,7 @@
 
 	<appender name="ELASTIC" class="ElasticGatlingAppender">
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>DEBUG</level>
+			<level>${logging.elastic.appender.level:-DEBUG}</level>
 			<onMatch>ACCEPT</onMatch>
 			<onMismatch>DENY</onMismatch>
 		</filter>

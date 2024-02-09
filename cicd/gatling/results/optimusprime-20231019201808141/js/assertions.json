@@ -1,0 +1,10 @@
+{
+  "simulation": "io.perfana.afterburner.gatling.setup.OptimusPrime",
+  "simulationId": "optimusprime-20231019201808141",
+  "start": 1697746688831,
+  "description": "Perfana",
+  "scenarios": ["Acceptance test"],
+  "assertions": [
+
+  ]
+}

@@ -16,16 +16,20 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling-plugin.version>3.9.5</gatling-plugin.version>
+        <gatling-plugin.version>3.10.3</gatling-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <kotlin.version>1.9.10</kotlin.version>
 
-        <events-gatling-maven-plugin.version>4.6.0-events-1</events-gatling-maven-plugin.version>
+        <events-gatling-maven-plugin.version>4.7.0-events-1</events-gatling-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-hello-world.version>[3.0.0,3.1.0)</test-events-hello-world.version>
 
-        <!-- By default enable events -->
-        <eventsEnabled>false</eventsEnabled>
+        <!-- By default scheduler events are enabled -->
+        <schedulerEnabled>true</schedulerEnabled>
+        <perfanaEnabled>false</perfanaEnabled>
+        <helloworldEnabled>true</helloworldEnabled>
+        <debugEnabled>false</debugEnabled>
+
         <eventScheduleScript></eventScheduleScript>
 
         <!-- Default load settings -->
@@ -50,9 +54,7 @@
         <targetUsersPerSecond>10</targetUsersPerSecond>
         <rampupTimeInSeconds>30</rampupTimeInSeconds>
         <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
-        <perfanaEnabled>true</perfanaEnabled>
         <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-        <eventsEnabled>true</eventsEnabled>
         <annotations></annotations>
         <tags>load-test,micro-service</tags>
     </properties>
@@ -125,8 +127,8 @@
                 <configuration>
                     <simulationClass>afterburner.AfterburnerBasicSimulation</simulationClass>
                     <eventSchedulerConfig>
-                        <debugEnabled>true</debugEnabled>
-                        <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
+                        <debugEnabled>${debugEnabled}</debugEnabled>
+                        <schedulerEnabled>${schedulerEnabled}</schedulerEnabled>
                         <failOnError>true</failOnError>
                         <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
                         <scheduleScript>
@@ -149,6 +151,7 @@
                         </testConfig>
                         <eventConfigs>
                             <eventConfig implementation="io.perfana.helloworld.event.HelloWorldEventConfig">
+                                <enabled>${helloworldEnabled}</enabled>
                                 <name>HelloWorldEvent1</name>
                                 <helloInitialSleepSeconds>4</helloInitialSleepSeconds>
                                 <myRestService>https://my-rest-api</myRestService>
@@ -156,10 +159,9 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
                                 <name>PerfanaEvent1</name>
-                                <enabled>${eventsEnabled}</enabled>
+                                <enabled>${perfanaEnabled}</enabled>
                                 <perfanaUrl>${perfanaUrl}</perfanaUrl>
                                 <apiKey>${apiKey}</apiKey>
-                                <assertResultsEnabled>false</assertResultsEnabled>
                                 <variables>
                                     <var1>my_value</var1>
                                 </variables>

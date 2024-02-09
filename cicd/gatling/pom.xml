@@ -566,6 +566,16 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>lotsOfRequestNames</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <scenario>lotsOfRequestNames</scenario>
+            </properties>
+        </profile>
+
 
 
 
