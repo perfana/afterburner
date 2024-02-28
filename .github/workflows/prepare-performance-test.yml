@@ -19,7 +19,7 @@ jobs:
     steps:
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: perfana/perfana-gitops
           token: ${{ secrets.PAT_GITHUB }}
@@ -31,10 +31,10 @@ jobs:
         run: |
           echo "TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')" >> $GITHUB_ENV
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v4
         id: install
       - name: Checkout code from code branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: main
           fetch-depth: 0
