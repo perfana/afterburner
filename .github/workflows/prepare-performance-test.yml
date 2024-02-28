@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')" >> $GITHUB_ENV
       - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+        uses: Azure/setup-kubectl@v4.0.0
         id: install
       - name: Checkout code from code branch
         uses: actions/checkout@v4

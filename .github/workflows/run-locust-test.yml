@@ -34,7 +34,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - run: pip install locust influxdb
       - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+        uses: Azure/setup-kubectl@v4.0.0
         id: install
       - name: Get commit message
         if: inputs.annotations == ''
