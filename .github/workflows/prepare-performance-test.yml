@@ -50,13 +50,13 @@ jobs:
           DEPLOYMENT=${{ inputs.service }}-fe-afterburner
           while true; do
              echo "Waiting for deployment $DEPLOYMENT ..."
-             if [[ $(kubectl get deployment $DEPLOYMENT -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+             if [[ $(kubectl -n acme get deployment $DEPLOYMENT -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
                 echo "Deployment $DEPLOYMENT ready"
                 break
              fi
           done
           ATTEMPTS=1
-          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/$DEPLOYMENT -n acme"
+          ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
           until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
              echo "Waiting rollout status $DEPLOYMENT ... ($ATTEMPTS/60)"
              $ROLLOUT_STATUS_CMD
@@ -71,13 +71,13 @@ jobs:
           DEPLOYMENT=${{ inputs.service }}-be-afterburner
           while true; do
              echo "Waiting for deployment $DEPLOYMENT ..."
-             if [[ $(kubectl get deployment $DEPLOYMENT -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+             if [[ $(kubectl -n acme get deployment $DEPLOYMENT -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
                 echo "Deployment $DEPLOYMENT ready"
                 break
              fi
           done
           ATTEMPTS=1
-          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/$DEPLOYMENT -n acme"
+          ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
           until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
              echo "Waiting rollout status $DEPLOYMENT ... ($ATTEMPTS/60)"
              $ROLLOUT_STATUS_CMD
