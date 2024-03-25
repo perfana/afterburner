@@ -45,7 +45,7 @@ jobs:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
         run: |
           echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
-          echo "Current context: $(kubectl config current-context)"
+          kubectl config get-contexts
       - name: Get deployed version
         if: env.TAG_NAME == ''
         env:
