@@ -31,7 +31,7 @@ jobs:
         run: |
           TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')
           echo "Found image version: $TAG_NAME"
-          echo "TAG_NAME" >> $GITHUB_ENV
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
       - name: Install kubectl
         uses: Azure/setup-kubectl@v4.0.0
         id: install
