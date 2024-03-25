@@ -29,7 +29,9 @@ jobs:
       - name: Find image version
         working-directory: perfana-gitops
         run: |
-          echo "TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')" >> $GITHUB_ENV
+          TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')
+          echo "Found image version: $TAG_NAME"
+          echo "TAG_NAME" >> $GITHUB_ENV
       - name: Install kubectl
         uses: Azure/setup-kubectl@v4.0.0
         id: install
@@ -56,6 +58,7 @@ jobs:
                 echo "Deployment $DEPLOYMENT ready"
                 break
              fi
+             sleep 4
           done
           ATTEMPTS=1
           ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
@@ -77,6 +80,7 @@ jobs:
                 echo "Deployment $DEPLOYMENT ready"
                 break
              fi
+             sleep 4
           done
           ATTEMPTS=1
           ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
