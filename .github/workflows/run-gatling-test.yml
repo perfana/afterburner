@@ -62,10 +62,6 @@ jobs:
         with:
           java-version: 17
           maven-version: 3.6.3
-      - name: get KUBECONFIG from secrets
-        env:
-          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
-        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
       - name: Start Gatling test
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
