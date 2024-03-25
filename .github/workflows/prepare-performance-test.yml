@@ -19,7 +19,7 @@ jobs:
     steps:
       ## checkout perfana-gitops
       - name: Checkout perfana-gitops
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: perfana/perfana-gitops
           token: ${{ secrets.PAT_GITHUB }}
@@ -31,50 +31,58 @@ jobs:
         run: |
           echo "TAG_NAME=$(cat ./apps/acme/demo/${{ inputs.service }}-fe/values.yaml | awk '/tag:/ {print $2}')" >> $GITHUB_ENV
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3
+        uses: Azure/setup-kubectl@v4.0.0
         id: install
       - name: Checkout code from code branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: main
           fetch-depth: 0
       - name: get KUBECONFIG from secrets
         env:
-          KUBECONFIG_TO_FILE: ${{secrets.KUBECONFIG_ACME}}
-        run: echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
+        run: |
+          echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+          echo "Current context: $(kubectl config current-context)"
       - name: Check deployed version fe-afterburner
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
           IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
+          DEPLOYMENT=${{ inputs.service }}-fe-afterburner
           while true; do
-             echo "Waiting for deployment ${{ inputs.service }}-fe-afterburner ..."
-             if [[ $(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ${{ inputs.service }}-fe-afterburner ready"
+             echo "Waiting for deployment $DEPLOYMENT ..."
+             if [[ $(kubectl -n acme get deployment $DEPLOYMENT -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment $DEPLOYMENT ready"
                 break
              fi
           done
-          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/${{ inputs.service }}-fe-afterburner -n acme"
+          ATTEMPTS=1
+          ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
           until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
-           $ROLLOUT_STATUS_CMD
-           ATTEMPTS=$((attempts + 1))
-           sleep 10
+             echo "Waiting rollout status $DEPLOYMENT ... ($ATTEMPTS/60)"
+             $ROLLOUT_STATUS_CMD
+             ATTEMPTS=$((ATTEMPTS + 1))
+             sleep 4
           done
       - name: Check deployed version be-afterburner
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
           IMAGE: perfana/afterburner:${{ env.TAG_NAME }}
         run: |
+          DEPLOYMENT=${{ inputs.service }}-be-afterburner
           while true; do
-             echo "Waiting for deployment ${{ inputs.service }}-be-afterburner ..."
-             if [[ $(kubectl get deployment ${{ inputs.service }}-be-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
-                echo "Deployment ${{ inputs.service }}-be-afterburner ready"
+             echo "Waiting for deployment $DEPLOYMENT ..."
+             if [[ $(kubectl -n acme get deployment $DEPLOYMENT -o jsonpath='{$.spec.template.spec.containers[:1].image}') = $IMAGE ]]; then
+                echo "Deployment $DEPLOYMENT ready"
                 break
              fi
           done
-          ROLLOUT_STATUS_CMD="kubectl rollout status deployment/${{ inputs.service }}-be-afterburner -n acme"
+          ATTEMPTS=1
+          ROLLOUT_STATUS_CMD="kubectl -n acme rollout status deployment/$DEPLOYMENT"
           until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
-           $ROLLOUT_STATUS_CMD
-           ATTEMPTS=$((attempts + 1))
-           sleep 10
+             echo "Waiting rollout status $DEPLOYMENT ... ($ATTEMPTS/60)"
+             $ROLLOUT_STATUS_CMD
+             ATTEMPTS=$((ATTEMPTS + 1))
+             sleep 4
           done
