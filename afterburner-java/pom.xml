@@ -247,6 +247,32 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>exec-maven-plugin</artifactId>
+               <executions>
+                   <execution>
+                       <id>Copy ext jars like pyroscope and jfr-explorer to jib dir</id>
+                       <phase>generate-sources</phase>
+                       <goals>
+                           <goal>exec</goal>
+                       </goals>
+                       <configuration>
+                           <executable>${basedir}/scripts/add-ext-jars-to-jib.sh</executable>
+                       </configuration>
+                   </execution>
+                   <execution>
+                       <id>Remove ext jars from jib dir</id>
+                       <phase>clean</phase>
+                       <goals>
+                           <goal>exec</goal>
+                       </goals>
+                       <configuration>
+                           <executable>${basedir}/scripts/rm-ext-jars-to-jib.sh</executable>
+                       </configuration>
+                   </execution>
+               </executions>
+           </plugin>
         </plugins>
     </build>
     <profiles>
@@ -320,28 +346,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>pyroscope</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>Generate pyroscope jar and copy to jib dir</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${basedir}/scripts/create-pyroscope-java-jar.sh</executable>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+     </profiles>
 </project>
