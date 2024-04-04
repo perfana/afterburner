@@ -12,7 +12,7 @@ fi
 
 if [ ! -f src/main/jib/jfr-exporter.jar ]; then
   echo "Downloading JFR exporter jar"
-  curl -Ss -L -o src/main/jib/jfr-exporter.jar "https://github.com/perfana/jfr-exporter/releases/download/0.3.0/jfr-exporter-0.3.0.jar"
+  curl -Ss -L -o src/main/jib/jfr-exporter.jar "https://github.com/perfana/jfr-exporter/releases/download/0.3.1/jfr-exporter-0.3.1.jar"
 else
   echo "JFR exporter jar already exists"
 fi
