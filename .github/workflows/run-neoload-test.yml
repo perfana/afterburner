@@ -1,0 +1,84 @@
+---
+name: Run performance tests with Neoload
+
+on:
+  workflow_call:
+    inputs:
+      systemUnderTest:
+        required: true
+        type: string
+      workload:
+        required: true
+        type: string
+      service:
+        required: true
+        type: string
+      annotations:
+        required: false
+        type: string
+
+
+jobs:
+
+  performance-test-neoload:
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout afterburner repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install kubectl
+        uses: Azure/setup-kubectl@v4.0.0
+        id: install
+      - name: Get commit message
+        if: inputs.annotations == ''
+        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
+      - name: Get commit sha
+        run: echo "GIT_SHA=$(git rev-parse --verify demo)" >> $GITHUB_ENV
+      - name: get KUBECONFIG from secrets
+        env:
+          KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
+        run: |
+          echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
+          kubectl config get-contexts
+      - name: Get deployed version
+        if: env.TAG_NAME == ''
+        env:
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+        run: |
+          VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
+          echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17.0.4+101'
+          distribution: 'temurin'
+          cache: maven
+      - name: Setup Maven Action
+        uses: s4u/setup-maven-action@v1.6.0
+        with:
+          java-version: 17.0.4+101
+          maven-version: 3.6.3
+      - name: Build with Maven
+        env:
+          KUBECONFIG: /runner/_work/afterburner/afterburner/config
+        run: |
+          cd cicd/neoload
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
+          -Dsut-config=${{ inputs.service }} \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
+          -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          -Dversion="${{ env.TAG_NAME }}" \
+          -DgitSha="${{ env.GIT_SHA }}" \
+          -DsystemUnderTest=${{ inputs.systemUnderTest }} \
+          -DtestEnvironment=acme \
+          -Dannotations="${{ env.COMMIT_MESSAGE }}" \
+          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+          -Dhost=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
+          -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
+          -DinfluxUser=admin \
+          -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
+          -DneoloadAccountToken=${{ secrets.NEOLOAD_ACCOUNT_TOKEN }} \
+          -DneoloadTestId=${{ secrets.NEOLOAD_TEST_ID }} \
+          -DperfanaUrl=https://demo.perfana.cloud

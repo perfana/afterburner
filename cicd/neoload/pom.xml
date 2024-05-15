@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.perfana</groupId>
-    <artifactId>perfana-k6-afterburner</artifactId>
+    <artifactId>perfana-neoload-afterburner</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <repositories>
@@ -29,17 +29,17 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <event-scheduler-maven-plugin.version>3.0.2</event-scheduler-maven-plugin.version>
+        <event-scheduler-maven-plugin.version>3.0.4</event-scheduler-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
-        <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
+        <test-events-neoload.version>1.0.0-SNAPSHOT</test-events-neoload.version>
         <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
 
         <!-- Perfana url  -->
-        <perfanaUrl>http://perfana:3000</perfanaUrl>
+        <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
-        <influxDbUrl>http://influxdb:8086/myk6db</influxDbUrl>
+        <influxUrl>http://influx:8086</influxUrl>
 
 
         <!-- By default Jenkins build Url is used -->
@@ -48,15 +48,15 @@
         <!-- By default send data to perfana -->
         <perfanaEnabled>true</perfanaEnabled>
 
-        <!-- By default don't assert test results -->
-        <assertResultsEnabled>false</assertResultsEnabled>
+        <!-- By default assert test results -->
+        <assertResultsEnabled>true</assertResultsEnabled>
 
-        <!-- By default disable events -->
-        <eventsEnabled>false</eventsEnabled>
+        <!-- By default enable events -->
+        <eventsEnabled>true</eventsEnabled>
         <eventScheduleScript></eventScheduleScript>
 
         <!-- Settings for the Perfana Dashboard -->
-        <systemUnderTest>BumbleBee</systemUnderTest>
+        <systemUnderTest>JetFire</systemUnderTest>
         <version>1.0</version>
         <tags></tags>
 
@@ -130,28 +130,17 @@
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
                                     <perfana-containers>.*afterburner-db.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
-                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
                                     <perfana-pods>${sut-config}.*</perfana-pods>
                                 </variables>
-                                <overrideTestRunId>false</overrideTestRunId>
                             </eventConfig>
-                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>Start Neoload script</name>
-                                <continueOnKeepAliveParticipant>true</continueOnKeepAliveParticipant>
-                                <onStartTest>k6 run --out csv=test_results.csv \
-                                    -e CONSTANT_LOAD_TIME=${duration}s \
-                                    -e RAMPUP_TIME=${rampUpTime}s \
-                                    -e START_RATE=${startRate} \
-                                    -e TARGET_RATE=${targetRate} \
-                                    -e TARGET_BASE_URL=${targetBaseUrl} \
-                                    -e SYSTEM_UNDER_TEST=${systemUnderTest} \
-                                    -e TEST_ENVIRONMENT=${testEnvironment} \
-                                    -e TEST_RUN_ID=${testRunId} \
-                                    /runner/_work/afterburner/afterburner/cicd/k6/script.js
-                                </onStartTest>
-                                <onKeepAlive></onKeepAlive>
-                                <onAbort></onAbort>
-                                <onAfterTest></onAfterTest>
+                            <eventConfig implementation="io.perfana.event.neoload.NeoloadEventConfig">
+                                <name>NeoloadEvent</name>
+                                <neoloadAccountToken>${neoloadAccountToken}</neoloadAccountToken>
+                                <neoloadTestId>${neoloadTestId}</neoloadTestId>
+                                <influxUrl>${influxUrl}</influxUrl>
+                                <influxUser>${influxUser}</influxUser>
+                                <influxPassword>${influxPassword}</influxPassword>
+                                <influxDatabase>neoload</influxDatabase>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
@@ -220,8 +209,8 @@
                 <dependencies>
                     <dependency>
                         <groupId>io.perfana</groupId>
-                        <artifactId>test-events-command-runner</artifactId>
-                        <version>${test-events-command-runner.version}</version>
+                        <artifactId>test-events-neoload</artifactId>
+                        <version>${test-events-neoload.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>io.perfana</groupId>
@@ -292,27 +281,7 @@
             </properties>
         </profile>
 
-
-
         <!-- Test type profiles -->
-
-        <profile>
-            <id>test-type-stress</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <workload>k6-stressTest</workload>
-                <duration>1</duration>
-                <startRate>1</startRate>
-                <targetRate>30</targetRate>
-                <rampUpTime>900</rampUpTime>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-                <eventsEnabled>true</eventsEnabled>
-                <tags>k6,spring-boot-kubernetes,kubernetes,spanmetrics</tags>
-            </properties>
-        </profile>
 
         <profile>
             <id>test-type-load</id>
@@ -320,57 +289,15 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <workload>k6-loadTest</workload>
+                <workload>neo-loadTest</workload>
                 <duration>600</duration>
-                <startRate>1</startRate>
-                <targetRate>1</targetRate>
-                <rampUpTime>120</rampUpTime>
+                <rampUpTime>60</rampUpTime>
                 <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,spring-boot-kubernetes,kubernetes,spanmetrics</tags>
+                <tags>neoload,spring-boot-kubernetes,kubernetes,spanmetrics</tags>
             </properties>
         </profile>
 
-        <profile>
-            <id>test-type-slow-backend</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <workload>slowBackendTest</workload>
-                <duration>7</duration>
-                <targetRate>50</targetRate>
-                <rampUpTime>3</rampUpTime>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-                <eventsEnabled>true</eventsEnabled>
-                <eventScheduleScript>
-                    PT0S|wiremock-change-delay(delay=400)|delay=400
-                    PT1M|wiremock-change-delay(delay=2000)|delay=2000
-                    PT2M|wiremock-change-delay(delay=4000)|delay=4000
-                    PT3M|wiremock-change-delay(delay=8000)|delay=8000
-                    PT4M|wiremock-change-delay(delay=12000)|delay=12000
-                    PT5M|wiremock-change-delay(delay=400)|delay=400
-                </eventScheduleScript>
-                <tags>perfana-demo-host</tags>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test-type-endurance</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <workload>enduranceTest</workload>
-                <duration>7</duration>
-                <targetRate>50</targetRate>
-                <rampUpTime>3</rampUpTime>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-            </properties>
-        </profile>
 
     </profiles>
 </project>
