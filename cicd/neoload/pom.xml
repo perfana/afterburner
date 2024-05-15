@@ -135,6 +135,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.event.neoload.NeoloadEventConfig">
                                 <name>NeoloadEvent</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <neoloadAccountToken>${neoloadAccountToken}</neoloadAccountToken>
                                 <neoloadTestId>${neoloadTestId}</neoloadTestId>
                                 <influxUrl>${influxUrl}</influxUrl>
