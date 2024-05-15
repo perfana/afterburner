@@ -46,6 +46,7 @@ on:
           - jmeter
           - k6
           - locust
+          - neoload
       annotations:
         description: 'Test run annotation'
         type: string
