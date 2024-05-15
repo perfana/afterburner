@@ -145,6 +145,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <tags>${sut-config}-fe</tags>
                                 <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
@@ -164,6 +165,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventBackend</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <tags>${sut-config}-be</tags>
                                 <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
@@ -175,6 +177,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <command>echo "${gitSha}"</command>
                                 <output>key</output>
                                 <key>https://github.com/perfana/afterburner</key>
@@ -182,6 +185,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentFE</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <command>kubectl get deployment ${sut-config}-fe-afterburner -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,TOKEN</excludes>
@@ -190,6 +194,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentBE</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <command>kubectl get deployment ${sut-config}-be-afterburner -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,TOKEN</excludes>
@@ -198,6 +203,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentMySql</name>
+                                <readyForStartParticipant>true</readyForStartParticipant>
                                 <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
                                 <excludes>status,password,secret</excludes>
