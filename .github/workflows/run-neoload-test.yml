@@ -65,7 +65,7 @@ jobs:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/neoload
-          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-load,assert-results \
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
