@@ -18,7 +18,7 @@ jobs:
       runner: acme
 
   performance-test-neoload:
-    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+    uses: perfana/afterburner/.github/workflows/run-neoload-test.yml@main
     needs: prepare-performance-test
     secrets: inherit
     with:
