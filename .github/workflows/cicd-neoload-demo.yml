@@ -1,0 +1,32 @@
+---
+
+name: Performance test Neoload demo
+
+on:
+  workflow_run:
+    workflows: ["Build afterburner and deploy"]
+    types:
+      - completed
+
+jobs:
+
+  prepare-performance-test:
+    uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
+    secrets: inherit
+    with:
+      service: bumble-bee
+      runner: acme
+
+  performance-test-neoload:
+    uses: perfana/afterburner/.github/workflows/run-k6-test.yml@main
+    needs: prepare-performance-test
+    secrets: inherit
+    with:
+      systemUnderTest: JetFire
+      workload: load
+      service: jet-fire
+      runner: acme
+
+  deploy-to-production:
+    uses: perfana/afterburner/.github/workflows/deploy-to-production.yml@demo
+    needs: performance-test-neoload
