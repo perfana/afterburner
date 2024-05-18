@@ -16,12 +16,14 @@ on:
       annotations:
         required: false
         type: string
-
+      runner:
+        default: 'acme'
+        type: string
 
 jobs:
 
   performance-test-neoload:
-    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') ||  (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
+    runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
