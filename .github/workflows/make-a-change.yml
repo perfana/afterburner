@@ -14,7 +14,7 @@ on:
         options:
           - cpu
           - connections
-          - database
+          - query
           - random
           - baseline
     #schedule:
@@ -79,39 +79,39 @@ jobs:
           
           if [[ $isIssuePresent -eq 0  && "$issueSelected" -ne "baseline" ]]; then
             echo all 3 performance issues are _not_ found, now generate one or the other based the modulo of the current run number
+          
+          ### `issue`     :  previously 'mod_run'; indicates the type of issue to introduce
+          ### `mod_run`   :  previoously 'mod_run_2': when issue==random, run only every run % 3 build. 
             
             current_run=${{ github.run_number }}
+            mod_run=0          
             if [[ "$issueSelected" -eq "random" ]]; then
-               mod_run=$(( RANDOM % 3 ))
+              issue=$(( RANDOM % 3 ))
+              mod_run=$(( current_run % 3 )) # run once every 4 builds
             elif [[ "$issueSelected" -eq "cpu" ]]; then
-              mode_run=0
+              issue=0
             elif [[ "$issueSelected" -eq "connections" ]]; then
-              mode_run=1
-            elif [[ "$issueSelected" -eq "database" ]]; then
-              mode_run=2
-            fi
-            if [[ "$issueSelected" -eq "random" ]]; then
-              mod_run_2=$(( current_run % 3 )) # run once every 4 builds
-            else
-              mod_run=0
+              issue=1
+            elif [[ "$issueSelected" -eq "query" ]]; then
+              issue=2
             fi
           
-            if [[ $mod_run_2 -eq 0 ]]; then
-              if [[ $mod_run -eq 0 ]]; then
+            if [[ $mod_run -eq 0 ]]; then
+              if [[ $issue -eq 0 ]]; then
                 echo "generate cpu issue"
                 commit_message="make matrix calculation more variable"
                 sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
                 sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
-              elif [[ $mod_run -eq 1 ]]; then
+              elif [[ $issue -eq 1 ]]; then
                 echo "generate connection pool issue"
                 commit_message="use default httpclient connection pool size"
                 sed -i 's/afterburner.remote.call.httpclient.connections.max=60/afterburner.remote.call.httpclient.connections.max=2/g' $prop_file
-              elif [[ $mod_run -eq 2 ]]; then
+              elif [[ $issue -eq 2 ]]; then
                 echo "generate query issue"
                 commit_message="remove duplicates per salary"
                 sed -i "s/) limit 200;/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/" $query_file
               else
-                echo "WARN: current random mod 3 is $mod_run, this is not expected"
+                echo "WARN: current random mod 3 is $issue, this is not expected"
               fi
             fi
           fi
