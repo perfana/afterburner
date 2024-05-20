@@ -59,7 +59,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.6.0
+        uses: s4u/setup-maven-action@v1.13.0
         with:
           java-version: 17
           maven-version: 3.9.2
