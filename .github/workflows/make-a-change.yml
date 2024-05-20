@@ -44,7 +44,7 @@ jobs:
             connectionPoolIssue=0
           fi
 
-          if grep -q "ORDER BY s.salary DESC" "$query_file"; then
+          if grep -q "SELECT MAX(to_date) FROM salaries" "$query_file"; then
             echo query issue found
             queryIssue=1
           else
@@ -59,20 +59,20 @@ jobs:
             mod_run_2=$(( current_run % 3 )) # run once every 4 builds 
             if [[ $mod_run_2 -eq 0 ]]; then
               if [[ $mod_run -eq 0 ]]; then
-                echo "current run mod 4 is 0 ($current_run/$mod_run), generate cpu issue"
+                echo "random mod 3 is 0 ($current_run/$mod_run), generate cpu issue"
                 commit_message="make matrix calculation more variable"
                 sed -i 's/no variation: is no fun/some variation: is more fun/g' $cpu_java_file
                 sed -i 's/int funSize = matrixSize/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/g' $cpu_java_file
               elif [[ $mod_run -eq 1 ]]; then
-                echo "current run mod 4 is 1 ($current_run/$mod_run), generate connection pool issue"
+                echo "random mod 3 is 1 ($current_run/$mod_run), generate connection pool issue"
                 commit_message="use default httpclient connection pool size"
                 sed -i 's/afterburner.remote.call.httpclient.connections.max=60/afterburner.remote.call.httpclient.connections.max=2/g' $prop_file
               elif [[ $mod_run -eq 2 ]]; then
-                echo "current run mod 4 is 2 ($current_run/$mod_run), generate query issue"
-                commit_message="order results"
-                sed -i "s/GROUP BY e.emp_no/GROUP BY e.emp_no, s.salary ORDER BY s.salary DESC/" $query_file
+                echo "random mod 3 is 2 ($current_run/$mod_run), generate query issue"
+                commit_message="remove duplicates per salary"
+                sed -i "s/) limit 200;/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/" $query_file
               else
-                echo "WARN: current run mod 4 is $mod_run, this is not expected"
+                echo "WARN: current random mod 3 is $mod_run, this is not expected"
               fi
             fi
           fi
@@ -91,8 +91,8 @@ jobs:
           fi
           if [ $queryIssue -eq 1 ]; then
             echo query issue is found, now fix it
-            commit_message="${commit_message}fix performance issue: revert result ordering change"
-            sed -i "s/GROUP BY e.emp_no, s.salary ORDER BY s.salary DESC/GROUP BY e.emp_no/" $query_file
+            commit_message="${commit_message}fix performance issue: revert remove duplicates per salary"
+            sed -i "s/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/) limit 200;/" $query_file
           fi
 
           echo "commit_message=$commit_message" >> $GITHUB_ENV
