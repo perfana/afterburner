@@ -76,6 +76,12 @@ public class DatabaseConnector {
         return employeeMapper.selectEmployeeByLastName(lastName);
     }
 
+    @Operation(description = "Find employees by manager last name.")
+    @GetMapping("/db/employee/find-by-manager-last-name")
+    public List<Employee> findEmployeeByManagerLastName(@RequestParam(defaultValue = "") String lastName) {
+        return employeeMapper.findEmployeesByManagerLastName(lastName);
+    }
+
     @Operation(description = "Execute long query.")
     @GetMapping("/db/employee/select-long-time")
     public int longQuery(@RequestParam int durationInSec) {

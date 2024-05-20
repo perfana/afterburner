@@ -1,5 +1,5 @@
 ---
-name: Run performance tests with Gatling
+name: Run performance tests with Neoload
 
 on:
   workflow_call:
@@ -20,21 +20,19 @@ on:
         default: 'acme'
         type: string
 
-
 jobs:
 
-  performance-test-gatling:
+  performance-test-neoload:
     runs-on: ${{ (inputs.runner == 'test') && fromJSON('["self-hosted", "test"]') || (inputs.runner == 'acme-0') && fromJSON('["self-hosted", "acme-0"]') || fromJSON('["self-hosted", "acme"]') }}
     steps:
-      - name: Install kubectl
-        uses: Azure/setup-kubectl@v4.0.0
-        id: install
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout afterburner repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: demo
+      - name: Install kubectl
+        uses: Azure/setup-kubectl@v4.0.0
+        id: install
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
@@ -56,37 +54,33 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '17.0.4+101'
           distribution: 'temurin'
           cache: maven
       - name: Setup Maven Action
         uses: s4u/setup-maven-action@v1.6.0
         with:
-          java-version: 17
+          java-version: 17.0.4+101
           maven-version: 3.6.3
-      - name: Start Gatling test
+      - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
-          cd cicd/gatling
-          # fetch gatling 2 influx tool
-          wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
-          chmod +x g2i
-          # execute maven
-          mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
+          cd cicd/neoload
+          mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -Dsut-config=${{ inputs.service }} \
-          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-${{ github.run_id }}" \
+          -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           -Dversion="${{ env.TAG_NAME }}" \
           -DgitSha="${{ env.GIT_SHA }}" \
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
-          -Dannotations="$COMMIT_MESSAGE" \
+          -Dannotations="${{ env.COMMIT_MESSAGE }}" \
           -DapiKey=${{ secrets.PERFANA_APIKEY }} \
-          -DtargetBaseUrl=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
+          -Dhost=http://${{ inputs.service }}-fe-afterburner.acme:8080 \
           -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }} \
-          -Dscenario=acceptance
+          -DneoloadAccountToken=${{ secrets.NEOLOAD_ACCOUNT_TOKEN }} \
+          -DneoloadTestId=${{ secrets.NEOLOAD_TEST_ID }} \
+          -DperfanaUrl=https://demo.perfana.cloud

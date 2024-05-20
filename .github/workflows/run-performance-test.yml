@@ -46,6 +46,7 @@ on:
           - jmeter
           - k6
           - locust
+          - neoload
       annotations:
         description: 'Test run annotation'
         type: string
@@ -110,6 +111,16 @@ jobs:
   performance-test-locust:
     uses: perfana/afterburner/.github/workflows/run-locust-test.yml@main
     if: inputs.tool == 'locust'
+    secrets: inherit
+    with:
+      systemUnderTest: ${{ inputs.systemUnderTest }}
+      workload: ${{ inputs.workload }}
+      service: ${{ inputs.service }}
+      annotations: ${{ inputs.annotations }}
+
+  performance-test-neoload:
+    uses: perfana/afterburner/.github/workflows/run-neoload-test.yml@main
+    if: inputs.tool == 'neoload'
     secrets: inherit
     with:
       systemUnderTest: ${{ inputs.systemUnderTest }}
