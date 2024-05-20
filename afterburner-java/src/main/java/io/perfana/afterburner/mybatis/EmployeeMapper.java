@@ -23,7 +23,7 @@ public interface EmployeeMapper {
     //@QueryHints(value = { @QueryHint(name = "javax.persistence.query.timeout", value = "20") })
     int selectLongTime(@Param("durationInSec") int durationInSec);
 
-    @Select("SELECT DISTINCT e.* " +
+    @Select("SELECT e.* " +
             "FROM employees AS e " +
             "         JOIN ( " +
             "    SELECT emp_no " +
@@ -44,6 +44,7 @@ public interface EmployeeMapper {
             "    WHERE em.last_name = #{lastName}" +
             "      AND dm.to_date = (SELECT MAX(to_date) FROM dept_manager WHERE dept_no = dm.dept_no) " +
             ") " +
+            "GROUP BY e.emp_no" +
             ";")
     List<Employee> findEmployeesByManagerLastName(@Param("lastName") String lastName);
 
