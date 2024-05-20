@@ -45,7 +45,7 @@ public interface EmployeeMapper {
             "      AND dm.to_date = (SELECT MAX(to_date) FROM dept_manager WHERE dept_no = dm.dept_no) " +
             ") " +
             "GROUP BY e.emp_no" +
-            ";")
+            " limit 200;")
     List<Employee> findEmployeesByManagerLastName(@Param("lastName") String lastName);
 
 }
