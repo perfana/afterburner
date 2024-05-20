@@ -54,13 +54,13 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '17.0.4+101'
+          java-version: '17'
           distribution: 'temurin'
           cache: maven
       - name: Setup Maven Action
         uses: s4u/setup-maven-action@v1.13.0
         with:
-          java-version: 17.0.4+101
+          java-version: 17
           maven-version: 3.6.3
       - name: Build with Maven
         env:
