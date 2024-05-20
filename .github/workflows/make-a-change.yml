@@ -72,14 +72,9 @@ jobs:
             isIssuePresent=1
           fi
           
-          if [[ $isIssuePresent -eq 0 && "$issueSelected" != "random" && "$issueSelected" != "baseline" ]]; then
-            echo "ERROR: first make sure the baseline has run without issue and then select an specific issue"
-            exit 1
-          fi
-          
           if [[ $isIssuePresent -eq 0  && "$issueSelected" != "baseline" ]]; then
           
-            echo "There are NO performance issues found, and the issue selected is ${issueSelected} so maybe we want to introduce a performance issue..."
+          echo "There are NO performance issues found, and the issue selected is ${issueSelected} so maybe we want to introduce a performance issue..."
           
           ### `issue`     :  previously 'mod_run'; indicates the type of issue to introduce
           ### `mod_run`   :  previoously 'mod_run_2': when issue==random, run only every run % 3 build. 
