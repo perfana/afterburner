@@ -44,7 +44,7 @@ jobs:
             connectionPoolIssue=0
           fi
 
-          if grep -q "ORDER BY s.salary DESC;" "$query_file"; then
+          if grep -q "ORDER BY s.salary DESC" "$query_file"; then
             echo query issue found
             queryIssue=1
           else
@@ -70,7 +70,7 @@ jobs:
               elif [[ $mod_run -eq 2 ]]; then
                 echo "current run mod 4 is 2 ($current_run/$mod_run), generate query issue"
                 commit_message="order results"
-                sed -i "s/\(.*\)\"\;\")/\1\"ORDER BY s.salary DESC;\")/" $query_file
+                sed -i "s/GROUP BY e.emp_no/GROUP BY e.emp_no, s.salary ORDER BY s.salary DESC/" $query_file
               else
                 echo "WARN: current run mod 4 is $mod_run, this is not expected"
               fi
@@ -92,7 +92,7 @@ jobs:
           if [ $queryIssue -eq 1 ]; then
             echo query issue is found, now fix it
             commit_message="${commit_message}fix performance issue: revert result ordering change"
-            sed -i "s/\(.*\)\"ORDER BY s.salary DESC\;\")/\1\"\;\")/" $query_file
+            sed -i "s/GROUP BY e.emp_no, s.salary ORDER BY s.salary DESC/GROUP BY e.emp_no/" $query_file
           fi
 
           echo "commit_message=$commit_message" >> $GITHUB_ENV
