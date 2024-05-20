@@ -23,7 +23,7 @@ public interface EmployeeMapper {
     //@QueryHints(value = { @QueryHint(name = "javax.persistence.query.timeout", value = "20") })
     int selectLongTime(@Param("durationInSec") int durationInSec);
 
-    @Select("SELECT e.* " +
+    @Select("SELECT DISTINCT e.* " +
             "FROM employees AS e " +
             "         JOIN ( " +
             "    SELECT emp_no " +
