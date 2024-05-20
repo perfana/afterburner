@@ -72,12 +72,12 @@ jobs:
             isIssuePresent=1
           fi
           
-          if [[ $isIssuePresent -eq 0 && "$issueSelected" -ne "random" && "$issueSelected" -ne "baseline" ]]; then
+          if [[ $isIssuePresent -eq 0 && "$issueSelected" != "random" && "$issueSelected" != "baseline" ]]; then
             echo "ERROR: first make sure the baseline has run without issue and then select an specific issue"
             exit 1
           fi
           
-          if [[ $isIssuePresent -eq 0  && "$issueSelected" -ne "baseline" ]]; then
+          if [[ $isIssuePresent -eq 0  && "$issueSelected" != "baseline" ]]; then
             echo all 3 performance issues are _not_ found, now generate one or the other based the modulo of the current run number
           
           ### `issue`     :  previously 'mod_run'; indicates the type of issue to introduce
@@ -85,14 +85,14 @@ jobs:
             
             current_run=${{ github.run_number }}
             mod_run=0          
-            if [[ "$issueSelected" -eq "random" ]]; then
+            if [[ "$issueSelected" == "random" ]]; then
               issue=$(( RANDOM % 3 ))
               mod_run=$(( current_run % 3 )) # run once every 4 builds
-            elif [[ "$issueSelected" -eq "cpu" ]]; then
+            elif [[ "$issueSelected" == "cpu" ]]; then
               issue=0
-            elif [[ "$issueSelected" -eq "connections" ]]; then
+            elif [[ "$issueSelected" == "connections" ]]; then
               issue=1
-            elif [[ "$issueSelected" -eq "query" ]]; then
+            elif [[ "$issueSelected" == "query" ]]; then
               issue=2
             fi
           
