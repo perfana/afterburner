@@ -78,7 +78,8 @@ jobs:
           fi
           
           if [[ $isIssuePresent -eq 0  && "$issueSelected" != "baseline" ]]; then
-            echo all 3 performance issues are _not_ found, now generate one or the other based the modulo of the current run number
+          
+            echo "There are NO performance issues found, and the issue selected is ${issueSelected} so maybe we want to introduce a performance issue..."
           
           ### `issue`     :  previously 'mod_run'; indicates the type of issue to introduce
           ### `mod_run`   :  previoously 'mod_run_2': when issue==random, run only every run % 3 build. 
@@ -96,7 +97,7 @@ jobs:
               issue=2
             fi
           
-            if [[ $mod_run -eq 0 ]]; then
+            if [[ $mod_run -eq 0 ]]; then    #### mod_run is default 0, only 'random' might set it to something different
               if [[ $issue -eq 0 ]]; then
                 echo "generate cpu issue"
                 commit_message="make matrix calculation more variable"
@@ -113,6 +114,10 @@ jobs:
               else
                 echo "WARN: current random mod 3 is $issue, this is not expected"
               fi
+              # remove the no-op change if present
+              sed -i "s/magik matrix/magic matrix/" $cpu_java_file
+            else # mod_run was != 0, so code change is skipped altogether. Force one anyhow.
+              sed -i "s/magic matrix/magik matrix/" $cpu_java_file
             fi
           fi
 
