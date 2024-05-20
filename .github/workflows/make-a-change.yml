@@ -117,7 +117,9 @@ jobs:
               # remove the no-op change if present
               sed -i "s/magik matrix/magic matrix/" $cpu_java_file
             else # mod_run was != 0, so code change is skipped altogether. Force one anyhow.
+              echo "Making a safe (no-op) change.."
               sed -i "s/magic matrix/magik matrix/" $cpu_java_file
+              commit_message="changed the text"
             fi
           fi
 
