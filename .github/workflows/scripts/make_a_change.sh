@@ -102,8 +102,6 @@ else
     commit_message="${commit_message}fix performance issue: revert remove duplicates per salary"
     edit_file "s/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/) limit 200;/" $query_file
   fi
-
-  toggleNoopIssue
 fi
 #echo "commit_message=$commit_message" >> $GITHUB_ENV
 
