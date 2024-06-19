@@ -38,7 +38,7 @@ jobs:
           issueSelected=${{ inputs.performanceIssue }}
           
           # seed RANDOM to prevent same sequences
-          RANDOM=$(date +%N | cut -b4-9)
+          RANDOM=$(date +'%s' | cut -b6-10)
           
           cpu_java_file=afterburner-java/src/main/java/io/perfana/afterburner/controller/CpuBurner.java
           prop_file=afterburner-java/src/main/resources/application.properties
