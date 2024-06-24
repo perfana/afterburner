@@ -36,6 +36,7 @@ jobs:
           # seed RANDOM to prevent same sequences
           RANDOM=$(date +'%s' | cut -b6-10)
 
+          current_run=${{ github.run_number }}
           if [[ "$issueSelected" == "random" ]]; then
             issue=$(( RANDOM % 3 ))
             mod_run=$(( current_run % 3 )) # run once every 4 builds
