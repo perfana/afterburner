@@ -29,7 +29,8 @@ jobs:
       - name: Make a change
         run: |
           # default is random, inputs.performanceIssues is empty when run from scheduler
-          issueSelected=${{ inputs.performanceIssue }:-random}
+          issueSelected=${{ inputs.performanceIssue }}
+          issueSelected=${issueSelected:-random}
           
           # seed RANDOM to prevent same sequences
           RANDOM=$(date +'%s' | cut -b6-10)
