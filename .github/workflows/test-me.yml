@@ -12,6 +12,7 @@ on:
         default: 'random'
         type: choice
         options:
+          - ''
           - cpu
           - connections
           - query
