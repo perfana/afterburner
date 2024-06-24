@@ -38,7 +38,8 @@ jobs:
       - name: Make a change
         run: |
           # default is random, inputs.performanceIssues is empty when run from scheduler
-          issueSelected=${{ inputs.performanceIssue }:-random}
+          issueSelected=${{ inputs.performanceIssue }}
+          issueSelected=${issueSelected:-random}
           
           # seed RANDOM to prevent same sequences
           RANDOM=$(date +'%s' | cut -b6-10)
@@ -83,13 +84,13 @@ jobs:
             echo "There are NO performance issues found, and the issue selected is '${issueSelected}' so maybe we want to introduce a performance issue..."
             
             ### `issue`     :  indicates the type of issue to introduce
-            ### `mod_run`   :  when issue==random, run only every run % 3 build. 
+            ### `mod_run`   :  when issue==random, run only every run % 2 build. 
               
             current_run=${{ github.run_number }}
             mod_run=0          
             if [[ "$issueSelected" == "random" ]]; then
               issue=$(( RANDOM % 3 ))
-              mod_run=$(( current_run % 3 )) # run once every 4 builds
+              mod_run=$(( current_run % 2 )) # run once every 3 builds
             elif [[ "$issueSelected" == "cpu" ]]; then
               issue=0
             elif [[ "$issueSelected" == "connections" ]]; then
