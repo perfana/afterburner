@@ -18,8 +18,10 @@ on:
           - random
           - baseline
   schedule:
+    ## At minute 10, 30, 50 past every hour
+    - cron: '10,30,50 * * * *'
     ## At minute 10 past every 2nd hour from 8h to 16h AMS time (6-14 UTC)
-    - cron: '10 6-14/2 * * *'
+    #- cron: '10 6-14/2 * * *'
 
 jobs:
   build:
@@ -35,7 +37,8 @@ jobs:
           persist-credentials: false
       - name: Make a change
         run: |
-          issueSelected=${{ inputs.performanceIssue }}
+          # default is random, inputs.performanceIssues is empty when run from scheduler
+          issueSelected=${{ inputs.performanceIssue }:-random}
           
           # seed RANDOM to prevent same sequences
           RANDOM=$(date +'%s' | cut -b6-10)
@@ -77,11 +80,11 @@ jobs:
           
           if [[ $isIssuePresent -eq 0  && "$issueSelected" != "baseline" ]]; then
           
-          echo "There are NO performance issues found, and the issue selected is ${issueSelected} so maybe we want to introduce a performance issue..."
-          
-          ### `issue`     :  previously 'mod_run'; indicates the type of issue to introduce
-          ### `mod_run`   :  previoously 'mod_run_2': when issue==random, run only every run % 3 build. 
+            echo "There are NO performance issues found, and the issue selected is '${issueSelected}' so maybe we want to introduce a performance issue..."
             
+            ### `issue`     :  indicates the type of issue to introduce
+            ### `mod_run`   :  when issue==random, run only every run % 3 build. 
+              
             current_run=${{ github.run_number }}
             mod_run=0          
             if [[ "$issueSelected" == "random" ]]; then
@@ -119,26 +122,28 @@ jobs:
               sed -i "s/magic matrix/magik matrix/" $cpu_java_file
               commit_message="changed the text"
             fi
-          fi
+          else
+            echo "Found performance issue(s) to fix: cpuIssue: $cpuIssue, connectionPoolIssue: $connectionPoolIssue, queryIssue $queryIssue"
 
-          # reset issue into a fix
-          if [ $cpuIssue -eq 1 ]; then
-            echo cpu issue is found, now fix it
-            commit_message="make cpu more efficient "
-            sed -i 's/some variation: is more fun/no variation: is no fun/g' $cpu_java_file
-            sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
+            # reset issue into a fix
+            if [ $cpuIssue -eq 1 ]; then
+              echo cpu issue is found, now fix it
+              commit_message="make cpu more efficient "
+              sed -i 's/some variation: is more fun/no variation: is no fun/g' $cpu_java_file
+              sed -i 's/int funSize = (int) (matrixSize \* (1.0 + (random.nextDouble() \* 3.3)))/int funSize = matrixSize/g' $cpu_java_file
+            fi
+            if [ $connectionPoolIssue -eq 1 ]; then
+              echo connection pool issue is found, now fix it
+              commit_message="${commit_message}tune http connection pool size"
+              sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
+            fi
+            if [ $queryIssue -eq 1 ]; then
+              echo query issue is found, now fix it
+              commit_message="${commit_message}fix performance issue: revert remove duplicates per salary"
+              sed -i "s/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/) limit 200;/" $query_file
+            fi
           fi
-          if [ $connectionPoolIssue -eq 1 ]; then
-            echo connection pool issue is found, now fix it
-            commit_message="${commit_message}tune http connection pool size"
-            sed -i 's/afterburner.remote.call.httpclient.connections.max=2/afterburner.remote.call.httpclient.connections.max=60/g' $prop_file
-          fi
-          if [ $queryIssue -eq 1 ]; then
-            echo query issue is found, now fix it
-            commit_message="${commit_message}fix performance issue: revert remove duplicates per salary"
-            sed -i "s/      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;/) limit 200;/" $query_file
-          fi
-
+          
           echo "commit_message=$commit_message" >> $GITHUB_ENV
       - name: Commit files
         run: |
