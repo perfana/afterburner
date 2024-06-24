@@ -1,0 +1,43 @@
+---
+
+# to test things in build
+name: Test me
+
+on:
+  workflow_dispatch:
+    inputs:
+      performanceIssue:
+        description: 'Performance Issue'
+        required: true
+        default: 'random'
+        type: choice
+        options:
+          - cpu
+          - connections
+          - query
+          - random
+          - baseline
+  schedule:
+    ## Every minute
+    - cron: '*/1 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make a change
+        run: |
+          # default is random, inputs.performanceIssues is empty when run from scheduler
+          issueSelected=${{ inputs.performanceIssue }:-random}
+          
+          # seed RANDOM to prevent same sequences
+          RANDOM=$(date +'%s' | cut -b6-10)
+
+          if [[ "$issueSelected" == "random" ]]; then
+            issue=$(( RANDOM % 3 ))
+            mod_run=$(( current_run % 3 )) # run once every 4 builds
+            echo "Random issue: $issue, mod_run: $mod_run"
+          else
+            echo "No random selected!!"
+          fi
