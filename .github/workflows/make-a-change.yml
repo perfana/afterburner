@@ -98,6 +98,8 @@ jobs:
             elif [[ "$issueSelected" == "query" ]]; then
               issue=2
             fi
+            
+            echo "mod_run: $mod_run and issueSelected: '$issueSelected'"
           
             if [[ $mod_run -eq 0 ]]; then    #### mod_run is default 0, only 'random' might set it to something different
               if [[ $issue -eq 0 ]]; then
@@ -116,11 +118,13 @@ jobs:
               else
                 echo "WARN: current random mod 3 is $issue, this is not expected"
               fi
-              # remove the no-op change if present
-              sed -i "s/magik matrix/magic matrix/" $cpu_java_file
             else # mod_run was != 0, so code change is skipped altogether. Force one anyhow.
               echo "Making a safe (no-op) change.."
-              sed -i "s/magic matrix/magik matrix/" $cpu_java_file
+              if grep -q "magic" "$cpu_java_file"; then
+                sed -i "s/magic matrix/magik matrix/" $cpu_java_file
+              else 
+                sed -i "s/magik matrix/magic matrix/" $cpu_java_file 
+              fi
               commit_message="changed the text"
             fi
           else
