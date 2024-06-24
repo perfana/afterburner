@@ -90,7 +90,7 @@ jobs:
             mod_run=0          
             if [[ "$issueSelected" == "random" ]]; then
               issue=$(( RANDOM % 3 ))
-              mod_run=$(( current_run % 2 )) # run once every 3 builds
+              mod_run=$(( current_run % 4 )) # run once every 4 builds
             elif [[ "$issueSelected" == "cpu" ]]; then
               issue=0
             elif [[ "$issueSelected" == "connections" ]]; then
