@@ -21,7 +21,8 @@ object Scenarios {
    * These are the scenarios run in 'normal' mode.
    */
   val acceptanceTestScenario = scenario("Acceptance test")
-.feed(CSVFeeder.firstName)
+    .feed(CSVFeeder.firstName)
+    .feed(CSVFeeder.lastName)
     .exec(session => session.set("testRunId", Configuration.testRunId))
      .exec(SimpleCpuBurn.call)
      .pause(3)
@@ -35,7 +36,9 @@ object Scenarios {
       .pause(3)
       .exec(CallMany.call)
     .pause(3)
-    .exec(Database.call)
+    .exec(Database.call1)
+    .pause(1)
+    .exec(Database.call2)
     .exec(FlakyCall.call)
 
   // Define a feeder with a random request name generator
@@ -43,13 +46,17 @@ object Scenarios {
 
   val lotsOfRequestNamesScenario = scenario("Lots of request names test")
   .feed(CSVFeeder.firstName)
+  .feed(CSVFeeder.lastName)
     .exec(session => session.set("testRunId", Configuration.testRunId))
      .exec(SimpleCpuBurn.call)
      .pause(3)
       .exec(SimpleDelay.call)
       .pause(3)
       .exec(CallMany.call)
-      .exec(Database.call)
+      .pause(1)
+      .exec(Database.call1)
+      .pause(1)
+      .exec(Database.call2)
       .pause(3)
       .feed(requestNameFeeder)
       .exec(FlakyCallDynamicRequestName.call)
@@ -61,7 +68,10 @@ object Scenarios {
     .pause(3)
     .exec(CallMany.call)
     .pause(3)
-  //  .exec(Database.call)
+//    .exec(Database.call1)
+//    .pause(1)
+//    .exec(Database.call2)
+//    .pause(1)
     .exec(FlakyCall.call)
 
   val cpuTestScenario = scenario("CPU test")
@@ -73,7 +83,11 @@ object Scenarios {
     .pause(3)
     .exec(CallMany.call)
     .pause(3)
-//    .exec(Database.call)
+  //    .exec(Database.call1)
+  //    .pause(1)
+  //    .exec(Database.call2)
+  //    .pause(1)
+
   /**
    * These are the scenarios run in 'debug' mode.
    */
