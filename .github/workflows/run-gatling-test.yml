@@ -71,7 +71,7 @@ jobs:
           cd cicd/gatling
           # fetch gatling 2 influx tool
           # wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
-          wget -O g2i https://github.com/perfana/gatling-to-influxdb/releases/tag/g2i-1.0.8/g2i-linux-amd64
+          wget -O g2i https://github.com/perfana/gatling-to-influxdb/releases/tag/g2i-1.0.9/g2i-linux-amd64
           chmod +x g2i
           # execute maven
           mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
