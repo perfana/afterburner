@@ -51,6 +51,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'maven'
       - name: Build local
         working-directory: afterburner-java
         run: ../mvnw -Drevision=${{ env.TAG_NAME }} clean install

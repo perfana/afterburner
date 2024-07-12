@@ -57,7 +57,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+          cache: 'maven'
       - name: Setup Maven Action
         uses: s4u/setup-maven-action@v1.13.0
         with:
