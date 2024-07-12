@@ -51,6 +51,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.gavlyukovskiy</groupId>
             <artifactId>p6spy-spring-boot-starter</artifactId>
             <version>1.8.1</version>

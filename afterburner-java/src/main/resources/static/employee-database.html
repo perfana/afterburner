@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Database</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h1>Find Employee</h1>
+
+<p>This only works when the employee database is present.
+    Run with -Dspring-boot.run.profiles=employee-db and with database container.</p>
+
+<p>First names to try: </p>
+<p>Last names to try: </p>
+
+<label for="firstName">First name:</label>
+<input type="text" id="firstName">
+<button onclick="findEmployeeByFirstName()">Search by First Name</button>
+
+<label for="lastName">Last name:</label>
+<input type="text" id="lastName">
+<button onclick="findEmployeeByLastName()">Search by Last Name</button>
+
+<label for="managerLastName">Manager Last name:</label>
+<input type="text" id="managerLastName">
+<button onclick="findEmployeeByManagerLastName()">Search by Manager's Last Name</button>
+
+<div id="responseDiv" style="padding: 15px;margin-top: 15px; border: 1px solid;">
+    <pre id="response"></pre>
+</div>
+
+<script>
+    function displayResponse(responseData) {
+        $('#responseDiv').css('border', '1px solid green');
+        let formattedResponse = JSON.stringify(responseData, null, 4);
+        $('#response').text(formattedResponse);
+    }
+
+    function handleError() {
+        $('#response').text('An error occurred');
+        $('#responseDiv').css('border', '1px solid red');
+    }
+
+    function findEmployeeByFirstName() {
+        let firstName = $('#firstName').val();
+        $.get(`/db/employee/find-by-name?firstName=${firstName}`, function(data) {
+            displayResponse(data);
+        }).fail(handleError);
+    }
+
+    function findEmployeeByLastName() {
+        let lastName = $('#lastName').val();
+        $.get(`/db/employee/find-by-last-name?lastName=${lastName}`, function(data) {
+            displayResponse(data);
+        }).fail(handleError);
+    }
+
+    function findEmployeeByManagerLastName() {
+        let managerLastName = $('#managerLastName').val();
+        $.get(`/db/employee/find-by-manager-last-name?managerLastName=${managerLastName}`, function(data) {
+            displayResponse(data);
+        }).fail(handleError);
+    }
+
+</script>
+
+</body>
+</html>

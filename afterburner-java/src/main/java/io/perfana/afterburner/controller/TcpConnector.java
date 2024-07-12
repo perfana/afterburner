@@ -43,14 +43,14 @@ public class TcpConnector {
             socket.close();
             long estimatedCloseTime = System.nanoTime() - nanoStartTime;
 
-            String message = String.format("{ 'tcp-connect':'success', 'connect-duration-nanos':%d, 'close-duration-nanos':%d, 'host':'%s', 'port':%d }",
+            String message = String.format("{ \"tcp-connect\":\"success\", \"connect-duration-nanos\":%d, \"close-duration-nanos\":%d, \"host\":\"%s\", \"port\":%d }",
                     estimatedConnectTime, estimatedCloseTime, host, port);
 
             long durationMillis = System.currentTimeMillis() - startTime;
             return new BurnerMessage(message, props.getName(), durationMillis);
 
         } catch (IOException e) {
-            String message = String.format("{ 'tcp-connect':'failure', 'error':'%s', 'host':'%s', 'port':%d }",
+            String message = String.format("{ \"tcp-connect\":\"failure\", \"error\":\"%s\", \"host\":\"%s\", \"port\":%d }",
                     e.getMessage(), host, port);
             long durationMillis = System.currentTimeMillis() - startTime;
             return new BurnerMessage(message, props.getName(), durationMillis);

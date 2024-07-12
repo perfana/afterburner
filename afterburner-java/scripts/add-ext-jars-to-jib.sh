@@ -12,7 +12,7 @@ else
 fi
 
 if [ ! -f src/main/jib/jfr-exporter.jar ]; then
-  JFR_EXPORTER_VERSION=0.4.0
+  JFR_EXPORTER_VERSION=0.5.0
   echo "Downloading JFR exporter jar version $JFR_EXPORTER_VERSION"
   curl -Ss -L -o src/main/jib/jfr-exporter.jar "https://github.com/perfana/jfr-exporter/releases/download/${JFR_EXPORTER_VERSION}/jfr-exporter-${JFR_EXPORTER_VERSION}.jar"
 else
