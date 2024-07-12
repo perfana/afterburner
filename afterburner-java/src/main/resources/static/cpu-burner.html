@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matrix calculator</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<h1>Matrix calculator</h1>
+
+<form>
+    <label for="matrixSize">Matrix Size:</label><br>
+    <input type="number" id="matrixSize" name="matrixSize" value="123"><br>
+    <input type="button" value="Calculate" id="calculateButton"><br>
+</form>
+
+<pre id="response"></pre>
+
+<script>
+    $(document).ready(function() {
+        $('#calculateButton').click(function() {
+            var matrixSize = $('#matrixSize').val();
+            $.ajax({
+                url: '/cpu/magic-identity-check' + '?matrixSize=' + matrixSize,
+                type: 'GET',
+                success: function(response) {
+                    var formattedResponse = "Message: " + response.message + "\n" +
+                        "Name: " + response.name + "\n" +
+                        "Duration ms: " + response.durationInMillis;
+                    $('#response').text(formattedResponse);
+                },
+                error: function(error) {
+                    $('#response').text('Error when trying to calculate');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

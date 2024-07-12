@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping basket</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>Manage Baskets</h1>
+
+<div>
+    <h2>Create a basket</h2>
+    <textarea id="products" placeholder="Products, separated by comma"></textarea>
+    <textarea id="prices" placeholder="Prices, separated by comma"></textarea>
+    <input type="text" id="customer" placeholder="Customer">
+    <input type="number" id="totalPrice" placeholder="Total Price">
+    <button onclick="storeBasket()">Create</button>
+</div>
+
+<div>
+    <h2>Get all Baskets</h2>
+    <button onclick="getAllBaskets()">View All</button>
+</div>
+
+<div>
+    <h2>Purchase a basket</h2>
+    <button onclick="purchaseBasket()">Purchase</button>
+</div>
+
+<div id="responseDiv" style="padding: 15px;margin-top: 15px; border: 1px solid;">
+    <pre id="response"></pre>
+</div>
+
+<script>
+    function displayResponse(responseData) {
+        $('#responseDiv').css('border', '1px solid green');
+        let formattedResponse = JSON.stringify(responseData, null, 4);
+        $('#response').text(formattedResponse);
+    }
+
+    function handleError() {
+        $('#response').text('An error occurred');
+        $('#responseDiv').css('border', '1px solid red');
+    }
+
+    function storeBasket() {
+        var products = document.getElementById('products').value.split(",");
+        var prices = document.getElementById('prices').value.split(",").map(Number);
+        var customer = document.getElementById('customer').value;
+        var totalPrice = document.getElementById('totalPrice').value;
+        var requestData = {products: products, prices: prices, customer: customer, totalPrice: totalPrice};
+        $.ajax({
+            url: '/basket/store',
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify(requestData),
+            success: function(response) {
+                displayResponse(response);
+            },
+            error: handleError,
+        });
+    }
+
+    function getAllBaskets() {
+        $.get('/basket/all', function(data) {
+            displayResponse(data);
+        }).fail(handleError);
+    }
+
+    function purchaseBasket() {
+        $.ajax({
+            url: '/basket/purchase',
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify({}),
+            success: function(response) {
+                displayResponse(response);
+            },
+            error: handleError,
+        });
+    }
+</script>
+</body>
+</html>

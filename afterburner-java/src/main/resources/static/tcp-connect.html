@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check TCP connection</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h1>Check TCP connection</h1>
+
+<form id="tcpForm">
+    <label for="host">Host:</label><br>
+    <input type="text" id="host" name="host" value="www.google.nl"><br>
+    <label for="port">Port:</label><br>
+    <input type="number" id="port" name="port"  value="80"><br>
+    <label for="timeout">Timeout (ms):</label><br>
+    <input type="number" id="timeout" name="timeout" value="1000"><br>
+    <input type="button" id="submit" value="Connect">
+</form>
+<div id="responseDiv" style="padding: 15px;">
+    <pre id="response"></pre>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $('#submit').click(function(){
+            var host = $('#host').val();
+            var port = $('#port').val();
+            var timeout = $('#timeout').val();
+
+            $.ajax({
+                url: '/tcp/connect',
+                type: 'GET',
+                data: {host: host, port: port, "timeout-ms": timeout},
+                success: function(response) {
+                    var messageObject = JSON.parse(response.message);
+                    var formattedResponse;
+                    if (messageObject['tcp-connect'] === 'success') {
+                        formattedResponse = "Message: " + messageObject['tcp-connect'] + "\n" +
+                            "Connect Duration (in nanos): " + messageObject['connect-duration-nanos'] + "\n" +
+                            "Close Duration (in nanos): " + messageObject['close-duration-nanos'] + "\n" +
+                            "Host: " + messageObject['host'] + "\n" +
+                            "Port: " + messageObject['port'] + "\n" +
+                            "Name: " + response.name + "\n" +
+                            "Duration (in millis): " + response.durationInMillis;
+                    } else {
+                        formattedResponse = "Message: " + messageObject['tcp-connect'] + "\n" +
+                            "Error: " + messageObject['error'] + "\n" +
+                            "Host: " + messageObject['host'] + "\n" +
+                            "Port: " + messageObject['port'] + "\n" +
+                            "Name: " + response.name + "\n" +
+                            "Duration (in millis): " + response.durationInMillis;
+                    }
+                    $('#response').text(formattedResponse);
+                    $('#responseDiv').css('border', '3px solid ' + (messageObject['tcp-connect'] === 'success' ? 'green' : 'red'));
+                },
+                error: function(error) {
+                    $('#response').text('An error occurred');
+                    $('#responseDiv').css('border', '3px solid red');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
