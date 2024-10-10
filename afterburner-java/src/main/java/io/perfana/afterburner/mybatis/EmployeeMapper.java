@@ -43,7 +43,7 @@ public interface EmployeeMapper {
             "             JOIN employees em ON dm.emp_no = em.emp_no" +
             "    WHERE em.last_name = #{lastName}" +
             "      AND dm.to_date = (SELECT MAX(to_date) FROM dept_manager WHERE dept_no = dm.dept_no) " +
-            "      AND s.to_date = (SELECT MAX(to_date) FROM salaries WHERE emp_no = em.emp_no)) limit 200;"
+            ") limit 200;"
     )
     List<Employee> findEmployeesByManagerLastName(@Param("lastName") String lastName);
 
