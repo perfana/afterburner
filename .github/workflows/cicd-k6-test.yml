@@ -22,9 +22,9 @@ jobs:
     needs: prepare-performance-test
     secrets: inherit
     with:
-      systemUnderTest: BumbleBee
+      systemUnderTest: StarScream
       workload: load
-      service: bumble-bee
+      service: star-scream
       runner: test
 
   deploy-to-production:
