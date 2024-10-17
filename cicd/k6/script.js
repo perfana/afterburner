@@ -60,6 +60,9 @@ export const options = {
             ],
         },
     },
+    thresholds: {
+        http_req_duration: ['p(99)<1000'], // 95 percent of the response times must be below 200 ms
+    },
     systemTags: ['proto', 'subproto', 'status', 'method', 'url', 'name', 'group', 'check', 'error', 'error_code', 'tls_version', 'scenario', 'service', 'expected_response', 'rpc_type', 'vu', 'iter'],
     tags: {
         system_under_test: __ENV.SYSTEM_UNDER_TEST,
