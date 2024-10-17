@@ -106,6 +106,10 @@ jobs:
           sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/optimus-prime-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/star-scream-fe/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/star-scream-fe/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/star-scream-be/values.yaml
       - name: Commit files
         run: |
           cd perfana-gitops
