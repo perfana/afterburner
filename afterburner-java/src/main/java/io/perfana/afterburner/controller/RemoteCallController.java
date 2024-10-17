@@ -115,7 +115,7 @@ public class RemoteCallController {
             @RequestParam(value = "count", defaultValue = "3") int count) {
 
             List<Future<String>> results = new ArrayList<>();
-            for (int i = 0; i < (count * 2); i++) {
+            for (int i = 0; i < count; i++) {
                 try {
                     results.add(afterburnerRemote.executeCallAsync(path, type));
                 } catch (IOException e) {
