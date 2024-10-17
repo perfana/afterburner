@@ -14,7 +14,7 @@ jobs:
     uses: perfana/afterburner/.github/workflows/prepare-performance-test.yml@main
     secrets: inherit
     with:
-      service: bumble-bee
+      service: star-scream
       runner: test
 
   performance-test-k6:
