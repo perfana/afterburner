@@ -192,14 +192,14 @@ export function scenario2() {
         };
 
         // Request No. 1
-        // {
-        //     let url = BASE_URL + `/remote/call-many?count=${count}&path=${path}`;
-        //     let request = http.get(url, params);
-        //
-        //     check(request, {
-        //         "OK": (r) => r.status === 200
-        //     });
-        // }
+        {
+            let url = BASE_URL + `/remote/call?count=${count}&path=${path}`;
+            let request = http.get(url, params);
+
+            check(request, {
+                "OK": (r) => r.status === 200
+            });
+        }
     });
 
     sleep(Math.random() * 10);
