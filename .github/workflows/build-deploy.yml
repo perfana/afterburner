@@ -97,9 +97,9 @@ jobs:
           sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/jet-fire-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/jet-fire-be/values.yaml
+          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-fe/values.yaml
           sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
-          sed -i "s|repository: .*|$repository|g" ./apps/acme/demo/star-scream-be/values.yaml
-          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
+          sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
           
           sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
