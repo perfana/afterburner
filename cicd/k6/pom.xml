@@ -328,7 +328,7 @@
                 <duration>600</duration>
                 <startRate>1</startRate>
                 <targetRate>1</targetRate>
-                <rampUpTime>120</rampUpTime>
+                <rampUpTime>180</rampUpTime>
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
