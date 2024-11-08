@@ -43,7 +43,6 @@ jobs:
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
-          PERFANA_API_KEY: ${{ (inputs.runner == 'test') && secrets.PERFANA_APIKEY || secrets.PERFANA_APIKEY_DEMO }}
         run: |
           echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
           kubectl config get-contexts
@@ -76,6 +75,7 @@ jobs:
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
+          PERFANA_API_KEY: ${{ (inputs.runner == 'test') && secrets.PERFANA_APIKEY || secrets.PERFANA_APIKEY_DEMO }}
         run: |
           cd cicd/k6
           # fetch k6 2 influx tool
