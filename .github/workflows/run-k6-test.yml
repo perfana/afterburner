@@ -17,7 +17,7 @@ on:
         required: false
         type: string
       runner:
-        default: 'acme'
+        default: 'test'
         type: string
 
 
@@ -43,6 +43,7 @@ jobs:
       - name: get KUBECONFIG from secrets
         env:
           KUBECONFIG_TO_FILE: ${{ (inputs.runner == 'test') && secrets.KUBECONFIG_TEST || secrets.KUBECONFIG_ACME }}
+          PERFANA_API_KEY: ${{ (inputs.runner == 'test') && secrets.PERFANA_APIKEY || secrets.PERFANA_APIKEY_DEMO }}
         run: |
           echo "$KUBECONFIG_TO_FILE" | base64 --decode --ignore-garbage >> /runner/_work/afterburner/afterburner/config
           kubectl config get-contexts
@@ -89,8 +90,8 @@ jobs:
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
           -Dannotations="${{ env.COMMIT_MESSAGE }}" \
-          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
-          -DinfluxDbUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana.svc.cluster.local:8086' || 'https://influx.demo.perfana.cloud' }} \
+          -DapiKey=${{ env.PERFANA_API_KEY }} \
+          -DinfluxDbUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana.svc.cluster.local:8086' || 'http://psg-perfana-secure-gateway.acme.svc.cluster.local/influxdb' }} \
           -DinfluxDbUsername=admin \
           -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana.svc.cluster.local:3000' || 'https://demo.perfana.cloud' }}
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana.svc.cluster.local:3000' || 'http://psg-perfana-secure-gateway.acme.svc.cluster.local' }}
