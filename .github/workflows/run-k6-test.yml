@@ -94,5 +94,5 @@ jobs:
           -DinfluxDbUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana.svc.cluster.local:8086' || 'http://psg-perfana-secure-gateway.acme.svc.cluster.local/influxdb' }} \
           -DinfluxDbUsername=admin \
           -DinfluxDbPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DinfluxDbDatabase=${{ (inputs.runner == 'test') && 'k6' || 'demo_k6' }}
+          -DinfluxDbDatabase=${{ (inputs.runner == 'test') && 'k6' || 'demo_k6' }} \
           -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana.svc.cluster.local:3000' || 'http://psg-perfana-secure-gateway.acme.svc.cluster.local' }}
