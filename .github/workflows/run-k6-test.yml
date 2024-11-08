@@ -79,7 +79,7 @@ jobs:
         run: |
           cd cicd/k6
           # fetch k6 2 influx tool
-          wget https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-linux-amd64
+          wget https://github.com/perfana/x2i/releases/download/x2i-1.0.0/x2i-linux-amd64 -O x2i
           mvn clean install -U event-scheduler:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}" \
           -Dsut-config=${{ inputs.service }} \
