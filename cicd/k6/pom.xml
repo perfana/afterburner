@@ -137,7 +137,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerK6ToInflux</name>
-                                <onStartTest>sh -c "chmod +x ./x2i;  ./x2i . -u ${influxDbUsername} -p ${influxDbPassword} -a ${influxDbUrl} -b k6 -t ${testEnvironment} -y ${systemUnderTest} -s 120 -d  | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "chmod +x ./x2i;  ./x2i . -u ${influxDbUsername} -p ${influxDbPassword} -a ${influxDbUrl} -b ${influxDbDatabase} -t ${testEnvironment} -y ${systemUnderTest} -s 120 -d  | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>Run k6 job</name>
