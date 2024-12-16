@@ -332,7 +332,7 @@
                 <perfanaEnabled>true</perfanaEnabled>
                 <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
                 <eventsEnabled>true</eventsEnabled>
-                <tags>k6,spring-boot-kubernetes,kubernetes,spanmetrics</tags>
+                <tags>k6,spring-boot-kubernetes,kubernetes,spanmetrics,jfr</tags>
             </properties>
         </profile>
 
