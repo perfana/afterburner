@@ -1,57 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- Default Console Appender (JSON Format) -->
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <customFields>
-                {
-                "system_under_test": "${management.metrics.tags.system_under_test}",
-                "test_environment": "${management.metrics.tags.test_environment}",
-                "service": "${management.metrics.tags.service}"
-                }
-            </customFields>
+        <encoder>
+            <pattern>%d{dd-MM-yyyy'T'HH:mm:ss.SSS} %highlight(%-5level) %green([%20.20thread]) %yellow([%40.40logger{40}]) - %msg%n</pattern>
         </encoder>
     </appender>
-
-    <!-- Root Logger Configuration for Default Profile -->
     <root level="info">
         <appender-ref ref="Console" />
     </root>
 
-    <!-- Spring Profile for Logstash Logging -->
     <springProfile name="logstash">
-        <!-- Console Appender with JSON Format for Logstash-Specific Logs -->
         <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-                <customFields>
-                    {
-                    "system_under_test": "${management.metrics.tags.system_under_test}",
-                    "test_environment": "${management.metrics.tags.test_environment}",
-                    "service": "${management.metrics.tags.service}"
-                    }
-                </customFields>
+            <encoder>
+                <pattern>%red(%d{dd-MM-yyyy'T'HH:mm:ss.SSS}) %highlight(%-5level) %green([%20.20thread]) %yellow([%40.40logger{40}]) - %msg%n</pattern>
             </encoder>
         </appender>
-
-        <!-- Logstash Appender for Sending Logs to Logstash (JSON Format) -->
         <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder" charset="UTF-8">
-                <customFields>
-                    {
-                    "system_under_test": "${management.metrics.tags.system_under_test}",
-                    "test_environment": "${management.metrics.tags.test_environment}",
-                    "service": "${management.metrics.tags.service}"
-                    }
-                </customFields>
+            <encoder charset="UTF-8"
+                     class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"system_under_test":"${management.metrics.tags.system_under_test}", "test_environment": "${management.metrics.tags.test_environment}", "service": "${management.metrics.tags.service}"}</customFields>
             </encoder>
             <destination>${afterburner.logback.logstash.remotehost:-logstash}:${afterburner.logback.logstash.port:-4560}</destination>
         </appender>
 
-        <!-- Root Logger Configuration for Logstash Profile -->
         <root level="info">
             <appender-ref ref="Stash" />
         </root>
     </springProfile>
-
 </configuration>
+
