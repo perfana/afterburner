@@ -12,8 +12,14 @@
 
     <springProfile name="logstash">
         <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%red(%d{dd-MM-yyyy'T'HH:mm:ss.SSS}) %highlight(%-5level) %green([%20.20thread]) %yellow([%40.40logger{40}]) - %msg%n</pattern>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>
+                    {
+                    "system_under_test": "${management.metrics.tags.system_under_test}",
+                    "test_environment": "${management.metrics.tags.test_environment}",
+                    "service": "${management.metrics.tags.service}"
+                    }
+                </customFields>
             </encoder>
         </appender>
         <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
