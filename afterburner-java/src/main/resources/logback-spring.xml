@@ -30,9 +30,9 @@
 <!--            <destination>${afterburner.logback.logstash.remotehost:-logstash}:${afterburner.logback.logstash.port:-4560}</destination>-->
 <!--        </appender>-->
 
-        <root level="info">
-            <appender-ref ref="Stash" />
-        </root>
+<!--        <root level="info">-->
+<!--            <appender-ref ref="Stash" />-->
+<!--        </root>-->
     </springProfile>
 </configuration>
 
