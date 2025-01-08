@@ -166,6 +166,11 @@
             <artifactId>logstash-logback-encoder</artifactId>
             <version>7.3</version> <!-- 7.4+ only works with logback 1.3 which is in SpringBoot 3.x -->
         </dependency>
+        <dependency>
+            <groupId>com.github.loki4j</groupId>
+            <artifactId>loki-logback-appender</artifactId>
+            <version>1.6.0</version>
+        </dependency>
     </dependencies>
 
     <build>
