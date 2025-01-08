@@ -18,7 +18,7 @@
         </appender>
         <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
             <http>
-                <url>http://${afterburner.logback.loki.remotehost:-loki-gateway.perfana.svc.cluster.local}:${afterburner.logback.loki.port:-80}</url>
+                <url>http://${afterburner.logback.loki.remotehost:-loki-gateway.perfana.svc.cluster.local}:${afterburner.logback.loki.port:-80}/loki/api/v1/push</url>
             </http>
             <format>
                 <label>
