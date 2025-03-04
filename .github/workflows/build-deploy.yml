@@ -102,6 +102,7 @@ jobs:
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-fe/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/acme/demo/star-scream-be/values.yaml
           
+          
           sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
           sed -i "s|repository: .*|$repository|g" ./apps/perfana/test/optimus-prime-be/values.yaml
           sed -i "s|tag: .*|$tag|g" ./apps/perfana/test/optimus-prime-fe/values.yaml
