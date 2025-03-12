@@ -11,7 +11,7 @@ object SimpleMiniLeak {
   val call = exec(http("simple_mini_leak")
             .get("/memory/grow?objects=8&items=54")
             .header("perfana-request-name", "simple_mini_leak")
-            .header("perfana-test-run-id", "${testRunId}")
+            .header("perfana-test-run-id", "#{testRunId}")
             .check(status.is(200)))
         
 }

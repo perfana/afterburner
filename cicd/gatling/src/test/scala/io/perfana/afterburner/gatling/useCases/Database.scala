@@ -9,15 +9,15 @@ import scala.concurrent.duration._
 object Database {
 
     val call1 = exec(http("database_call")
-              .get("/remote/call-many?count=1&path=/db/employee/find-by-name?firstName=${FIRST_NAME}")
+              .get("/remote/call-many?count=1&path=/db/employee/find-by-name?firstName=#{FIRST_NAME}")
               .header("perfana-request-name", "database_call")
-              .header("perfana-test-run-id", "${testRunId}")
+              .header("perfana-test-run-id", "#{testRunId}")
               .check(status.is(200)))
 
     val call2 = exec(http("database_call_manager")
-      .get("/remote/call-many?count=1&path=/db/employee/find-by-manager-last-name?lastName=${LAST_NAME}")
+      .get("/remote/call-many?count=1&path=/db/employee/find-by-manager-last-name?lastName=#{LAST_NAME}")
       .header("perfana-request-name", "database_call_manager")
-      .header("perfana-test-run-id", "${testRunId}")
+      .header("perfana-test-run-id", "#{testRunId}")
       .check(status.is(200)))
         
 }
