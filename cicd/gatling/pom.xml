@@ -298,7 +298,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingPush</name>
-                                <onStartTest>sh -c "./g2i ./target/gatling/results -l ERROR --max-batch-size 100 -a ${influxUrl} -u ${influxUser}  -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./g2i ./target/gatling/results -l DEBUG --max-batch-size 100 -a ${influxUrl} -u ${influxUser}  -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
