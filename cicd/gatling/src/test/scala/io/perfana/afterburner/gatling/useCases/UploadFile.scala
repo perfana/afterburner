@@ -16,7 +16,7 @@ object UploadFile {
                   .fileName("gatling-upload.txt")
             )
             .header("perfana-request-name", "upload-file")
-            .header("perfana-test-run-id", "${testRunId}")
+            .header("perfana-test-run-id", "#{testRunId}")
 
         )
 

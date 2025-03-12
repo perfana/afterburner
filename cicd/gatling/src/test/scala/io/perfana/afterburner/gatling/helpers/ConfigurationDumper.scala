@@ -16,7 +16,7 @@ object ConfigurationDumper {
 
     for (field <- Configuration.getClass.getDeclaredFields()) {
     field.setAccessible(true)
-    values += s"Configuration.${field.getName} = ${field.get(Configuration)}\n"
+    values += s"Configuration.#{field.getName} = #{field.get(Configuration)}\n"
     }
 
     println(values) // I print this now, so it will be printed during creation of object instances etc, before running
