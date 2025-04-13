@@ -115,8 +115,8 @@ public class RemoteCallController {
             @RequestParam(value = "count", defaultValue = "3") int count) {
 
             List<Future<String>> results = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-                try {
+            for (int i = 0; i < (count * 2); i++) {  // oops twice the number of calls!
+            try {
                     results.add(afterburnerRemote.executeCallAsync(path, type));
                 } catch (IOException e) {
                     log.error("Execute call async failed for " + path + ", expect one less result", e);
