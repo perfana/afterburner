@@ -2,7 +2,7 @@
 <configuration>
 	<appender name="LOKI" class="LokiGatlingAppender">
 		<http>
-			<url>http://loki:3100/loki/api/v1/push</url>
+			<url>http://loki-gateway.perfana.svc.cluster.local/loki/api/v1/push</url>
 		</http>
 		<batchSize>100</batchSize>
 		<batchTimeoutMs>1000</batchTimeoutMs>
