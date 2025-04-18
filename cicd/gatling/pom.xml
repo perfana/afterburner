@@ -118,16 +118,21 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.31</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.perfana</groupId>-->
+<!--            <artifactId>gatling-elasticsearch-logs</artifactId>-->
+<!--            <version>0.9</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>io.perfana</groupId>
-            <artifactId>gatling-elasticsearch-logs</artifactId>
-            <version>0.9</version>
+            <artifactId>gatling-loki-logs</artifactId>
+            <version>0.1.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-core</artifactId>
-            <version>1.12.501</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.amazonaws</groupId>-->
+<!--            <artifactId>aws-java-sdk-core</artifactId>-->
+<!--            <version>1.12.501</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>

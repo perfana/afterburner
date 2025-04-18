@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="LOKI" class="LokiGatlingAppender">
+		<http>
+			<url>http://loki:3100/loki/api/v1/push</url>
+		</http>
+		<batchSize>100</batchSize>
+		<batchTimeoutMs>1000</batchTimeoutMs>
+
+		<format>
+			<message class="com.github.loki4j.logback.JsonLayout" />
+		</format>
+
+	</appender>
+
+	<logger name="io.gatling.http.engine.response" level="DEBUG"/>
+	<logger name="io.gatling.http.action.ws.fsm.WsLogger" level="DEBUG"/>
+
+	<root level="INFO">
+		<appender-ref ref="LOKI"/>
+	</root>
+</configuration>
