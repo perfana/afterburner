@@ -38,7 +38,7 @@ object Scenarios {
     .pause(3)
     .exec(Database.call1)
     .pause(1)
-//    .exec(Database.call2)
+    .exec(Database.call2)
     .exec(FlakyCall.call)
 
   // Define a feeder with a random request name generator
