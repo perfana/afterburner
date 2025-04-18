@@ -1,45 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+	<appender name="LOKI" class="LokiGatlingAppender">
+		<http>
+			<url>http://loki:3100/loki/api/v1/push</url>
+		</http>
+		<batchSize>100</batchSize>
+		<batchTimeoutMs>1000</batchTimeoutMs>
 
-	<appender name="ELASTIC" class="ElasticGatlingAppender">
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-			<level>${logging.elastic.appender.level:-DEBUG}</level>
-			<onMatch>ACCEPT</onMatch>
-			<onMismatch>DENY</onMismatch>
-		</filter>
-		<url>http://elastic:${elasticPassword}@elasticsearch-master.logging:9200/_bulk</url>
-		<authentication class="com.internetitem.logback.elasticsearch.config.BasicAuthentication" />
-		<index>gatling-%date{yyyy.MM.dd}</index>
-		<type>gatling</type>
-		<errorsToStderr>true</errorsToStderr>
-		<properties>
-			<property>
-				<name>systemUnderTest</name>
-				<value>${systemUnderTest}</value>
-				<allowEmpty>false</allowEmpty>
-			</property>
-			<property>
-				<name>testEnvironment</name>
-				<value>${testEnvironment}</value>
-				<allowEmpty>false</allowEmpty>
-			</property>
-		</properties>
-		<headers>
-			<header>
-				<name>Content-Type</name>
-				<value>application/json</value>
-			</header>
-		</headers>
+		<format>
+			<message class="com.github.loki4j.logback.JsonLayout" />
+		</format>
+
 	</appender>
 
 	<logger name="io.gatling.http.engine.response" level="DEBUG"/>
+	<logger name="io.gatling.http.action.ws.fsm.WsLogger" level="DEBUG"/>
 
-	<appender name="ASYNC ELK" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="ELASTIC"/>
-	</appender>
-
-	<root level="WARN">
-		<appender-ref ref="ASYNC ELK"/>
+	<root level="INFO">
+		<appender-ref ref="LOKI"/>
 	</root>
 
 </configuration>
