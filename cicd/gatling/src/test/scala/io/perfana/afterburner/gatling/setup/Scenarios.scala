@@ -39,7 +39,7 @@ object Scenarios {
 //    .exec(Database.call1)
     .pause(1)
     .randomSwitch(
-      5.0 -> exec(Database.call2),
+      50.0 -> exec(Database.call2),
     )
     .pause(1)
     .exec(FlakyCall.call)
