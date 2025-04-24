@@ -34,17 +34,16 @@ public class CpuBurner {
         this.tracer = tracer;
     }
 
-    @Operation(summary = "Spend some time on CPU doing some magik matrix calculations.")
+    @Operation(summary = "Spend some time on CPU doing some magic matrix calculations.")
     @GetMapping("/cpu/magic-identity-check")
     public BurnerMessage magicIdentityCheck(
             @RequestParam(value = "matrixSize", defaultValue = "10") int matrixSize) throws InvalidMatrixException {
 
         long startTime = System.currentTimeMillis();
 
-        // no variation: is no fun!
-        int funSize = matrixSize;
-
-        log.info("Calculate magik matrix identity for matrix size [{}].", funSize);
+        // some variation: is more fun!
+        int funSize = (int) (matrixSize * (1.0 + (random.nextDouble() * 1.5)));
+        log.info("Calculate magic matrix identity for matrix size [{}].", funSize);
 
         long[][] simpleMagicSquare;
         long[][] identitySquare;
