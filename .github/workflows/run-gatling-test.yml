@@ -60,7 +60,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.13.0
+        uses: s4u/setup-maven-action@v1.18.0
         with:
           java-version: 17
           maven-version: 3.6.3
@@ -69,9 +69,9 @@ jobs:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
         run: |
           cd cicd/gatling
-          # fetch gatling 2 influx tool
+          # fetch x2i tool
           # wget https://github.com/perfana/gatling-to-influxdb/releases/download/1.0.0-perfana/g2i
-          wget -O g2i https://github.com/perfana/gatling-to-influxdb/releases/download/g2i-1.0.7/g2i-linux-amd64
+          wget -O g2i https://github.com/perfana/x2i/releases/download/x2i-1.1.0-alpha-2/x2i-linux-amd64
           chmod +x g2i
           # execute maven
           mvn clean install -U events-gatling:test -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \

@@ -29,8 +29,8 @@
         <encoding>UTF-8</encoding>
 
         <!-- dependency versioning -->
-        <gatling.version>3.9.5</gatling.version>
-        <events-gatling-maven-plugin.version>4.6.0-events-1</events-gatling-maven-plugin.version>
+        <gatling.version>3.13.4</gatling.version>
+        <events-gatling-maven-plugin.version>4.7.0-events-1</events-gatling-maven-plugin.version>
         <scala-maven-plugin.version>4.8.0</scala-maven-plugin.version>
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
@@ -223,6 +223,10 @@
                         <jvmArg>-Dgatling.data.graphite.host=${influxDbHost}</jvmArg>
                         <jvmArg>-Xms1g</jvmArg>
                         <jvmArg>-Xmx4g</jvmArg>
+                        <jvmArg>--add-exports</jvmArg>
+                        <jvmArg>java.base/jdk.internal.misc=ALL-UNNAMED</jvmArg>
+                        <jvmArg>--add-opens</jvmArg>
+                        <jvmArg>java.base/java.lang=ALL-UNNAMED</jvmArg>
                     </jvmArgs>
                     <propagateSystemProperties>false</propagateSystemProperties>
 
@@ -300,7 +304,7 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
                                 <name>CommandRunnerGatlingPush</name>
-                                <onStartTest>sh -c "./g2i ./results -a ${influxUrl} -u ${influxUser} -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
+                                <onStartTest>sh -c "./g2i ./target/gatling/results -l DEBUG --max-batch-size 100 -a ${influxUrl} -u ${influxUser}  -p ${influxPassword} -b gatling3 -t acme -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
