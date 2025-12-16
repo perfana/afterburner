@@ -58,6 +58,7 @@ jobs:
           java-version: 17
           java-distribution: temurin
           maven-version: 3.9.9
+          cache-enabled: false
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
