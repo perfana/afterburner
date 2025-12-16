@@ -61,6 +61,21 @@ jobs:
         run: |
           curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C /opt
           echo "/opt/apache-maven-3.9.9/bin" >> $GITHUB_PATH
+      - name: Install custom Maven plugins
+        run: |
+          mkdir -p ~/.m2/repository
+          mvn install:install-file \
+            -Dfile=/usr/local/share/maven-plugins/breakingit-jmeter-timescaledb-1.0.0.jar \
+            -DgroupId=io.breakingit \
+            -DartifactId=jmeter-timescaledb \
+            -Dversion=1.0.0 \
+            -Dpackaging=jar
+          mvn install:install-file \
+            -Dfile=/usr/local/share/maven-plugins/events-jmeter-maven-plugin-3.8.0-events-3-SNAPSHOT.jar \
+            -DgroupId=io.perfana \
+            -DartifactId=events-jmeter-maven-plugin \
+            -Dversion=3.8.0-events-3-SNAPSHOT \
+            -Dpackaging=jar
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
