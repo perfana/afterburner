@@ -52,13 +52,15 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
-      - name: Setup Java and Maven
-        uses: s4u/setup-maven-action@v1.18.0
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          java-version: 17
-          java-distribution: temurin
-          maven-version: 3.9.9
-          cache-enabled: false
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Install Maven
+        run: |
+          curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C /opt
+          echo "/opt/apache-maven-3.9.9/bin" >> $GITHUB_PATH
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
