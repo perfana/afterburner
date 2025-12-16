@@ -36,7 +36,11 @@ object Scenarios {
       .pause(3)
       .exec(CallMany.call)
     .pause(3)
-    .exec(Database.call1)
+//    .exec(Database.call1)
+    .pause(1)
+    .randomSwitch(
+      50.0 -> exec(Database.call2),
+    )
     .pause(1)
 //    .randomSwitch(
 //      50.0 -> exec(Database.call2),

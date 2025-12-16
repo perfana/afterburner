@@ -18,7 +18,7 @@ on:
         type: string
       runner:
         type: string
-        default: 'demo'
+        default: 'acme'
 
 
 jobs:

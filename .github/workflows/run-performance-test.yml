@@ -53,13 +53,13 @@ on:
         required: false
       runner:
         description: 'Runner environment'
-        default: 'demo'
+        default: 'acme'
         type: choice
         options:
           - acme
           - acme-0
           - test
-          
+
 
 
 jobs:

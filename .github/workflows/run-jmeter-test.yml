@@ -52,17 +52,13 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.13.0
+      - name: Setup Java and Maven
+        uses: s4u/setup-maven-action@v1.18.0
         with:
           java-version: 17
-          maven-version: 3.9.2
+          java-distribution: temurin
+          maven-version: 3.9.9
+          cache-enabled: false
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
@@ -88,5 +84,5 @@ jobs:
           -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}
+          -DtimescalePassword=${{ secrets.TIMESCALE_DB_PASSWORD }} \
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.io' }}

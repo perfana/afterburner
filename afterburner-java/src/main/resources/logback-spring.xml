@@ -16,17 +16,34 @@
                 <pattern>%red(%d{dd-MM-yyyy'T'HH:mm:ss.SSS}) %highlight(%-5level) %green([%20.20thread]) %yellow([%40.40logger{40}]) - %msg%n</pattern>
             </encoder>
         </appender>
-        <appender name="Stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-            <encoder charset="UTF-8"
-                     class="net.logstash.logback.encoder.LogstashEncoder">
-                <customFields>{"system_under_test":"${management.metrics.tags.system_under_test}", "test_environment": "${management.metrics.tags.test_environment}", "service": "${management.metrics.tags.service}"}</customFields>
-            </encoder>
-            <destination>${afterburner.logback.logstash.remotehost:-logstash}:${afterburner.logback.logstash.port:-4560}</destination>
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>http://${afterburner.logback.loki.remotehost:-loki-gateway.perfana.svc.cluster.local}:${afterburner.logback.loki.port:-80}/loki/api/v1/push</url>
+            </http>
+            <format>
+                <label>
+                    <pattern>app=${name},host=${HOSTNAME},level=%level</pattern>
+                    <pattern>system_under_test=${management.metrics.tags.system_under_test},test_environment=${management.metrics.tags.test_environment},service=${management.metrics.tags.service},level=%level</pattern>
+                    <readMarkers>true</readMarkers>
+                </label>
+                <message>
+                    <pattern>
+                        {
+                        "level":"%level",
+                        "class":"%logger{36}",
+                        "thread":"%thread",
+                        "message": "%replace(%message){'\"':'\\\"','\\\\':'\\\\\\\\'}"
+                        }
+                    </pattern>
+                </message>
+            </format>
         </appender>
 
-        <root level="info">
-            <appender-ref ref="Stash" />
+        <root level="INFO">
+            <appender-ref ref="LOKI" />
         </root>
+
+
     </springProfile>
 </configuration>
 

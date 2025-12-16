@@ -279,6 +279,7 @@
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
                                     afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.socket.timeout.millis,
                                     afterburner.remote.call.httpclient.connect.timeout.millis,
                                     afterburner.remote.call.httpclient.connections.max,

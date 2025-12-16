@@ -6,6 +6,7 @@ import io.perfana.afterburner.domain.BurnerMessage;
 import io.perfana.afterburner.matrix.InvalidMatrixException;
 import io.perfana.afterburner.matrix.MatrixCalculator;
 import io.perfana.afterburner.matrix.MatrixEqualResult;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.sleuth.Span;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Random;
+
 @RestController
 public class CpuBurner {
 
@@ -21,6 +24,8 @@ public class CpuBurner {
     public static final String MATRIX_SIZE_TAG = "matrix-size";
 
     private final AfterburnerProperties props;
+
+    private final Random random = createRandom();
 
     Tracer tracer;
 
@@ -36,18 +41,20 @@ public class CpuBurner {
 
         long startTime = System.currentTimeMillis();
 
-        log.info("Calculate magic matrix identity for matrix size [{}].", matrixSize);
+        // no variation: is no fun!
+        int funSize = matrixSize;
+        log.info("Calculate magik matrix identity for matrix size [{}].", funSize);
 
         long[][] simpleMagicSquare;
         long[][] identitySquare;
         
         Span matrixInitSpan = tracer.nextSpan().name("matrix-init").start();
         try (Tracer.SpanInScope ws = tracer.withSpan(matrixInitSpan)) {
-            simpleMagicSquare = MatrixCalculator.simpleMagicSquare(matrixSize);
-            identitySquare = MatrixCalculator.identitySquare(matrixSize);
+            simpleMagicSquare = MatrixCalculator.simpleMagicSquare(funSize);
+            identitySquare = MatrixCalculator.identitySquare(funSize);
         }
         finally {
-            matrixInitSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixInitSpan.tag(MATRIX_SIZE_TAG, String.valueOf(funSize)).end();
         }
 
         long[][] multiplyMatrix;
@@ -56,7 +63,7 @@ public class CpuBurner {
             multiplyMatrix = MatrixCalculator.multiply(simpleMagicSquare, identitySquare);
         }
         finally {
-            matrixMultiplySpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixMultiplySpan.tag(MATRIX_SIZE_TAG, String.valueOf(funSize)).end();
         }
 
         MatrixEqualResult matrixEqualResult;
@@ -65,14 +72,19 @@ public class CpuBurner {
             matrixEqualResult = MatrixCalculator.areEqual(simpleMagicSquare, multiplyMatrix);
         }
         finally {
-            matrixEqualCheckSpan.tag(MATRIX_SIZE_TAG, String.valueOf(matrixSize)).end();
+            matrixEqualCheckSpan.tag(MATRIX_SIZE_TAG, String.valueOf(funSize)).end();
         }
 
         String message = String.format("A simple magic square multiplied by an identity square of size [%d] [%s] to the magic square.",
-                matrixSize, matrixEqualResult.areEqual() ? "is equal" : "is not equal");
+                funSize, matrixEqualResult.areEqual() ? "is equal" : "is not equal");
 
         long durationMillis = System.currentTimeMillis() - startTime;
         return new BurnerMessage(message, props.getName(), durationMillis);
+    }
+
+    @NotNull
+    private static Random createRandom() {
+        return new Random();
     }
 
 }
