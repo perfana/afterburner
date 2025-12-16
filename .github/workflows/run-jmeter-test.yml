@@ -52,16 +52,11 @@ jobs:
         run: |
           VERSION=$(kubectl get deployment ${{ inputs.service }}-fe-afterburner -n acme -o jsonpath='{$.spec.template.spec.containers[:1].image}' | cut -d ":" -f 2) 
           echo "TAG_NAME=$VERSION" >> $GITHUB_ENV
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-      - name: Setup Maven Action
+      - name: Setup Java and Maven
         uses: s4u/setup-maven-action@v1.18.0
         with:
           java-version: 17
+          java-distribution: temurin
           maven-version: 3.9.9
       - name: Build with Maven
         env:
