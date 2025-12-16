@@ -59,10 +59,10 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.13.0
+        uses: s4u/setup-maven-action@v1.18.0
         with:
           java-version: 17
-          maven-version: 3.9.2
+          maven-version: 3.9.9
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
