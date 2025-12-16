@@ -148,6 +148,9 @@
                         <RAMP_TIME>${rampupTimeInSeconds}</RAMP_TIME>
                         <DURATION>${durationInSeconds}</DURATION>
                         <runId>${testRunId}</runId>
+                        <timescalePassword>${timescalePassword}</timescalePassword>
+                        <timescaleHost>postgresql.perfana</timescaleHost>
+                        <timescaleHost>perfana</timescaleHost>
                     </propertiesUser>
 
                     <!-- Event scheduler configuration -->
