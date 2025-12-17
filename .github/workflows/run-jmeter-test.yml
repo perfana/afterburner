@@ -103,3 +103,6 @@ jobs:
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DtimescalePassword=${{ secrets.TIMESCALE_DB_PASSWORD }} \
           -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://api.demo.perfana.io' }}
+      - name: Sleep for debugging
+        if: always()
+        run: sleep 3600
