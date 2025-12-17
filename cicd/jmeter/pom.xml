@@ -150,6 +150,7 @@
                         <runId>${testRunId}</runId>
                         <timescalePassword>${timescalePassword}</timescalePassword>
                         <timescaleHost>postgresql.perfana</timescaleHost>
+                        <timescaleDatabase>perfana</timescaleDatabase>
                     </propertiesUser>
 
                     <!-- Event scheduler configuration -->
