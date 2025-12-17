@@ -141,6 +141,7 @@
 
                     <!-- User properties passed to JMeter test -->
                     <propertiesUser>
+                        <DATA_DIR>${basedir}/src/test/resources/data</DATA_DIR>
                         <HOST>${targetHost}</HOST>
                         <PORT>${targetPort}</PORT>
                         <PROTOCOL>${targetProtocol}</PROTOCOL>
