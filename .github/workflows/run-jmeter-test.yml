@@ -102,4 +102,4 @@ jobs:
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
           -DtimescalePassword=${{ secrets.TIMESCALE_DB_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://api.perfana.io' }}
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://api.demo.perfana.io' }}
