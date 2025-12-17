@@ -41,7 +41,7 @@
         <eventScheduleScript></eventScheduleScript>
 
         <!-- JMeter test configuration -->
-        <targetHost>afterburner-fe</targetHost>
+        <targetHost>afterburner-fe.acme</targetHost>
         <targetPort>8080</targetPort>
         <targetProtocol>http</targetProtocol>
         <initialThreads>1</initialThreads>
@@ -56,7 +56,7 @@
         <sut_version>${SUT_VERSION}</sut_version>
         <tags>jmeter,spring-boot-kubernetes,jfr,spanmetrics,docker</tags>
         <apiKey>${apiKey}</apiKey>
-        <influxUrl>http://influxdb:8086</influxUrl>
+        <influxUrl>http://influxdb.acme:8086</influxUrl>
 
         <!-- Test file(s) to run (can be overridden via -DtestFile=filename.jmx) -->
         <!-- For multiple files use wildcard patterns like: webshop-*.jmx -->
@@ -150,7 +150,6 @@
                         <runId>${testRunId}</runId>
                         <timescalePassword>${timescalePassword}</timescalePassword>
                         <timescaleHost>postgresql.perfana</timescaleHost>
-                        <timescaleHost>perfana</timescaleHost>
                     </propertiesUser>
 
                     <!-- Event scheduler configuration -->
@@ -253,12 +252,12 @@
     <profiles>
         <!-- Environment profiles -->
         <profile>
-            <id>test-env-default</id>
+            <id>test-env-acme</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <testEnvironment>acc</testEnvironment>
+                <testEnvironment>acme</testEnvironment>
             </properties>
         </profile>
 
