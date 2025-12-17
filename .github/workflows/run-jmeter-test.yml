@@ -94,7 +94,7 @@ jobs:
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
           -Dannotations="$COMMIT_MESSAGE" \
-          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+          -DapiKey=${{ secrets.PERFANA_APIKEY_DEMO }} \
           -DtargetProtocol=http \
           -DtargetDomain=${{ inputs.service }}-fe-afterburner.acme \
           -DtargetPort=8080 \
