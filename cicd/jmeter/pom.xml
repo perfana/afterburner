@@ -180,38 +180,80 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>perfana-demo-afterburner*</perfana-containers>
+                                    <perfana-containers>.*afterburner-db.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
                             </eventConfig>
 
                             <!-- Command runner to send JMeter results to InfluxDB -->
-                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>CommandRunnerJMeterToInflux</name>
-                                <enabled>false</enabled>
-                                <onStartTest>sh -c "x2i target/jmeter/results -i jmeter --stop-timeout 120 --max-batch-size 100 -a ${influxUrl} -u perfana -p perfana -bjmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
-                            </eventConfig>
+<!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
+<!--                                <name>CommandRunnerJMeterToInflux</name>-->
+<!--                                <enabled>false</enabled>-->
+<!--                                <onStartTest>sh -c "x2i target/jmeter/results -i jmeter &#45;&#45;stop-timeout 120 &#45;&#45;max-batch-size 100 -a ${influxUrl} -u perfana -p perfana -bjmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>-->
+<!--                            </eventConfig>-->
 
-                            <!-- Spring Boot actuator event for frontend -->
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
-                                <tags>afterburner-fe</tags>
-                                <actuatorBaseUrl>http://afterburner-fe:8080/actuator</actuatorBaseUrl>
+                                <tags>${sut-config}-fe</tags>
+                                <actuatorBaseUrl>http://${sut-config}-fe-afterburner.acme:8080/actuator</actuatorBaseUrl>
+                                <actuatorEnvProperties>
+                                    java.runtime.version,
+                                    JDK_JAVA_OPTIONS,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
+                                    afterburner.remote.call.httpclient.socket.timeout.millis,
+                                    afterburner.remote.call.httpclient.connect.timeout.millis,
+                                    afterburner.remote.call.httpclient.connections.max,
+                                    afterburner.remote.call.base_url,
+                                    server.tomcat.threads.max,
+                                    afterburner.async_max_pool_size,
+                                    afterburner.async_core_pool_size,
+                                    afterburner.async_queue_size,
+                                    featureToggleIdentityMatrix
+                                </actuatorEnvProperties>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
+                                <name>ActuatorEventBackend</name>
+                                <tags>${sut-config}-be</tags>
+                                <actuatorBaseUrl>http://${sut-config}-be-afterburner.acme:8080/actuator</actuatorBaseUrl>
                                 <actuatorEnvProperties>
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
                                     afterburner.async_core_pool_size,
-                                    featureToggleIdentityMatrix,
-                                    afterburner.remote.call.httpclient.connections.max
+                                    afterburner.datasource.employee.maximum-pool-size
                                 </actuatorEnvProperties>
                             </eventConfig>
-
                             <!-- Git commit hash event -->
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
-                                <command>echo "${GIT_SHA}"</command>
+                                <command>echo "${gitSha}"</command>
                                 <output>key</output>
                                 <key>https://github.com/perfana/perfana-demo</key>
                                 <tags>GitHub</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentFE</name>
+                                <command>kubectl get deployment ${sut-config}-fe-afterburner -n acme -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,TOKEN</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,${sut-config}-fe</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentBE</name>
+                                <command>kubectl get deployment ${sut-config}-be-afterburner -n acme -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,TOKEN</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,${sut-config}-be</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>KubernetesGetDeploymentMySql</name>
+                                <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
+                                <includes>env,resources,image,replicas,strategy,kubernetes</includes>
+                                <excludes>status,password,secret,preferredDuringSchedulingIgnoredDuringExecution</excludes>
+                                <output>keys</output>
+                                <tags>kubernetes,afterburner-db-mysql</tags>
                             </eventConfig>
                         </eventConfigs>
                     </eventSchedulerConfig>
