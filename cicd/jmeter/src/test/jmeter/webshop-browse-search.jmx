@@ -1134,26 +1134,19 @@
         </TransactionController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="product_image_download" enabled="true">
-            <stringProp name="HTTPSampler.path">/flaky</stringProp>
+            <stringProp name="HTTPSampler.path">/db/employee/find-by-name</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
             <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments">
-                <elementProp name="flakiness" elementType="HTTPArgument">
+                <elementProp name="firstName" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">1</stringProp>
+                  <stringProp name="Argument.value">${FIRST_NAME}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  <stringProp name="Argument.name">flakiness</stringProp>
-                </elementProp>
-                <elementProp name="maxRandomDelay" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">50</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  <stringProp name="Argument.name">maxRandomDelay</stringProp>
+                  <stringProp name="Argument.name">firstName</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
@@ -1170,26 +1163,26 @@
             <hashTree/>
           </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="product_availability_check" enabled="true">
-            <stringProp name="HTTPSampler.path">/flaky</stringProp>
+            <stringProp name="HTTPSampler.path">/remote/call-many</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
             <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
               <collectionProp name="Arguments.arguments">
-                <elementProp name="flakiness" elementType="HTTPArgument">
+                <elementProp name="count" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">3</stringProp>
+                  <stringProp name="Argument.value">1</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  <stringProp name="Argument.name">flakiness</stringProp>
+                  <stringProp name="Argument.name">count</stringProp>
                 </elementProp>
-                <elementProp name="maxRandomDelay" elementType="HTTPArgument">
+                <elementProp name="path" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">100</stringProp>
+                  <stringProp name="Argument.value">/db/employee/find-by-name?firstName=${FIRST_NAME}</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  <stringProp name="Argument.name">maxRandomDelay</stringProp>
+                  <stringProp name="Argument.name">path</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
