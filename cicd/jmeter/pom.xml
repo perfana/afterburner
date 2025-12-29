@@ -162,7 +162,7 @@
                         </scheduleScript>
                         <testConfig>
                             <systemUnderTest>${systemUnderTest}</systemUnderTest>
-                            <version>${sut_version}</version>
+                            <version>${version}</version>
                             <workload>${workload}</workload>
                             <testEnvironment>${testEnvironment}</testEnvironment>
                             <testRunId>${testRunId}</testRunId>
