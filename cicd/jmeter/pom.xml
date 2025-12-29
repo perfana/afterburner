@@ -166,7 +166,7 @@
                             <workload>${workload}</workload>
                             <testEnvironment>${testEnvironment}</testEnvironment>
                             <testRunId>${testRunId}</testRunId>
-                            <buildResultsUrl>http://nu.nl</buildResultsUrl>
+                            <buildResultsUrl>${buildResultsUrl}</buildResultsUrl>
                             <rampupTimeInSeconds>${rampupTimeInSeconds}</rampupTimeInSeconds>
                             <constantLoadTimeInSeconds>${constantLoadTimeInSeconds}</constantLoadTimeInSeconds>
                             <annotations>${annotations}</annotations>
