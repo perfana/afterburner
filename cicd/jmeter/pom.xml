@@ -229,7 +229,7 @@
                                 <name>GitGetHash</name>
                                 <command>echo "${gitSha}"</command>
                                 <output>key</output>
-                                <key>https://github.com/perfana/perfana-demo</key>
+                                <key>https://github.com/perfana/afterburner</key>
                                 <tags>GitHub</tags>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
