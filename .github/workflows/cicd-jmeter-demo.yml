@@ -22,7 +22,7 @@ jobs:
     needs: prepare-performance-test
     secrets: inherit
     with:
-      systemUnderTest: OptimusPrime
+      systemUnderTest: PerfanaWebshop
       workload: load
       service: optimus-prime
       runner: acme
