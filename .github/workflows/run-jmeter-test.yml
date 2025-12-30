@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: demo
+          ref: demo                                                                                                                      
       - name: Get commit message
         if: inputs.annotations == ''
         run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")" >> $GITHUB_ENV
@@ -58,12 +58,25 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
-      - name: Setup Maven Action
-        uses: s4u/setup-maven-action@v1.13.0
-        with:
-          java-version: 17
-          maven-version: 3.9.2
+      - name: Install Maven
+        run: |
+          curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xz -C /opt
+          echo "/opt/apache-maven-3.9.9/bin" >> $GITHUB_PATH
+      - name: Install custom Maven plugins
+        run: |
+          mkdir -p ~/.m2/repository
+          mvn install:install-file \
+            -Dfile=/usr/local/share/maven-plugins/breakingit-jmeter-timescaledb-1.0.0.jar \
+            -DgroupId=io.breakingit \
+            -DartifactId=jmeter-timescaledb \
+            -Dversion=1.0.0 \
+            -Dpackaging=jar
+          mvn install:install-file \
+            -Dfile=/usr/local/share/maven-plugins/events-jmeter-maven-plugin-3.8.0-events-3-SNAPSHOT.jar \
+            -DgroupId=io.perfana \
+            -DartifactId=events-jmeter-maven-plugin \
+            -Dversion=3.8.0-events-3-SNAPSHOT \
+            -Dpackaging=jar
       - name: Build with Maven
         env:
           KUBECONFIG: /runner/_work/afterburner/afterburner/config
@@ -73,7 +86,7 @@ jobs:
           wget https://github.com/perfana/gatling-to-influxdb/releases/download/j2i-1.0.0/j2i
           chmod +x j2i
           # execute maven
-          mvn -X -U clean verify -Ptest-env-demo,test-type-${{ inputs.workload }},assert-results \
+          mvn -X -U clean verify -Ptest-env-acme,test-type-${{ inputs.workload }} \
           -Dsut-config=${{ inputs.service }} \
           -DtestRunId="${{ inputs.systemUnderTest }}-${{ github.job }}-${{ github.run_number }}-${{ github.run_id }}" \
           -DbuildResultsUrl="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
@@ -82,12 +95,12 @@ jobs:
           -DsystemUnderTest=${{ inputs.systemUnderTest }} \
           -DtestEnvironment=acme \
           -Dannotations="$COMMIT_MESSAGE" \
-          -DapiKey=${{ secrets.PERFANA_APIKEY }} \
+          -DapiKey=${{ secrets.PERFANA_APIKEY_DEMO }} \
           -DtargetProtocol=http \
-          -DtargetDomain=${{ inputs.service }}-fe-afterburner.acme \
+          -DtargetHost=${{ inputs.service }}-fe-afterburner.acme \
           -DtargetPort=8080 \
           -DinfluxUrl=${{ (inputs.runner == 'test') && 'http://influxdb.perfana:8086' || 'https://influx.demo.perfana.cloud' }} \
           -DinfluxUser=admin \
           -DinfluxPassword=${{ secrets.INFLUXDB_PASSWORD }} \
-          -DelasticPassword=${{ secrets.ELASTIC_PASSWORD }} \
-          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://demo.perfana.cloud' }}
+          -DtimescalePassword=${{ secrets.TIMESCALE_DB_PASSWORD }} \
+          -DperfanaUrl=${{ (inputs.runner == 'test') && 'http://perfana-fe.perfana:3000' || 'https://api.demo.perfana.io' }}

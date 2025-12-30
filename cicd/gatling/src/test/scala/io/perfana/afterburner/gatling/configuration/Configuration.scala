@@ -76,7 +76,7 @@ object Configuration {
     /* Add proxy if specified */
     if(Configuration.useProxy) {
       System.out.println("Using proxy at localhost port 8888!")
-      baseHttpDebugProtocol.proxy(Proxy("localhost", 8888).httpsPort(8888))
+      baseHttpDebugProtocol.proxy(Proxy("localhost", 8888))
     }else{
       baseHttpDebugProtocol
     }
