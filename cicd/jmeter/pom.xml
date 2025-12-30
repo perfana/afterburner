@@ -1,180 +1,162 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.perfana</groupId>
-    <artifactId>gatling-afterburner</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases><enabled>false</enabled></releases>
-            <snapshots><enabled>true</enabled></snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+    <groupId>perfana.io</groupId>
+    <artifactId>jmeter-afterburner</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
     <properties>
-
         <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
-        <!-- dependency versioning -->
-        <events-jmeter-maven-plugin.version>3.8.0-events-1</events-jmeter-maven-plugin.version>
+        <!-- JMeter and plugin versions -->
+        <events-jmeter-maven-plugin.version>3.8.0-events-3-SNAPSHOT</events-jmeter-maven-plugin.version>
+        <jmeter.version>5.6.3</jmeter.version>
+
+        <!-- Perfana client versions -->
         <perfana-java-client.version>[3.0.0,3.1.0)</perfana-java-client.version>
         <test-events-wiremock.version>[3.0.0,3.1.0)</test-events-wiremock.version>
         <test-events-springboot.version>[3.0.0,3.1.0)</test-events-springboot.version>
         <test-events-test-run-config-command.version>[3.0.0,3.1.0)</test-events-test-run-config-command.version>
         <test-events-command-runner.version>[3.0.0,3.1.0)</test-events-command-runner.version>
 
-        <!-- Perfana url  -->
-        <perfanaUrl>https://demo.perfana.cloud</perfanaUrl>
+        <!-- Perfana configuration -->
+        <!-- <perfanaUrl>http://localhost:3001</perfanaUrl> -->
+        <!-- <perfanaUrl>http://perfana-api:3001</perfanaUrl> -->
+        <perfanaUrl>http://perfana-api.perfana:3001</perfanaUrl>
 
-        <!-- By default Jenkins build Url is used -->
-        <CIBuildResultsUrl>${BUILD_URL}</CIBuildResultsUrl>
-
-        <!-- By default no proxy is used -->
-        <useProxy>false</useProxy>
-
-        <!-- By default debugmode is off -->
+        <!-- Feature toggles -->
         <debug>false</debug>
-
-        <!-- Default graphite namespace -->
-        <graphitePrefix>gatling2.debug</graphitePrefix>
-
-        <!-- Default scenario -->
-        <scenario>acceptance</scenario>
-
-        <!-- By default assert test results -->
         <assertResultsEnabled>true</assertResultsEnabled>
-
-        <!-- By default send data to perfana -->
         <perfanaEnabled>true</perfanaEnabled>
-
-        <!-- By default disable wiremock -->
         <wiremockEnabled>false</wiremockEnabled>
-
-        <!-- By default enable events -->
-        <eventsEnabled>true</eventsEnabled>
-        <eventScheduleScript/>
-
-        <!-- Default load settings -->
-        <initialUsersPerSecond>1</initialUsersPerSecond>
-        <targetConcurrency>1</targetConcurrency>
-        <!-- these are turned into minutes in jmeter script for bmz-Concurrent Thread Group plugin! -->
-        <!-- via: ${__groovy(vars.get("test.rampUp") == null ? 3 : Integer.valueOf(vars.get("test.rampUp")) / 60)} -->
-        <rampupTimeInSeconds>60</rampupTimeInSeconds>
-        <constantLoadTimeInSeconds>900</constantLoadTimeInSeconds>
-
-        <!-- Settings for the Perfana Dashboard -->
-        <systemUnderTest>StarScream</systemUnderTest>
-        <version>1.0</version>
-        <tags/>
-        <apiKey/>
         <wiremockUrl>http://wiremock:8080</wiremockUrl>
-        <influxDbHost>influxdb</influxDbHost>
+        <eventsEnabled>true</eventsEnabled>
 
-        <influxDbUrl>http://influxdb:8086/write?db=jmeter</influxDbUrl>
+        <!-- Event scheduler script -->
+        <eventScheduleScript></eventScheduleScript>
 
+        <!-- JMeter test configuration -->
+        <targetHost>afterburner-fe.acme</targetHost>
+        <targetPort>8080</targetPort>
+        <targetProtocol>http</targetProtocol>
+        <initialThreads>1</initialThreads>
+        <targetThreads>10</targetThreads>
+        <rampupTimeInSeconds>60</rampupTimeInSeconds>
+        <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
+        <!-- Total duration for JMeter ThreadGroup (rampup + constant load) -->
+        <durationInSeconds>360</durationInSeconds>
+
+        <!-- Perfana test run settings -->
+        <systemUnderTest>PerfanaWebshop</systemUnderTest>
+        <sut_version>${SUT_VERSION}</sut_version>
+        <tags>jmeter,spring-boot-kubernetes,jfr,spanmetrics,docker</tags>
+        <apiKey>${apiKey}</apiKey>
+        <influxUrl>http://influxdb.acme:8086</influxUrl>
+
+        <!-- Test file(s) to run (can be overridden via -DtestFile=filename.jmx) -->
+        <!-- For multiple files use wildcard patterns like: webshop-*.jmx -->
+        <testFile>webshop-*.jmx</testFile>
+
+        <!-- Run multiple test files in parallel -->
+        <runTestsInParallel>true</runTestsInParallel>
     </properties>
 
-
     <dependencies>
+        <!-- JMeter core dependencies -->
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>2.7.9</version>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_core</artifactId>
+            <version>${jmeter.version}</version>
+            <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_http</artifactId>
+            <version>${jmeter.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JMeter plugins for extended functionality
+        <dependency>
+            <groupId>kg.apc</groupId>
+            <artifactId>jmeter-plugins-cmn-jmeter</artifactId>
+            <version>0.7</version>
+        </dependency> -->
     </dependencies>
 
     <build>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>io.perfana</groupId>
-                    <artifactId>events-jmeter-maven-plugin</artifactId>
-                    <version>${events-jmeter-maven-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.10</version>
-                <executions>
-                    <execution>
-                        <id>timestamp-property</id>
-                        <goals>
-                            <goal>timestamp-property</goal>
-                        </goals>
-                        <configuration>
-                            <name>build.time</name>
-                            <pattern>yyyyMMdd-HHmmss</pattern>
-                            <timeZone>CET</timeZone>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>io.perfana</groupId>
                 <artifactId>events-jmeter-maven-plugin</artifactId>
+                <version>${events-jmeter-maven-plugin.version}</version>
                 <executions>
-                    <!--- needed to generate target/config.json -->
                     <execution>
                         <id>configuration</id>
                         <goals>
                             <goal>configure</goal>
                         </goals>
                     </execution>
-                    <!-- Run JMeter tests -->
                     <execution>
                         <id>jmeter-tests</id>
                         <goals>
                             <goal>jmeter</goal>
                         </goals>
+                        <phase>integration-test</phase>
                     </execution>
-                    <!-- Fail build on errors in test -->
                     <execution>
-                        <id>jmeter-check-results</id>
+                        <id>verify</id>
                         <goals>
                             <goal>results</goal>
                         </goals>
+                        <phase>verify</phase>
                     </execution>
                 </executions>
                 <configuration>
-                    <errorRateThresholdInPercent>10</errorRateThresholdInPercent>
-                    <propertiesUser>
-                        <test.testRunId>${testRunId}</test.testRunId>
-                        <test.duration>${constantLoadTimeInSeconds}</test.duration>
-                        <test.targetConcurrency>${targetConcurrency}</test.targetConcurrency>
-                        <test.rampUpTime>${rampupTimeInSeconds}</test.rampUpTime>
-                        <test.influxdb.url>${influxDbUrl}</test.influxdb.url>
-                        <test.influxdb.user>${influxDbUser}</test.influxdb.user>
-                        <test.influxdb.password>${influxDbPassword}</test.influxdb.password>
-                        <test.systemUnderTest>${systemUnderTest}</test.systemUnderTest>
-                        <test.testEnvironment>${testEnvironment}</test.testEnvironment>
-                        <test.protocol>${targetProtocol}</test.protocol>
-                        <test.server_name>${targetDomain}</test.server_name>
-                        <test.port>${targetPort}</test.port>
-                    </propertiesUser>
+                    <testFilesDirectory>src/test/jmeter</testFilesDirectory>
+                    <!-- Supports single file, wildcards (webshop-*.jmx), or multiple patterns -->
+                    <testFilesIncluded>
+                        <include>${testFile}</include>
+                    </testFilesIncluded>
+                    <testResultsTimestamp>false</testResultsTimestamp>
+                    <ignoreResultFailures>false</ignoreResultFailures>
+                    <!-- Run multiple test files in parallel -->
+                    <runTestsInParallel>${runTestsInParallel}</runTestsInParallel>
+
+                    <!-- JMeter extensions (custom plugins) -->
                     <jmeterExtensions>
-                        <artifact>kg.apc:jmeter-plugins-casutg:2.9</artifact>
+                        <artifact>io.breakingit:jmeter-timescaledb:1.0.0</artifact>
                     </jmeterExtensions>
-                    <downloadExtensionDependencies>false</downloadExtensionDependencies>
-                    <overrideRootLogLevel>debug</overrideRootLogLevel>
+
+                    <!-- JMeter properties -->
+                    <propertiesJMeter>
+                        <jmeter.save.saveservice.thread_counts>true</jmeter.save.saveservice.thread_counts>
+                        <jmeter.save.saveservice.subresults>true</jmeter.save.saveservice.subresults>
+                    </propertiesJMeter>
+
+                    <!-- User properties passed to JMeter test -->
+                    <propertiesUser>
+                        <HOST>${targetHost}</HOST>
+                        <PORT>${targetPort}</PORT>
+                        <PROTOCOL>${targetProtocol}</PROTOCOL>
+                        <THREADS>${targetThreads}</THREADS>
+                        <RAMP_TIME>${rampupTimeInSeconds}</RAMP_TIME>
+                        <DURATION>${durationInSeconds}</DURATION>
+                        <runId>${testRunId}</runId>
+                        <timescalePassword>${timescalePassword}</timescalePassword>
+                        <timescaleHost>postgresql.perfana</timescaleHost>
+                        <timescaleDatabase>perfana</timescaleDatabase>
+                    </propertiesUser>
+
+                    <!-- Event scheduler configuration -->
                     <eventSchedulerConfig>
-                        <debugEnabled>true</debugEnabled>
+                        <debugEnabled>${debug}</debugEnabled>
                         <schedulerEnabled>${eventsEnabled}</schedulerEnabled>
-                        <failOnError>true</failOnError>
-                        <continueOnEventCheckFailure>true</continueOnEventCheckFailure>
                         <scheduleScript>
                             ${eventScheduleScript}
                         </scheduleScript>
@@ -191,12 +173,7 @@
                             <tags>${tags}</tags>
                         </testConfig>
                         <eventConfigs>
-                            <eventConfig implementation="io.perfana.event.wiremock.WiremockEventConfig">
-                                <name>MyWiremockEvent</name>
-                                <enabled>${wiremockEnabled}</enabled>
-                                <wiremockFilesDir>src/test/resources/wiremock</wiremockFilesDir>
-                                <wiremockUrl>${wiremockUrl}</wiremockUrl>
-                            </eventConfig>
+                            <!-- Perfana event configuration -->
                             <eventConfig implementation="io.perfana.event.PerfanaEventConfig">
                                 <name>PerfanaEvent</name>
                                 <enabled>${perfanaEnabled}</enabled>
@@ -204,15 +181,18 @@
                                 <apiKey>${apiKey}</apiKey>
                                 <assertResultsEnabled>${assertResultsEnabled}</assertResultsEnabled>
                                 <variables>
-                                    <perfana-containers>.*mariadb.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
-                                    <perfana-requests>database_call|flaky_call|remote_call_async</perfana-requests>
-                                    <perfana-pods>${sut-config}.*</perfana-pods>
+                                    <perfana-containers>.*afterburner-db.*|.*${sut-config}-fe.*|.*${sut-config}-be.*</perfana-containers>
+                                    <perfana-pods>optimus-prime.*</perfana-pods>
                                 </variables>
                             </eventConfig>
-                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">
-                                <name>CommandRunnerJMeterPush</name>
-                                <onStartTest>sh -c "./j2i target/jmeter/results -u ${influxUser} -p ${influxPassword} -a ${influxUrl} -b jmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>
-                            </eventConfig>
+
+                            <!-- Command runner to send JMeter results to InfluxDB -->
+<!--                            <eventConfig implementation="io.perfana.events.commandrunner.CommandRunnerEventConfig">-->
+<!--                                <name>CommandRunnerJMeterToInflux</name>-->
+<!--                                <enabled>false</enabled>-->
+<!--                                <onStartTest>sh -c "x2i target/jmeter/results -i jmeter &#45;&#45;stop-timeout 120 &#45;&#45;max-batch-size 100 -a ${influxUrl} -u perfana -p perfana -bjmeter -t ${testEnvironment} -y ${systemUnderTest} -d | awk '{print $2}'"</onStartTest>-->
+<!--                            </eventConfig>-->
+
                             <eventConfig implementation="io.perfana.events.springboot.event.SpringBootEventConfig">
                                 <name>ActuatorEventFrontend</name>
                                 <tags>${sut-config}-fe</tags>
@@ -220,6 +200,7 @@
                                 <actuatorEnvProperties>
                                     java.runtime.version,
                                     JDK_JAVA_OPTIONS,
+                                    afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.connection.request.timeout.millis,
                                     afterburner.remote.call.httpclient.socket.timeout.millis,
                                     afterburner.remote.call.httpclient.connect.timeout.millis,
@@ -243,11 +224,12 @@
                                     afterburner.datasource.employee.maximum-pool-size
                                 </actuatorEnvProperties>
                             </eventConfig>
+                            <!-- Git commit hash event -->
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>GitGetHash</name>
                                 <command>echo "${gitSha}"</command>
                                 <output>key</output>
-                                <key>https://github.com/perfana/perfana-gatling-afterburner</key>
+                                <key>https://github.com/perfana/perfana-demo</key>
                                 <tags>GitHub</tags>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
@@ -268,21 +250,18 @@
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
                                 <name>KubernetesGetDeploymentMySql</name>
-                                <command>kubectl get statefulset afterburner-db-mysql -ojson</command>
+                                <command>kubectl get statefulset afterburner-db-mysql -n acme -ojson</command>
                                 <includes>env,resources,image,replicas,strategy,kubernetes</includes>
-                                <excludes>status,password,secret</excludes>
+                                <excludes>status,password,secret,preferredDuringSchedulingIgnoredDuringExecution</excludes>
                                 <output>keys</output>
                                 <tags>kubernetes,afterburner-db-mysql</tags>
                             </eventConfig>
                         </eventConfigs>
                     </eventSchedulerConfig>
                 </configuration>
+
+                <!-- Plugin dependencies for Perfana integration -->
                 <dependencies>
-                    <dependency>
-                        <groupId>io.perfana</groupId>
-                        <artifactId>test-events-wiremock</artifactId>
-                        <version>${test-events-wiremock.version}</version>
-                    </dependency>
                     <dependency>
                         <groupId>io.perfana</groupId>
                         <artifactId>perfana-java-client</artifactId>
@@ -303,262 +282,96 @@
                         <artifactId>test-events-command-runner</artifactId>
                         <version>${test-events-command-runner.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>io.perfana</groupId>
+                        <artifactId>test-events-wiremock</artifactId>
+                        <version>${test-events-wiremock.version}</version>
+                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>
     </build>
 
-
-    <!-- ************************************************************************ ==
-    == Below we have defined three sets of profiles, which control the type of    ==
-    == test that will be run and the targeted testEnvironment.                        ==
-    == If you wish to run a stress test on acceptance, use:                       ==
-    == mvn perfana-gatling:integration-test -Ptest-type-stress,test-env-acc       ==
-    == ************************************************************************ -->
-
     <profiles>
-
-        <!-- Test testEnvironment profiles -->
-
+        <!-- Environment profiles -->
         <profile>
-            <id>test-env-local</id>
+            <id>test-env-acme</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <targetBaseUrl>http://localhost:8080</targetBaseUrl>
-                <testEnvironment>local</testEnvironment>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test-env-tst</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <targetBaseUrl>https://tst.example.com</targetBaseUrl>
-                <testEnvironment>tst</testEnvironment>
-            </properties>
-        </profile>
-
-
-        <profile>
-            <id>test-env-acc</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <server_name>optimus-prime-fe</server_name>
-                <port>8080</port>
-                <testEnvironment>acme</testEnvironment>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test-env-demo</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <testEnvironment>acme</testEnvironment>
             </properties>
         </profile>
-
-        <profile>
-            <id>kubernetes</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <perfanaUrl>http://perfana.perfana.svc.cluster.local</perfanaUrl>
-                <wiremockUrl>http://wiremock.perfana.svc.cluster.local:8080</wiremockUrl>
-                <influxDbHost>influxdb.perfana.svc.cluster.local</influxDbHost>
-            </properties>
-        </profile>
-
 
         <!-- Test type profiles -->
-
-        <profile>
-            <id>test-type-stress</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <workload>stressTest</workload>
-                <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>30</targetConcurrency>
-                <!-- these actually are minutes when injected into jmeter bmz-Concurrent Thread Group plugin! -->
-                <rampupTimeInSeconds>30</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>1</constantLoadTimeInSeconds>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <tags>stress-test,micro-service</tags>
-            </properties>
-        </profile>
-
         <profile>
             <id>test-type-load</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <workload>loadTest</workload>
-                <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>10</targetConcurrency>
+                <initialThreads>1</initialThreads>
+                <targetThreads>10</targetThreads>
                 <rampupTimeInSeconds>60</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>240</constantLoadTimeInSeconds>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-                <eventsEnabled>true</eventsEnabled>
-                <eventScheduleScript>
-                    PT0S|wiremock-change-delay(delay=400)|delay=400
-                </eventScheduleScript>
-                <tags>spring-boot-kubernetes,kubernetes,jmeter</tags>
+                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
+                <!-- Total duration = rampup + constant load = 60 + 300 = 360 -->
+                <durationInSeconds>360</durationInSeconds>
             </properties>
         </profile>
 
         <profile>
-            <id>test-type-slow-backend</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <id>test-type-stress</id>
             <properties>
-                <scenario>slowbackend</scenario>
-                <workload>slowBackendTest</workload>
-                <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>2</targetConcurrency>
-                <rampupTimeInSeconds>60</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
-                <perfanaEnabled>true</perfanaEnabled>
-                <wiremockEnabled>true</wiremockEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.timestamp}</testRunId>
-                <graphitePrefix>gatling2</graphitePrefix>
-                <eventsEnabled>true</eventsEnabled>
-                <eventScheduleScript>
-                    PT0S|wiremock-change-delay(delay=400)|delay=400
-                    PT1M|wiremock-change-delay(delay=2000)|delay=2000
-                    PT2M|wiremock-change-delay(delay=4000)|delay=4000
-                    PT3M|wiremock-change-delay(delay=8000)|delay=8000
-                    PT4M|wiremock-change-delay(delay=12000)|delay=12000
-                    PT5M|wiremock-change-delay(delay=400)|delay=400
-                </eventScheduleScript>
-                <tags>load-test,micro-service</tags>
+                <workload>stressTest</workload>
+                <initialThreads>1</initialThreads>
+                <targetThreads>50</targetThreads>
+                <rampupTimeInSeconds>120</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>600</constantLoadTimeInSeconds>
+                <!-- Total duration = 120 + 600 = 720 -->
+                <durationInSeconds>720</durationInSeconds>
             </properties>
         </profile>
 
         <profile>
             <id>test-type-endurance</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
             <properties>
                 <workload>enduranceTest</workload>
-                <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>60</targetConcurrency>
-                <rampupTimeInSeconds>900</rampupTimeInSeconds>
-                <constantLoadTimeInSeconds>172800</constantLoadTimeInSeconds>
-                <perfanaEnabled>true</perfanaEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <graphitePrefix>gatling2</graphitePrefix>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test-type-nightly</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <workload>nightlyLoadTest</workload>
-                <initialUsersPerSecond>1</initialUsersPerSecond>
-                <targetConcurrency>40</targetConcurrency>
-                <rampupTimeInSeconds>600</rampupTimeInSeconds>
+                <initialThreads>1</initialThreads>
+                <targetThreads>20</targetThreads>
+                <rampupTimeInSeconds>300</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>3600</constantLoadTimeInSeconds>
-                <perfanaEnabled>true</perfanaEnabled>
-                <assertResultsEnabled>true</assertResultsEnabled>
-                <testRunId>${systemUnderTest}-${version}-${workload}-${testEnvironment}-${build.time}</testRunId>
-                <graphitePrefix>gatling2.nightly</graphitePrefix>
+                <!-- Total duration = 300 + 3600 = 3900 -->
+                <durationInSeconds>3900</durationInSeconds>
             </properties>
         </profile>
-
-        <!-- Scenarios-->
 
         <profile>
-            <id>acceptance</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
+            <id>test-type-spike</id>
             <properties>
-                <scenario>acceptance</scenario>
+                <workload>spikeTest</workload>
+                <initialThreads>1</initialThreads>
+                <targetThreads>100</targetThreads>
+                <rampupTimeInSeconds>10</rampupTimeInSeconds>
+                <constantLoadTimeInSeconds>180</constantLoadTimeInSeconds>
+                <!-- Total duration = 10 + 180 = 190 -->
+                <durationInSeconds>190</durationInSeconds>
             </properties>
         </profile>
-
-
-
-
-        <!-- This profile can be used to run the script in debug mode. This results in running the "debug" scenario and results are pushed to debug namespace in Graphite  -->
-        <profile>
-            <id>debug</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <debug>true</debug>
-                <perfanaEnabled>false</perfanaEnabled>
-                <graphitePrefix>gatling2.debug</graphitePrefix>
-                <scenario>debug</scenario>
-                <perfanaUrl>http://localhost:4000</perfanaUrl>
-            </properties>
-        </profile>
-
-
-        <!-- This profile can be used to route the traffic through a proxy for debugging  -->
-        <profile>
-            <id>proxy</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <useProxy>true</useProxy>
-            </properties>
-        </profile>
-
-
-
-        <!-- This profile can be used to trigger the assertions  to assert test run results from the pipeline   -->
-        <profile>
-            <id>assert-results</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <assertResultsEnabled>true</assertResultsEnabled>
-            </properties>
-        </profile>
-
-        <!-- This profile can be used in a distributed test -->
-        <profile>
-            <id>distributed-test</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <graphitePrefix>gatling2.${hostname}</graphitePrefix>
-            </properties>
-        </profile>
-
-        <!-- This profile can be used to set the script as slave script in a distributed test -->
-        <profile>
-            <id>is-slave-script</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <perfanaEnabled>false</perfanaEnabled>
-            </properties>
-        </profile>
-
     </profiles>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
 </project>

@@ -10,9 +10,10 @@ on:
       systemUnderTest:
         description: 'System Under Test'
         required: true
-        default: 'OptimusPrime'
+        default: 'PerfanaWebshop'
         type: choice
         options:
+          - PerfanaWebshop
           - OptimusPrime
           - JetFire
           - BumbleBee
@@ -38,7 +39,7 @@ on:
       tool:
         description: 'Load test tool'
         required: true
-        default: 'gatling'
+        default: 'jmeter'
         type: choice
         options:
           - gatling
