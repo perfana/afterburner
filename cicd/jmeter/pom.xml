@@ -54,7 +54,7 @@
         <!-- Perfana test run settings -->
         <systemUnderTest>PerfanaWebshop</systemUnderTest>
         <sut_version>${SUT_VERSION}</sut_version>
-        <tags>jmeter,spring-boot-kubernetes,jfr,spanmetrics,docker</tags>
+        <tags>jmeter,spring-boot-kubernetes,jfr,spanmetrics,docker,kubernetes</tags>
         <apiKey>${apiKey}</apiKey>
         <influxUrl>http://influxdb.acme:8086</influxUrl>
 
