@@ -34,7 +34,7 @@ public class CpuBurner {
         this.tracer = tracer;
     }
 
-    @Operation(summary = "Spend some time on CPU doing some magik matrix calculations.")
+    @Operation(summary = "Spend some time on CPU doing some magic matrix calculations.")
     @GetMapping("/cpu/magic-identity-check")
     public BurnerMessage magicIdentityCheck(
             @RequestParam(value = "matrixSize", defaultValue = "10") int matrixSize) throws InvalidMatrixException {
