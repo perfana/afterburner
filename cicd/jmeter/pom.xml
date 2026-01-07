@@ -257,9 +257,38 @@
                                 <tags>kubernetes,afterburner-db-mysql</tags>
                             </eventConfig>
                             <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
-                                <name>TestRunConfig</name>
-                                <command>echo '{"initialThreads":"${initialThreads}","targetThreads":"${targetThreads}","rampupTimeInSeconds":"${rampupTimeInSeconds}","constantLoadTimeInSeconds":"${constantLoadTimeInSeconds}","durationInSeconds":"${durationInSeconds}"}'</command>
-                                <output>keys</output>
+                                <name>InitialThreads</name>
+                                <command>echo "${initialThreads}"</command>
+                                <output>key</output>
+                                <key>initialThreads</key>
+                                <tags>jmeter,loadtest</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>TargetThreads</name>
+                                <command>echo "${targetThreads}"</command>
+                                <output>key</output>
+                                <key>targetThreads</key>
+                                <tags>jmeter,loadtest</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>RampupTime</name>
+                                <command>echo "${rampupTimeInSeconds}"</command>
+                                <output>key</output>
+                                <key>rampupTimeInSeconds</key>
+                                <tags>jmeter,loadtest</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>ConstantLoadTime</name>
+                                <command>echo "${constantLoadTimeInSeconds}"</command>
+                                <output>key</output>
+                                <key>constantLoadTimeInSeconds</key>
+                                <tags>jmeter,loadtest</tags>
+                            </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>Duration</name>
+                                <command>echo "${durationInSeconds}"</command>
+                                <output>key</output>
+                                <key>durationInSeconds</key>
                                 <tags>jmeter,loadtest</tags>
                             </eventConfig>
                         </eventConfigs>
