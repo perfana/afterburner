@@ -256,6 +256,12 @@
                                 <output>keys</output>
                                 <tags>kubernetes,afterburner-db-mysql</tags>
                             </eventConfig>
+                            <eventConfig implementation="io.perfana.events.testrunconfigcommand.TestRunConfigCommandEventConfig">
+                                <name>TestRunConfig</name>
+                                <command>echo '{"initialThreads":"${initialThreads}","targetThreads":"${targetThreads}","rampupTimeInSeconds":"${rampupTimeInSeconds}","constantLoadTimeInSeconds":"${constantLoadTimeInSeconds}","durationInSeconds":"${durationInSeconds}"}'</command>
+                                <output>keys</output>
+                                <tags>jmeter,loadtest</tags>
+                            </eventConfig>
                         </eventConfigs>
                     </eventSchedulerConfig>
                 </configuration>
@@ -313,7 +319,7 @@
             <properties>
                 <workload>loadTest</workload>
                 <initialThreads>1</initialThreads>
-                <targetThreads>10</targetThreads>
+                <targetThreads>2</targetThreads>
                 <rampupTimeInSeconds>60</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <!-- Total duration = rampup + constant load = 60 + 300 = 360 -->
