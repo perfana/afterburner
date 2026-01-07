@@ -348,7 +348,7 @@
             <properties>
                 <workload>loadTest</workload>
                 <initialThreads>1</initialThreads>
-                <targetThreads>2</targetThreads>
+                <targetThreads>5</targetThreads>
                 <rampupTimeInSeconds>60</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>300</constantLoadTimeInSeconds>
                 <!-- Total duration = rampup + constant load = 60 + 300 = 360 -->
