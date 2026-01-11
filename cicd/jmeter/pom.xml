@@ -352,7 +352,7 @@
                 <rampupTimeInSeconds>60</rampupTimeInSeconds>
                 <constantLoadTimeInSeconds>600</constantLoadTimeInSeconds>
                 <!-- Total duration = rampup + constant load = 60 + 300 = 360 -->
-                <durationInSeconds>360</durationInSeconds>
+                <durationInSeconds>660</durationInSeconds>
             </properties>
         </profile>
 
