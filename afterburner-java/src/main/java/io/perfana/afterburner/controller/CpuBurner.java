@@ -41,9 +41,9 @@ public class CpuBurner {
 
         long startTime = System.currentTimeMillis();
 
-        // some variation: is more fun!
-        int funSize = (int) (matrixSize * (1.0 + (random.nextDouble() * 3)));
-        log.info("Calculate magic matrix identity for matrix size [{}].", funSize);
+        // no variation: is no fun!
+        int funSize = matrixSize;
+        log.info("Calculate magik matrix identity for matrix size [{}].", funSize);
 
         long[][] simpleMagicSquare;
         long[][] identitySquare;
