@@ -43,7 +43,7 @@ public class CpuBurner {
 
         // no variation: is no fun!
         int funSize = matrixSize;
-        log.info("Calculate magic matrix identity for matrix size [{}].", funSize);
+        log.info("Calculate magik matrix identity for matrix size [{}].", funSize);
 
         long[][] simpleMagicSquare;
         long[][] identitySquare;
